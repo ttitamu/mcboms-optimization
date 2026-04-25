@@ -1,0 +1,16 @@
+# Run script for worked example
+# Usage: ampl worked_example.run
+
+reset;
+model worked_example.mod;
+
+option solver cplex;
+option cplex_options 'mipdisplay=2';
+
+solve;
+
+display PWF;
+display B_safety_year;
+display B_safety_PV;
+display NetBenefit;
+display x;

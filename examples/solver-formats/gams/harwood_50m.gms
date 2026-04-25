@@ -1,14 +1,22 @@
-$TITLE MCBOMs Project-Level MILP - Harwood 50M
+$TITLE Harwood (2003) Case Study - $50M budget
 $ONTEXT
-   Harwood et al. (2003) case study, 50M dollar budget
-   Mathematical formulation per Chapter 2 of MCBOMs Task 4 report.
-   Maximize total net benefit subject to a budget and at most one
-   alternative per project.
+   Reference: Harwood, Rabbani, Richard (2003), TRR 1840, Tables 2 and 3
+   10-site case study, mix of rural and urban undivided/divided 2- and
+   4-lane nonfreeway facilities.
+
+   Eq 2.2 - total benefit aggregation: B_total = PSB + PTOB
+   Eq 2.4 - objective: max sum (Benefit - Cost_disc) * x
+   Cost_disc (Harwood-style) = SafetyImprovementCost only;
+   total budget uses ResurfacingCost + SafetyImprovementCost.
+
+   PSB and PTOB taken directly from Harwood Tables 2 and 3 (paper-faithful).
+   The Eq 2.18 per-severity computation that produces PSB internally is
+   demonstrated in worked_example.gms.
 $OFFTEXT
 
 Sets
-   i        projects                 / 1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 , 10 /
-   j        alternatives             / 0 , 1 , 2 /
+   i    projects     / 1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 , 10 /
+   j    alternatives / 0 , 1 , 2 /
    ;
 
 Set ij(i,j)  valid project-alternative pairs /
@@ -35,71 +43,126 @@ Set ij(i,j)  valid project-alternative pairs /
    10 . 1
    /;
 
-Scalar B_total  total budget / 50000000 /;
+Scalar B_total   total budget USD / 50000000 /;
 
 Parameters
-   Benefit(i,j)  PV total benefit /
-   1 . 0   0
-   1 . 1   35107
-   2 . 0   0
-   2 . 1   399756
-   3 . 0   0
-   3 . 1   1188606
-   4 . 0   0
-   4 . 1   834008
-   5 . 0   0
-   5 . 1   1408618
-   6 . 0   0
-   6 . 1   901437
-   7 . 0   0
-   7 . 1   1040641
-   8 . 0   0
-   8 . 1   705644
-   8 . 2   1270056
-   9 . 0   0
-   9 . 1   1153238
-   10 . 0   0
-   10 . 1   2409442
-   /;
-
-Parameter Cost(i,j)  PV total cost /
+   ResurfacingCost(i,j)     'committed component'  /
    1 . 0   0
    1 . 1   528803
    2 . 0   0
-   2 . 1   639763
+   2 . 1   519763
    3 . 0   0
-   3 . 1   1381621
+   3 . 1   821621
    4 . 0   0
-   4 . 1   1047816
+   4 . 1   475200
    5 . 0   0
-   5 . 1   1420017
+   5 . 1   1180017
    6 . 0   0
-   6 . 1   3068549
+   6 . 1   2508549
    7 . 0   0
-   7 . 1   1863237
+   7 . 1   1503237
    8 . 0   0
-   8 . 1   1578989
-   8 . 2   2078989
+   8 . 1   1398989
+   8 . 2   1398989
    9 . 0   0
-   9 . 1   1701302
+   9 . 1   1365302
    10 . 0   0
-   10 . 1   2541150
+   10 . 1   1488369
    /;
 
-* ----------------------------------------------------------------
-* Variables
-* ----------------------------------------------------------------
-Binary Variable x(i,j)   alternative selection;
-Variable Z               total net benefit;
+Parameter SafetyImprovementCost(i,j)  'discretionary component' /
+   1 . 0   0
+   1 . 1   0
+   2 . 0   0
+   2 . 1   120000
+   3 . 0   0
+   3 . 1   560000
+   4 . 0   0
+   4 . 1   572616
+   5 . 0   0
+   5 . 1   240000
+   6 . 0   0
+   6 . 1   560000
+   7 . 0   0
+   7 . 1   360000
+   8 . 0   0
+   8 . 1   180000
+   8 . 2   680000
+   9 . 0   0
+   9 . 1   336000
+   10 . 0   0
+   10 . 1   1052781
+   /;
+
+Parameter PSB(i,j)  'safety benefit (PV)' /
+   1 . 0   0
+   1 . 1   0
+   2 . 0   0
+   2 . 1   328176
+   3 . 0   0
+   3 . 1   1094909
+   4 . 0   0
+   4 . 1   775629
+   5 . 0   0
+   5 . 1   1355589
+   6 . 0   0
+   6 . 1   808637
+   7 . 0   0
+   7 . 1   947234
+   8 . 0   0
+   8 . 1   555526
+   8 . 2   1119938
+   9 . 0   0
+   9 . 1   1071895
+   10 . 0   0
+   10 . 1   2329256
+   /;
+
+Parameter PTOB(i,j)  'operational benefit (PV)' /
+   1 . 0   0
+   1 . 1   35107
+   2 . 0   0
+   2 . 1   71580
+   3 . 0   0
+   3 . 1   93697
+   4 . 0   0
+   4 . 1   58379
+   5 . 0   0
+   5 . 1   53029
+   6 . 0   0
+   6 . 1   92800
+   7 . 0   0
+   7 . 1   93407
+   8 . 0   0
+   8 . 1   150118
+   8 . 2   150118
+   9 . 0   0
+   9 . 1   81343
+   10 . 0   0
+   10 . 1   80186
+   /;
+
+* Derived: Benefit, Cost, Cost_disc
+Parameter Benefit(i,j);
+Benefit(i,j) = PSB(i,j) + PTOB(i,j);
+
+Parameter Cost(i,j);
+Cost(i,j) = ResurfacingCost(i,j) + SafetyImprovementCost(i,j);
+
+Parameter Cost_disc(i,j);
+Cost_disc(i,j) = SafetyImprovementCost(i,j);
+
+Binary Variable x(i,j);
+Variable Z                  'total net benefit';
 
 Equations
-   Objective              objective function (Eq 2.4)
-   TotalBudget            total budget constraint (Eq 2.5)
-   MutualExclusivity(i)   at most one alt per project (Eq 2.6)
+   Objective                'Eq 2.4'
+   TotalBudget              'Eq 2.5'
+   MutualExclusivity(i)     'Eq 2.6'
    ;
 
 Objective ..
-   Z =E= sum(ij(i,j), (Benefit(i,j) - Cost(i,j)) * x(i,j));
+   Z =E= sum(ij(i,j), (Benefit(i,j) - Cost_disc(i,j)) * x(i,j));
 
 TotalBudget ..
    sum(ij(i,j), Cost(i,j) * x(i,j)) =L= B_total;
@@ -107,8 +170,7 @@ TotalBudget ..
 MutualExclusivity(i) ..
    sum(ij(i,j), x(i,j)) =L= 1;
 
-Model mcboms / all /;
-
-Solve mcboms using MIP maximizing Z;
+Model harwood / all /;
+Solve harwood using MIP maximizing Z;
 
 Display Z.l, x.l;

@@ -140,11 +140,16 @@ For reviewers working in standard MILP modeling environments rather than Python,
 - GAMS (`.gms`) — combined model and data, single-file
 - LP (`.lp`) — solver-native, fully self-contained instance
 
-Each format contains all three validation instances:
+Each format contains four instances:
 
-- `harwood_50m` — Harwood at $50M budget
-- `harwood_10m` — Harwood at $10M budget
-- `banihashemi_intersections` — Banihashemi intersection sub-problem
+- `worked_example` — Single-segment safety-only example with the **full Eq 2.18 chain** declared parametrically (severity disaggregation, CMF application, present-worth conversion). Demonstrates how raw inputs become benefit values.
+- `harwood_50m` — Harwood at $50M budget. Uses published per-site values from Tables 2 and 3 (PSB and PTOB) with the Chapter 2 aggregation (Eq 2.2) and discretionary-cost objective (Section 2.2.1).
+- `harwood_10m` — Harwood at $10M budget.
+- `banihashemi_intersections` — 13-intersection sub-problem with the **full Banihashemi Eq 15 (IHSDM CPM)** declared parametrically, including AMF computation from raw skew, control, LTL, and ISD inputs.
+
+LP files have been validated by solving with CBC; objective values match the Python implementation to the cent.
+
+See `examples/solver-formats/README.md` for run instructions and expected results per instance.
 
 ## Mathematical Formulation (Summary)
 

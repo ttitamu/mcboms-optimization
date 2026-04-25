@@ -1,18 +1,13 @@
-# AMPL run script for MCBOMs validation instances
-#
-# Usage:
-#   ampl harwood_50m.run
-#   ampl harwood_10m.run
-#   ampl banihashemi_intersections.run
-#
-# Requires a MILP solver (CPLEX, Gurobi, CBC, etc.). Tested with CPLEX 22.
+# Run script for Harwood $50M instance
+# Usage: ampl harwood_50m.run
+# Expected result: net benefit $6,159,517 (matches Harwood Table 4)
 
 reset;
-model mcboms.mod;
+model harwood.mod;
 data harwood_50m.dat;
 
 option solver cplex;
-option cplex_options 'mipdisplay=2 timing=1';
+option cplex_options 'mipdisplay=2';
 
 solve;
 

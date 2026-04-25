@@ -1,21 +1,19 @@
-# AMPL run script for MCBOMs validation instances
-#
-# Usage:
-#   ampl harwood_50m.run
-#   ampl harwood_10m.run
-#   ampl banihashemi_intersections.run
-#
-# Requires a MILP solver (CPLEX, Gurobi, CBC, etc.). Tested with CPLEX 22.
+# Run script for Banihashemi intersection sub-problem
+# Usage: ampl banihashemi_intersections.run
+# Computes IHSDM CPM crash predictions and (crash + delay) costs
+# parametrically; selects intersection improvements that maximize net benefit.
 
 reset;
-model mcboms.mod;
+model banihashemi_intersections.mod;
 data banihashemi_intersections.dat;
 
 option solver cplex;
-option cplex_options 'mipdisplay=2 timing=1';
+option cplex_options 'mipdisplay=2';
 
 solve;
 
+display PWF;
+display Crashes_per_year;
+display Total_Cost_20yr;
 display NetBenefit;
-display sum {i in PROJECTS, j in ALTERNATIVES[i]} Cost[i,j] * x[i,j];
 display {i in PROJECTS, j in ALTERNATIVES[i]: x[i,j] > 0.5} x[i,j];
