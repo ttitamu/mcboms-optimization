@@ -1,0 +1,113 @@
+site_name: MCBOMs Documentation
+site_description: Multidisciplinary Cost-Benefit Optimization Models — FHWA Contract HRSO20240009PR
+site_author: Texas A&M Transportation Institute
+site_url: https://sa-ameen.github.io/mcboms-optimization/
+
+repo_name: sa-ameen/mcboms-optimization
+repo_url: https://github.com/sa-ameen/mcboms-optimization
+edit_uri: edit/main/docs/
+
+copyright: Texas A&M Transportation Institute • FHWA Contract HRSO20240009PR
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/sa-ameen/mcboms-optimization
+
+nav:
+  - Home: index.md
+  - Overview: overview.md
+  - Mathematical Formulation:
+      - formulation/index.md
+      - Project-Level MILP: formulation/project-level.md
+      - Network-Level Extensions: formulation/network-level.md
+      - Safety Benefit (Eq 2.18): formulation/safety.md
+      - Operational Benefit (Eq 2.21): formulation/operations.md
+      - Corridor Condition Benefit (Eq 2.27): formulation/ccm.md
+      - Chapter 2 (Full PDF): formulation/chapter2.md
+  - Mathematical Models:
+      - models/index.md
+      - AMPL: models/ampl.md
+      - GAMS: models/gams.md
+      - LP Format: models/lp.md
+  - Validation:
+      - validation/index.md
+      - Worked Example: validation/worked-example.md
+      - Harwood (2003): validation/harwood.md
+      - Banihashemi (2007): validation/banihashemi.md
+  - Python Implementation:
+      - python/index.md
+      - Installation: python/installation.md
+      - Architecture: python/architecture.md
+      - Extending the Framework: python/extending.md
+  - Reference:
+      - reference/index.md
+      - Default Parameters: reference/parameters.md
+      - Validation Status: reference/status.md
+      - Troubleshooting: reference/troubleshooting.md
+      - Glossary: reference/glossary.md
+      - References: reference/references.md
+      - Harwood (2003) Methodology Notes: Harwood_2003_Methodology_Reference.md
