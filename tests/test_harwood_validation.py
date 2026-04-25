@@ -156,36 +156,58 @@ class TestHarwoodValidation50M:
         assert abs(actual_safety_cost - expected_totals["total_safety_cost"]) < 10
         assert abs(actual_benefit - expected_totals["total_benefit"]) < 10
     
-    @pytest.mark.skip(reason="MCBOMs optimizer not yet implemented with benefit calculations")
     def test_mcboms_matches_harwood_50m(self, expected_totals):
-        """Test MCBOMs optimization matches Harwood $50M results."""
+        """Test MCBOMs optimization reproduces Harwood's published $50M result.
+
+        Per MCBOMs Formulation Specification Section 8.1 (Level 2a), the $50M
+        case is the RIGOROUS validation: the MCBOMs optimizer run on Harwood's
+        published per-site cost and benefit values must reproduce Harwood's
+        published totals within rounding. At $50M the budget does not bind, so
+        PNR/PRP (which are disabled in our prototype per spec Section 7.3)
+        would not change the selected alternatives anyway.
+        """
+        import pandas as pd
         from mcboms.core import Optimizer
-        from mcboms.io import load_harwood_sites
-        
-        sites = load_harwood_sites()
-        # TODO: Generate alternatives with proper costs/benefits
-        
+        from mcboms.data.harwood_alternatives import (
+            get_harwood_alternatives,
+            get_expected_solution_50m,
+        )
+
+        alternatives = get_harwood_alternatives()
+        sites = pd.DataFrame({"site_id": sorted(alternatives["site_id"].unique())})
+
         optimizer = Optimizer(
             sites=sites,
-            alternatives=None,  # TODO
+            alternatives=alternatives,
             budget=50_000_000,
-            discount_rate=0.04,  # Harwood uses 4%
+            discount_rate=0.04,  # Harwood uses 4% (AASHTO 1977)
+            analysis_horizon=20,
+            verbose=False,
         )
-        
         result = optimizer.solve()
-        
-        # Validate within 5% tolerance
-        tolerance = 0.05
-        
-        assert abs(result.total_cost - expected_totals["total_resurfacing_cost"] - 
-                  expected_totals["total_safety_cost"]) / (
-                      expected_totals["total_resurfacing_cost"] + 
-                      expected_totals["total_safety_cost"]
-                  ) < tolerance, "Total cost outside 5% tolerance"
-        
-        assert abs(result.total_benefit - expected_totals["total_benefit"]) / (
-            expected_totals["total_benefit"]
-        ) < tolerance, "Total benefit outside 5% tolerance"
+
+        # Totals must match to within 1% (actually expected to be exact
+        # modulo rounding in Harwood's published values)
+        assert abs(result.total_benefit - expected_totals["total_benefit"]) \
+            / expected_totals["total_benefit"] < 0.01, \
+            f"Total benefit outside 1%: got ${result.total_benefit:,.0f}, " \
+            f"expected ${expected_totals['total_benefit']:,.0f}"
+
+        assert abs(result.net_benefit - expected_totals["net_benefit"]) \
+            / expected_totals["net_benefit"] < 0.01, \
+            f"Net benefit outside 1%: got ${result.net_benefit:,.0f}, " \
+            f"expected ${expected_totals['net_benefit']:,.0f}"
+
+        # All 10 sites must select the alternative Harwood selected in Table 2
+        expected_sel = get_expected_solution_50m()["selected_alternatives"]
+        actual_sel = dict(zip(
+            result.selected_alternatives["site_id"],
+            result.selected_alternatives["alt_id"],
+        ))
+        for site_id in range(1, 11):
+            assert actual_sel.get(site_id) == expected_sel[site_id], \
+                f"Site {site_id}: MCBOMs picked alt {actual_sel.get(site_id)}, " \
+                f"Harwood Table 2 shows alt {expected_sel[site_id]}"
 
 
 @pytest.mark.validation
@@ -230,35 +252,63 @@ class TestHarwoodValidation10M:
         
         assert set(do_nothing) == expected_totals["do_nothing_sites"]
     
-    @pytest.mark.skip(reason="MCBOMs optimizer not yet implemented with benefit calculations")
-    def test_mcboms_matches_harwood_10m(self, expected_totals):
-        """Test MCBOMs optimization matches Harwood $10M results."""
+    def test_mcboms_10m_divergence_documented(self, expected_totals):
+        """Verify MCBOMs $10M result diverges from Harwood AS EXPECTED per spec.
+
+        Per MCBOMs Formulation Specification Section 7.3, the PNR deferral-
+        penalty mechanism is deliberately not implemented. Consequently, at
+        the $10M budget (where deferral of sites matters), MCBOMs will find
+        a strictly net-benefit-superior solution that skips DIFFERENT sites
+        than Harwood's published $10M solution.
+
+        This test asserts:
+          1. The divergence exists (we are not accidentally reproducing PNR)
+          2. MCBOMs finds a net-benefit-SUPERIOR solution (if it were lower,
+             that would indicate a bug)
+          3. The budget constraint is still satisfied
+        """
+        import pandas as pd
         from mcboms.core import Optimizer
-        from mcboms.io import load_harwood_sites
-        
-        sites = load_harwood_sites()
-        
+        from mcboms.data.harwood_alternatives import get_harwood_alternatives
+
+        alternatives = get_harwood_alternatives()
+        sites = pd.DataFrame({"site_id": sorted(alternatives["site_id"].unique())})
+
         optimizer = Optimizer(
             sites=sites,
-            alternatives=None,  # TODO
+            alternatives=alternatives,
             budget=10_000_000,
             discount_rate=0.04,
+            analysis_horizon=20,
+            verbose=False,
         )
-        
         result = optimizer.solve()
-        
-        # Check do-nothing sites match
-        do_nothing_sites = set(
+
+        # Budget constraint must be satisfied
+        assert result.total_cost <= 10_000_000, \
+            f"Budget violated: ${result.total_cost:,.0f} > $10,000,000"
+
+        # MCBOMs should find a superior (>=) net benefit solution because
+        # we are not carrying Harwood's deferral penalty
+        assert result.net_benefit >= expected_totals["net_benefit"], \
+            f"MCBOMs net benefit (${result.net_benefit:,.0f}) is LOWER than " \
+            f"Harwood's published value (${expected_totals['net_benefit']:,.0f}). " \
+            f"This suggests a regression -- without PNR, MCBOMs should find a " \
+            f"solution at least as good as Harwood's."
+
+        # The do-nothing set should differ from Harwood's {4, 6, 9} because
+        # we are not forced to fund the same sites Harwood's PNR forced
+        actual_do_nothing = set(
             result.selected_alternatives[
                 result.selected_alternatives["alt_id"] == 0
             ]["site_id"].tolist()
         )
-        
-        assert do_nothing_sites == expected_totals["do_nothing_sites"], \
-            f"Do-nothing sites mismatch: got {do_nothing_sites}, expected {expected_totals['do_nothing_sites']}"
-        
-        # Check budget constraint satisfied
-        assert result.total_cost <= 10_000_000, "Budget constraint violated"
+        # If someday someone re-enables a principled PNR mechanism, this
+        # assertion will (correctly) fail and the test should be updated.
+        assert actual_do_nothing != expected_totals["do_nothing_sites"], \
+            "MCBOMs $10M do-nothing set matches Harwood's exactly. Either " \
+            "PNR has been re-enabled (update this test) or the optimizer " \
+            "happens to find Harwood's solution by coincidence (investigate)."
 
 
 class TestEconomicCalculations:

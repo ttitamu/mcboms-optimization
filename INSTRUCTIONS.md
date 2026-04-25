@@ -72,7 +72,8 @@ MCBOMs HARWOOD (2003) VALIDATION
 ======================================================================
 Validating optimizer against benchmark results from:
   Harwood et al. (2003). Systemwide optimization of safety
-  improvements for R3 projects. TRR 1840, pp. 148-157.
+  improvements for resurfacing, restoration, or rehabilitation
+  (RRR) projects. TRR 1840, pp. 148-157.
 
 ----------------------------------------------------------------------
 STEP 1: Loading Data
@@ -100,11 +101,13 @@ STEP 2: Optimization - $50M Budget (Unconstrained)
 ======================================================================
 VALIDATION SUMMARY
 ======================================================================
-  Tests passed: 6/6
+  Level 2a (rigorous) result: 4/4 checks passed
 
   ╔════════════════════════════════════════════════════════════════╗
   ║  ✓ VALIDATION SUCCESSFUL                                       ║
-  ║    MCBOMs optimizer matches Harwood (2003) benchmark results   ║
+  ║    MCBOMs reproduces Harwood (2003) $50M published results.    ║
+  ║    $10M divergence is documented methodological choice per     ║
+  ║    formulation spec Section 7.3.                               ║
   ╚════════════════════════════════════════════════════════════════╝
 ```
 

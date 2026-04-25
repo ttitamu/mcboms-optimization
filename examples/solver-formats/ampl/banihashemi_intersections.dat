@@ -1,0 +1,119 @@
+# Banihashemi (2007) intersection sub-problem instance
+# 13 intersections, 43 alternatives total
+# Reproduced from Banihashemi Table 3 with IHSDM CPM (Eq. 15)
+# AMFs: standard IHSDM/Vogt-Bared values (Banihashemi's exact values not published)
+# Costs from Banihashemi page 114; delay cost $12.50/veh-hr; 20-year project lifetime
+
+data;
+
+param B_total := 12000000;   # unconstrained budget for sub-problem; tighten as needed
+
+set PROJECTS := 1 2 3 4 5 6 7 8 9 10 11 12 13;
+
+set ALTERNATIVES[1] := 0 1 2 3;
+set ALTERNATIVES[2] := 0 1 2 3;
+set ALTERNATIVES[3] := 0 1;
+set ALTERNATIVES[4] := 0 1;
+set ALTERNATIVES[5] := 0 1 2 3;
+set ALTERNATIVES[6] := 0 1 2 3;
+set ALTERNATIVES[7] := 0 1 2 3;
+set ALTERNATIVES[8] := 0 1;
+set ALTERNATIVES[9] := 0 1 2 3;
+set ALTERNATIVES[10] := 0 1;
+set ALTERNATIVES[11] := 0 1;
+set ALTERNATIVES[12] := 0 1 2 3;
+set ALTERNATIVES[13] := 0 1 2 3 4;
+
+param Benefit :=
+     1 0  0
+     1 1  1147066
+     1 2  -1910462
+     1 3  317734
+     2 0  0
+     2 1  1118018
+     2 2  -1936869
+     2 3  270993
+     3 0  0
+     3 1  -21355578
+     4 0  0
+     4 1  -15025870
+     5 0  0
+     5 1  1143109
+     5 2  -1914059
+     5 3  311366
+     6 0  0
+     6 1  1129487
+     6 2  -1926443
+     6 3  289447
+     7 0  -2741473
+     7 1  0
+     7 2  -815311
+     7 3  1356452
+     8 0  0
+     8 1  -13914966
+     9 0  0
+     9 1  1336809
+     9 2  -14028218
+     9 3  -1900702
+    10 0  0
+    10 1  110462
+    11 0  0
+    11 1  -411858
+    12 0  0
+    12 1  1146307
+    12 2  128853
+    12 3  1232639
+    13 0  -1466836
+    13 1  0
+    13 2  169733
+    13 3  310219
+    13 4  1152514
+;
+
+param Cost :=
+     1 0  0
+     1 1  300000
+     1 2  0
+     1 3  300000
+     2 0  0
+     2 1  300000
+     2 2  0
+     2 3  300000
+     3 0  0
+     3 1  0
+     4 0  0
+     4 1  0
+     5 0  0
+     5 1  400000
+     5 2  0
+     5 3  400000
+     6 0  0
+     6 1  400000
+     6 2  0
+     6 3  400000
+     7 0  0
+     7 1  500000
+     7 2  600000
+     7 3  1100000
+     8 0  0
+     8 1  0
+     9 0  0
+     9 1  600000
+     9 2  0
+     9 3  600000
+    10 0  0
+    10 1  600000
+    11 0  0
+    11 1  0
+    12 0  0
+    12 1  100000
+    12 2  600000
+    12 3  700000
+    13 0  0
+    13 1  600000
+    13 2  600000
+    13 3  1200000
+    13 4  1200000
+;
+
+end;

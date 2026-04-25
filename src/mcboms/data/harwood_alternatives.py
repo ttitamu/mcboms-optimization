@@ -2,25 +2,47 @@
 Harwood (2003) Alternatives Data - EXACT VALUES FROM PAPER
 
 This module contains the data published in Harwood et al. (2003)
-Tables 2, 3, and 4, including penalty terms (PNR, PRP) from the 
-Harwood optimization formulation.
+Tables 2 and 3, which give per-site cost and benefit values for the
+10-site case study.
 
-Harwood's Net Benefit Formula (Equation 3):
+Harwood's Net Benefit Formula (paper's Equation 3):
+
   NBjk = PSBjk + PTOBjk + PNRjk - PRPjk - CCjk
 
 Where:
-  PSBjk = Present value of safety benefits (from AMFs)
-  PTOBjk = Present value of travel time benefits (ops benefit)
-  PNRjk = Penalty for Not Resurfacing (ADDED to do-nothing alternative)
-  PRPjk = Penalty for Resurfacing without safety improvements (SUBTRACTED)
-  CCjk = Construction cost (safety improvement cost only in objective)
+  PSBjk  = Present value of safety benefits (from AMFs)      -> `safety_benefit`
+  PTOBjk = Present value of travel time benefits             -> `ops_benefit`
+  PNRjk  = Penalty for Not Resurfacing (do-nothing penalty)  -> `pnr_benefit`  [DISABLED]
+  PRPjk  = Penalty for Resurfacing w/o safety improvements   -> `prp_penalty`  [DISABLED]
+  CCjk   = Construction cost (safety improvement cost)       -> `safety_improvement_cost`
 
-Key insight from Table 4:
-  $50M case: PNR = $0, PRP = $1,563,278
-  $10M case: PNR = $5,576,145 (sites 4,6,9 skipped), PRP = $1,223,009
+PNR/PRP ARE DISABLED IN THE PROTOTYPE (set to zero). Rationale, per the
+MCBOMs Mathematical Formulation Specification, Section 7.3:
+
+  - Per-site PNR values are NOT published in Harwood (2003). The paper
+    reports only aggregate PNR ($5,576,145 across deferred sites 4, 6,
+    9 in the $10M case) and the qualitative formula (a percentage of
+    pavement-failure replacement cost). Calibrating per-site PNR values
+    that reproduce Harwood's $10M solution is reverse-engineering, not
+    validation.
+
+  - The PNR formula requires per-site pavement condition and time-to-
+    failure data not standardized in any current FHWA guidance and not
+    present in our case study inputs.
+
+  - Banihashemi (2007), our second benchmark, also does not use a
+    deferral-penalty mechanism.
+
+Consequence: MCBOMs reproduces Harwood's $50M case exactly (PNR doesn't
+bind there) and finds a strictly net-benefit-superior solution at the
+$10M budget because we don't penalize deferral of low-benefit sites.
+Agencies wishing to incorporate pavement-deferral cost can add it to
+the do-nothing alternative's cost term directly.
 
 Reference:
   Harwood, D.W., Rabbani, E.R.K., and Richard, K.R. (2003).
+  Systemwide Optimization of Safety Improvements for Resurfacing,
+  Restoration, or Rehabilitation Projects.
   Transportation Research Record 1840, pp. 148-157.
 """
 
@@ -28,44 +50,15 @@ import pandas as pd
 
 
 # =============================================================================
-# PENALTY ESTIMATION
+# PENALTY TERMS -- DISABLED IN PROTOTYPE
 # =============================================================================
-# PNR (Penalty for Not Resurfacing) - from Table 4:
-#   - $10M case: Total PNR = $5,576,145 for skipping sites 4, 6, 9
-#   - Distributed based on site characteristics (length, ADT, pavement condition)
-#
-# PRP (Penalty for Resurfacing without safety improvements):
-#   - Applied when lane width < 11ft OR shoulder width < 6ft
-#   - And resurfacing without geometric improvements
-#   - From Table 4 $50M case: Total PRP = $1,563,278
+# See module docstring for rationale. The keys are kept for schema
+# stability, but all values are zero. If a future revision adds a
+# principled PNR/PRP mechanism (e.g., from HSIP pavement-condition data),
+# these dictionaries are the correct place to wire it in.
 
-# PNR values calibrated to reproduce Harwood's $10M optimal solution
-# Sites that MUST be funded (1, 2, 3, 5, 7, 8, 10): HIGH PNR penalty for skipping
-# Sites that can be skipped (4, 6, 9): LOWER PNR penalty
-#
-# The key is: PNR must be high enough that skipping these sites is "worse" than
-# the benefit you'd get from using that budget elsewhere.
-PNR_BY_SITE = {
-    1: 600_000,    # Must fund - but low benefit, so moderate penalty needed
-    2: 1_200_000,  # Must fund 
-    3: 1_500_000,  # Must fund (high benefit site)
-    4: 250_000,    # Can skip (do-nothing in $10M) - LOW penalty
-    5: 1_400_000,  # Must fund
-    6: 300_000,    # Can skip (do-nothing in $10M) - LOW penalty
-    7: 1_300_000,  # Must fund
-    8: 1_000_000,  # Must fund
-    9: 350_000,    # Can skip (do-nothing in $10M) - LOW penalty
-    10: 1_600_000, # Must fund (high benefit site)
-}
-# Note: The sum of PNR for skipped sites (4,6,9) = $900K
-# This is lower than the Table 4 value of $5.58M because we're using
-# simplified penalty estimation
-
-# PRP applies to resurface-only alternatives at sites with narrow lanes/shoulders
-# Site 1 has 9ft lanes, 2ft shoulders - triggers PRP
-PRP_BY_SITE = {
-    1: 156_328,  # 9ft lanes, 2ft shoulders - triggers PRP (resurface only, no safety improvements)
-}
+PNR_BY_SITE = {i: 0 for i in range(1, 11)}  # All zero -- PNR disabled per spec 7.3
+PRP_BY_SITE = {i: 0 for i in range(1, 11)}  # All zero -- PRP disabled per spec 7.3
 
 
 def get_harwood_alternatives() -> pd.DataFrame:

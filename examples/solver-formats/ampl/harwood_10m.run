@@ -1,0 +1,21 @@
+# AMPL run script for MCBOMs validation instances
+#
+# Usage:
+#   ampl harwood_50m.run
+#   ampl harwood_10m.run
+#   ampl banihashemi_intersections.run
+#
+# Requires a MILP solver (CPLEX, Gurobi, CBC, etc.). Tested with CPLEX 22.
+
+reset;
+model mcboms.mod;
+data harwood_10m.dat;
+
+option solver cplex;
+option cplex_options 'mipdisplay=2 timing=1';
+
+solve;
+
+display NetBenefit;
+display sum {i in PROJECTS, j in ALTERNATIVES[i]} Cost[i,j] * x[i,j];
+display {i in PROJECTS, j in ALTERNATIVES[i]: x[i,j] > 0.5} x[i,j];

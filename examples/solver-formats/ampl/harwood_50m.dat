@@ -1,0 +1,70 @@
+# Harwood et al. (2003) case study - $50M budget instance
+# Data extracted from Harwood Tables 2 and 3
+# 10 sites, 21 alternatives total, all values in 1994 dollars
+
+data;
+
+param B_total := 50000000;
+
+set PROJECTS := 1 2 3 4 5 6 7 8 9 10;
+
+set ALTERNATIVES[1] := 0 1;
+set ALTERNATIVES[2] := 0 1;
+set ALTERNATIVES[3] := 0 1;
+set ALTERNATIVES[4] := 0 1;
+set ALTERNATIVES[5] := 0 1;
+set ALTERNATIVES[6] := 0 1;
+set ALTERNATIVES[7] := 0 1;
+set ALTERNATIVES[8] := 0 1 2;
+set ALTERNATIVES[9] := 0 1;
+set ALTERNATIVES[10] := 0 1;
+
+param Benefit :=
+     1 0  0
+     1 1  35107
+     2 0  0
+     2 1  399756
+     3 0  0
+     3 1  1188606
+     4 0  0
+     4 1  834008
+     5 0  0
+     5 1  1408618
+     6 0  0
+     6 1  901437
+     7 0  0
+     7 1  1040641
+     8 0  0
+     8 1  705644
+     8 2  1270056
+     9 0  0
+     9 1  1153238
+    10 0  0
+    10 1  2409442
+;
+
+param Cost :=
+     1 0  0
+     1 1  528803
+     2 0  0
+     2 1  639763
+     3 0  0
+     3 1  1381621
+     4 0  0
+     4 1  1047816
+     5 0  0
+     5 1  1420017
+     6 0  0
+     6 1  3068549
+     7 0  0
+     7 1  1863237
+     8 0  0
+     8 1  1578989
+     8 2  2078989
+     9 0  0
+     9 1  1701302
+    10 0  0
+    10 1  2541150
+;
+
+end;

@@ -189,33 +189,45 @@ def run_validation():
     # Step 4: Summary
     # =========================================================================
     print_header("VALIDATION SUMMARY")
+    print()
+    print("  Per the MCBOMs Formulation Specification (Section 7.3 and 8.1),")
+    print("  the PNR/PRP penalty mechanisms from Harwood's paper are NOT")
+    print("  implemented in the prototype. This means:")
+    print("    - $50M case: should reproduce Harwood EXACTLY (PNR doesn't bind")
+    print("      at this budget level).")
+    print("    - $10M case: MCBOMs will find a strictly net-benefit-superior")
+    print("      solution that skips DIFFERENT sites than Harwood. This is")
+    print("      the expected, principled result of dropping PNR.")
+    print()
+    print("  -" * 35)
+    print("  Level 2a: $50M case (RIGOROUS validation)")
+    print("  -" * 35)
     
-    # Calculate pass/fail
-    tests_passed = 0
-    tests_total = 8
+    level_2a_passed = 0
+    level_2a_total = 4
     
     # $50M tests
     cost_diff_50m = abs(result_50m.total_cost - expected_50m["total_cost"]) / expected_50m["total_cost"]
     benefit_diff_50m = abs(result_50m.total_benefit - expected_50m["total_benefit"]) / expected_50m["total_benefit"]
     net_diff_50m = abs(result_50m.net_benefit - expected_50m["net_benefit"]) / expected_50m["net_benefit"]
     
-    if cost_diff_50m < 0.05:
-        tests_passed += 1
-        print(f"  [✓] $50M Total Cost within 5% (diff: {cost_diff_50m:.1%})")
+    if cost_diff_50m < 0.01:
+        level_2a_passed += 1
+        print(f"  [✓] $50M Total Cost within 1% (diff: {cost_diff_50m:.2%})")
     else:
-        print(f"  [✗] $50M Total Cost NOT within 5% (diff: {cost_diff_50m:.1%})")
+        print(f"  [✗] $50M Total Cost NOT within 1% (diff: {cost_diff_50m:.2%})")
         
-    if benefit_diff_50m < 0.05:
-        tests_passed += 1
-        print(f"  [✓] $50M Total Benefit within 5% (diff: {benefit_diff_50m:.1%})")
+    if benefit_diff_50m < 0.01:
+        level_2a_passed += 1
+        print(f"  [✓] $50M Total Benefit within 1% (diff: {benefit_diff_50m:.2%})")
     else:
-        print(f"  [✗] $50M Total Benefit NOT within 5% (diff: {benefit_diff_50m:.1%})")
+        print(f"  [✗] $50M Total Benefit NOT within 1% (diff: {benefit_diff_50m:.2%})")
         
-    if net_diff_50m < 0.05:
-        tests_passed += 1
-        print(f"  [✓] $50M Net Benefit within 5% (diff: {net_diff_50m:.1%})")
+    if net_diff_50m < 0.01:
+        level_2a_passed += 1
+        print(f"  [✓] $50M Net Benefit within 1% (diff: {net_diff_50m:.2%})")
     else:
-        print(f"  [✗] $50M Net Benefit NOT within 5% (diff: {net_diff_50m:.1%})")
+        print(f"  [✗] $50M Net Benefit NOT within 1% (diff: {net_diff_50m:.2%})")
     
     # Check $50M alternative selections
     all_match_50m = all(
@@ -223,56 +235,50 @@ def run_validation():
         for s in range(1, 11)
     )
     if all_match_50m:
-        tests_passed += 1
-        print(f"  [✓] $50M All alternatives match expected")
+        level_2a_passed += 1
+        print(f"  [✓] $50M All 10 alternatives match Harwood Table 2")
     else:
-        print(f"  [✗] $50M Some alternatives don't match")
+        print(f"  [✗] $50M Some alternatives don't match Harwood Table 2")
     
-    # $10M tests
+    print()
+    print("  -" * 35)
+    print("  Level 2b: $10M case (DOCUMENTED DIVERGENCE)")
+    print("  -" * 35)
+    print("  The following are INFORMATIONAL ONLY. Divergence from Harwood's")
+    print("  published $10M solution is expected per spec Section 7.3.")
+    print()
+
+    # $10M tests -- informational only, don't count toward pass/fail
     cost_diff_10m = abs(result_10m.total_cost - expected_10m["total_cost"]) / expected_10m["total_cost"]
     benefit_diff_10m = abs(result_10m.total_benefit - expected_10m["total_benefit"]) / expected_10m["total_benefit"]
     net_diff_10m = abs(result_10m.net_benefit - expected_10m["net_benefit"]) / expected_10m["net_benefit"]
-    
-    if cost_diff_10m < 0.05:
-        tests_passed += 1
-        print(f"  [✓] $10M Total Cost within 5% (diff: {cost_diff_10m:.1%})")
-    else:
-        print(f"  [✗] $10M Total Cost NOT within 5% (diff: {cost_diff_10m:.1%})")
-        
-    if benefit_diff_10m < 0.05:
-        tests_passed += 1
-        print(f"  [✓] $10M Total Benefit within 5% (diff: {benefit_diff_10m:.1%})")
-    else:
-        print(f"  [✗] $10M Total Benefit NOT within 5% (diff: {benefit_diff_10m:.1%})")
-        
-    if net_diff_10m < 0.05:
-        tests_passed += 1
-        print(f"  [✓] $10M Net Benefit within 5% (diff: {net_diff_10m:.1%})")
-    else:
-        print(f"  [✗] $10M Net Benefit NOT within 5% (diff: {net_diff_10m:.1%})")
-    
-    # Do-nothing sites check
+
+    print(f"  [i] $10M Total Cost difference:    {cost_diff_10m:+.1%}")
+    print(f"  [i] $10M Total Benefit difference: {benefit_diff_10m:+.1%}")
+    print(f"  [i] $10M Net Benefit difference:   {net_diff_10m:+.1%}  ({'higher' if result_10m.net_benefit > expected_10m['net_benefit'] else 'lower'} than Harwood)")
+
     if set(actual_do_nothing) == set(expected_do_nothing):
-        tests_passed += 1
-        print(f"  [✓] $10M Do-nothing sites match: {sorted(actual_do_nothing)}")
+        print(f"  [i] $10M Do-nothing sites: same as Harwood {sorted(actual_do_nothing)}")
     else:
-        print(f"  [✗] $10M Do-nothing sites don't match")
-        print(f"      Expected: {expected_do_nothing}, Got: {sorted(actual_do_nothing)}")
-    
+        print(f"  [i] $10M Do-nothing sites: MCBOMs={sorted(actual_do_nothing)}, Harwood={expected_do_nothing}")
+
     print()
-    print(f"  Tests passed: {tests_passed}/{tests_total}")
+    print(f"  Level 2a (rigorous) result: {level_2a_passed}/{level_2a_total} checks passed")
     print()
-    
-    if tests_passed >= tests_total - 1:  # Allow 1 tolerance
+
+    if level_2a_passed == level_2a_total:
         print("  ╔════════════════════════════════════════════════════════════════╗")
         print("  ║  ✓ VALIDATION SUCCESSFUL                                       ║")
-        print("  ║    MCBOMs optimizer matches Harwood (2003) benchmark results   ║")
+        print("  ║    MCBOMs reproduces Harwood (2003) $50M published results.    ║")
+        print("  ║    $10M divergence is documented methodological choice per     ║")
+        print("  ║    formulation spec Section 7.3.                               ║")
         print("  ╚════════════════════════════════════════════════════════════════╝")
         return 0
     else:
         print("  ╔════════════════════════════════════════════════════════════════╗")
         print("  ║  ✗ VALIDATION FAILED                                           ║")
-        print("  ║    Some results do not match expected values                   ║")
+        print("  ║    $50M rigorous reproduction did not match. Check for         ║")
+        print("  ║    regressions in optimizer.py or harwood_alternatives.py.     ║")
         print("  ╚════════════════════════════════════════════════════════════════╝")
         return 1
 

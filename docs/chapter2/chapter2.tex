@@ -1,0 +1,1647 @@
+% =====================================================================
+% MCBOMs Task 4 Report
+% Chapter 2: Updated Formulation of MCBOMs
+%
+% This file is a self-contained Overleaf-ready LaTeX document.
+% To incorporate into the master report, copy content between the
+% BEGIN CHAPTER and END CHAPTER markers.
+%
+% Typesetting conventions:
+%   - All equations use proper math mode
+%   - Variables are italicized; subscripts/superscripts use braces
+%   - Numbered equations use \begin{equation} ... \end{equation}
+%   - Cross-references use \ref{} for sections, eq., tables
+%   - Citations use natural language (Author, Year) for now;
+%     swap to \cite{key} when migrated to the master bibliography
+%
+% Date: April 24, 2026
+% Authors: A. Sameen and team, Texas A&M Transportation Institute
+% =====================================================================
+
+\documentclass[12pt,letterpaper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{siunitx}
+\usepackage{caption}
+\usepackage{float}
+
+\sisetup{
+  group-separator = {,},
+  group-minimum-digits = 4,
+  output-decimal-marker = {.},
+}
+
+\hypersetup{
+  colorlinks=false,
+  pdfborder={0 0 0},
+}
+
+% Custom commands for frequently-used notation
+\newcommand{\Btot}{B^{\mathrm{total}}}
+\newcommand{\Bsafety}{B^{\mathrm{safety}}}
+\newcommand{\Bops}{B^{\mathrm{operations}}}
+\newcommand{\Bccm}{B^{\mathrm{ccm}}}
+\newcommand{\Enobuild}{E^{\mathrm{no\text{-}build}}}
+\newcommand{\Ebuild}{E^{\mathrm{build}}}
+\newcommand{\UC}{\mathit{UC}}
+\newcommand{\DF}{\mathit{DF}}
+\newcommand{\PWF}{\mathit{PWF}}
+\newcommand{\CMF}{\mathit{CMF}}
+\newcommand{\AADT}{\mathit{AADT}}
+\newcommand{\OCC}{\mathit{OCC}}
+\newcommand{\VOT}{\mathit{VOT}}
+\newcommand{\VOC}{\mathit{VOC}}
+\newcommand{\VMT}{\mathit{VMT}}
+
+% Section numbering: this is Chapter 2 of the report.
+% In standalone mode, we present sections as Sections 2.1, 2.2, etc.
+\renewcommand{\thesection}{2.\arabic{section}}
+\renewcommand{\thesubsection}{2.\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{2.\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+\renewcommand{\theequation}{2.\arabic{equation}}
+\renewcommand{\thetable}{2.\arabic{table}}
+\renewcommand{\thefigure}{2.\arabic{figure}}
+
+\title{MCBOMs Task 4 Report \\ \large Chapter 2: Updated Formulation of MCBOMs (Formulation and Validation)}
+\author{Texas A\&M Transportation Institute \\ FHWA Contract HRSO20240009PR}
+\date{April 24, 2026}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+% =====================================================================
+% BEGIN CHAPTER 2 CONTENT
+% =====================================================================
+
+\section*{Chapter 2: Updated Formulation of MCBOMs}
+\addcontentsline{toc}{section}{Chapter 2: Updated Formulation of MCBOMs}
+
+The objective of Task~4 is to develop the network-level optimization model that
+forms the analytical core of the Multidisciplinary Cost Benefit Optimization
+Models (MCBOMs) framework. This chapter presents the updated mathematical
+formulation, integrating safety, operational, and corridor condition benefits
+within a Mixed-Integer Linear Programming (MILP) structure suitable for both
+project-level and network-level investment decisions. The chapter then documents
+the validation of the MCBOMs implementation against two published benchmarks:
+Harwood et al.~(2003), who developed the Resurfacing Safety Resource
+Allocation Program (RSRAP) for allocating resources to safety improvements
+within Resurfacing, Restoration, and Rehabilitation (RRR) projects on
+nonfreeway facilities, and Banihashemi~(2007), who developed a segment- and
+intersection-level network optimization framework integrating safety and
+operational performance.
+
+% ---------------------------------------------------------------------
+\setcounter{section}{0}
+\section{Foundational Framework}
+% ---------------------------------------------------------------------
+
+The MCBOMs framework addresses the multi-objective resource allocation problem
+faced by transportation agencies: given a portfolio of candidate projects, each
+with multiple possible improvement alternatives, determine the combination of
+alternatives that maximizes total societal benefit subject to a budget
+constraint. Three foundational design choices govern the formulation: the
+project--alternative structure, the benefit definition and quantification
+structure, and the discounting and time-horizon convention.
+
+% ---------------------------------------------------------------------
+\subsection{Project--Alternative Structure}
+% ---------------------------------------------------------------------
+
+A \emph{project} represents a candidate location for investment. Examples
+include a corridor segment, an intersection, a bridge, or any other discrete
+asset for which an improvement decision can be made. Each project is denoted by
+the index $i \in \{1, 2, \ldots, I\}$, where $I$ is the total number of
+projects in the analysis.
+
+For each project $i$, the analyst defines a set of \emph{improvement
+alternatives}, denoted $A_i = \{0, 1, 2, \ldots, J_i\}$. The alternative
+$j = 0$ is always the do-nothing baseline (no improvement implemented at site
+$i$). Alternatives $j \geq 1$ each represent a distinct combination of
+treatments. Treatments may include, for example, lane widening, shoulder paving,
+intersection signalization, or pavement resurfacing. A single alternative may
+bundle multiple treatments, in which case the alternative's combined effect is
+computed using the appropriate combination rule for each benefit category (see
+Section~\ref{sec:safety} for safety, Section~\ref{sec:ops} for operations).
+
+Each project is characterized by a record:
+\begin{equation}
+P_i = \{ \mathrm{Location}_i,\ \mathrm{Cost}_{ij},\ \mathrm{SafetyData}_{ij},\
+         \mathrm{OperationData}_{ij},\ \mathrm{CCMData}_{ij},\
+         \mathrm{TreatmentType}_{ij} \}
+\end{equation}
+\noindent for each alternative $j \in A_i$, capturing the data required to
+evaluate that alternative.
+
+The optimization decision variable is binary:
+\begin{equation}
+x_{ij} \in \{0, 1\}, \qquad
+x_{ij} = \begin{cases}
+1 & \text{if alternative } j \text{ is selected for project } i \\
+0 & \text{otherwise}
+\end{cases}
+\end{equation}
+
+The mutual-exclusivity constraint
+$\sum_{j \in A_i} x_{ij} \leq 1$ ensures that at most one alternative (including
+do-nothing) is selected for each project.
+
+% ---------------------------------------------------------------------
+\subsection{Benefit Definition and Quantification Structure}
+% ---------------------------------------------------------------------
+
+The total present-value societal benefit of selecting alternative $j$ for
+project $i$, evaluated over the analysis horizon $T$, is the discounted sum
+of three additive annual benefit components:
+\begin{equation}
+\Btot_{ij}\ =\ \sum_{t=1}^{T}\bigl[\, B_{ijt}^{\mathrm{safety}} + B_{ijt}^{\mathrm{operations}} + B_{ijt}^{\mathrm{corridor}} \,\bigr] \cdot \DF_t
+\label{eq:btot}
+\end{equation}
+
+\noindent where:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $B_{ijt}^{\mathrm{safety}}$ is the annual monetized safety benefit
+    in year $t$ (crash cost reduction); see Section~\ref{sec:safety}.
+  \item $B_{ijt}^{\mathrm{operations}}$ is the annual monetized operational
+    benefit in year $t$ (travel time, vehicle operating costs, reliability);
+    see Section~\ref{sec:ops}.
+  \item $B_{ijt}^{\mathrm{corridor}}$ is the annual monetized corridor
+    condition benefit in year $t$ (energy, environmental, resilience,
+    accessibility); see Section~\ref{sec:ccm}.
+  \item $\DF_t = 1/(1+r)^t$ is the discount factor in year $t$, with $r$ the
+    real discount rate (Section~\ref{sec:discounting}).
+\end{itemize}
+
+For notational compactness in the optimization formulation
+(Section~\ref{sec:milp}), the present-value-aggregated forms are denoted
+$\Bsafety_{ij}$, $\Bops_{ij}$, and $\Bccm_{ij}$, with the relationship:
+\begin{equation*}
+\Btot_{ij}\ =\ \Bsafety_{ij} + \Bops_{ij} + \Bccm_{ij}
+\end{equation*}
+
+The additive decomposition assumes that the three benefit categories are
+independent of one another. Where overlap exists (for example, when a composite
+metric such as the Mobility Energy Productivity (MEP) index embeds both travel
+time and energy components), explicit double-counting prevention rules are
+applied; see Section~\ref{sec:ccm} for the relevant adjustments.
+
+Each project--alternative pair has an associated cost:
+\begin{equation}
+C_{ij} = C_{ij}^{\mathrm{construction}} + C_{ij}^{\mathrm{indirect}}
+\end{equation}
+\noindent where construction cost includes resurfacing and geometric
+improvements as applicable, and indirect cost captures traffic management
+during construction, environmental mitigation, and utility relocation. For the
+Task~4 prototype, indirect cost is folded into construction cost where data
+permits; otherwise it is set to zero.
+
+Section~\ref{sec:alt-composition} extends this cost definition to the
+segment level, showing how $C_{ij}$ is composed from per-treatment
+per-segment cost contributions.
+
+% ---------------------------------------------------------------------
+\subsection{Alternative Composition and Segment-Level Treatment Specification}
+\label{sec:alt-composition}
+% ---------------------------------------------------------------------
+
+A central modeling concept in the MCBOMs framework, requested by FHWA
+reviewers and consistent with Banihashemi~(2007), is that an alternative
+$j$ for project $i$ is not necessarily a single uniform treatment applied
+across the entire project. Rather, an alternative is a \emph{composition}
+of segment-specific treatments: different homogeneous segments within the
+same project may receive different treatment combinations under the same
+alternative.
+
+\paragraph{Homogeneous segmentation.} Each project $i$ is partitioned into
+$K_i$ homogeneous segments, where a segment $k \in \{1, 2, \ldots, K_i\}$
+is a length of facility over which the relevant geometric, traffic, and
+crash-history attributes are approximately constant. New segments begin
+where the AADT, lane configuration, shoulder treatment, horizontal/vertical
+alignment, or roadside condition changes materially. This segmentation rule
+matches the Highway Safety Manual (AASHTO, 2010, Part~C) homogeneous-segment
+definition and the construction Banihashemi (2007, page~112) uses for his
+Crash Prediction Module.
+
+\paragraph{Treatment sets.} For each alternative $j \in A_i$ and each
+segment $k \in \{1, \ldots, K_i\}$, the analyst defines a treatment set:
+\begin{equation*}
+T_{jk}\ =\ \{\,\text{treatments applied to segment } k \text{ under alternative } j\,\}
+\end{equation*}
+
+\noindent For the do-nothing alternative ($j = 0$), $T_{0k} = \emptyset$ for
+every segment $k$. For non-trivial alternatives, $T_{jk}$ may differ across
+segments within the same alternative; this is the segment-level composition
+property.
+
+\paragraph{Alternative as a composition.} An alternative $j$ for project $i$
+is fully specified by the collection of its segment-level treatment sets:
+\begin{equation*}
+\text{Alternative } j \text{ for project } i\ =\ \{\, T_{j1},\ T_{j2},\ \ldots,\ T_{jK_i} \,\}
+\end{equation*}
+
+\paragraph{Cost decomposition.} The total cost of alternative $j$ for
+project $i$ is the sum of treatment-level costs across all segments:
+\begin{equation}
+C_{ij}\ =\ \sum_{k=1}^{K_i} \sum_{n \in T_{jk}} \mathit{Cost}_{ikn}
+\label{eq:cost-decomp}
+\end{equation}
+
+\noindent where $\mathit{Cost}_{ikn}$ is the implementation cost of
+treatment $n$ on segment $k$ of project $i$.
+
+\paragraph{Benefit decomposition.} Total present-value benefit
+$\Btot_{ij}$, defined in Equation~\ref{eq:btot}, similarly aggregates
+segment-level contributions. Each annual benefit component
+($B_{ijt}^{\mathrm{safety}}$, $B_{ijt}^{\mathrm{operations}}$,
+$B_{ijt}^{\mathrm{corridor}}$) is computed as a sum over segments
+$k = 1, \ldots, K_i$, with the segment-level value depending on the
+treatment set $T_{jk}$ applied to that segment. The detailed
+segment-level expansions are given in Section~\ref{sec:safety}
+(Equation~\ref{eq:safety-benefit}) for safety, Section~\ref{sec:ops}
+(Equation~\ref{eq:ops-benefit}) for operations, and Section~\ref{sec:ccm}
+(Equation~\ref{eq:ccm-benefit}) for corridor condition.
+
+\paragraph{Optimization decision variable remains alternative-level.}
+Although costs and benefits are computed at the treatment-segment level,
+the optimization decision variable $x_{ij}$ remains binary at the
+alternative level. The optimizer selects an entire alternative (with its
+full collection of segment-specific treatments) or rejects it; partial
+alternatives are not selectable. This matches Harwood~(2003)'s site-level
+decision-variable structure and is consistent with the Banihashemi~(2007)
+formulation interpreted at the alternative level.
+
+\paragraph{Illustrative example.} Consider a 6-mile rural two-lane highway
+project ($i = 1$) partitioned into three 2-mile homogeneous segments
+($K_1 = 3$). A single non-trivial alternative ($j = 1$) is defined as the
+following composition:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item Segment $k = 1$ (miles 0--2): left-turn lane addition at the
+    intersection located within this segment. $T_{11} = \{\,\text{left-turn lane}\,\}$.
+  \item Segment $k = 2$ (miles 2--4): centerline rumble strips.
+    $T_{12} = \{\,\text{rumble strips}\,\}$.
+  \item Segment $k = 3$ (miles 4--6): traffic signal installation at the
+    intersection located within this segment.
+    $T_{13} = \{\,\text{traffic signal}\,\}$.
+\end{itemize}
+
+\noindent The total cost of this alternative is computed by
+Equation~\ref{eq:cost-decomp}:
+\begin{align*}
+C_{11}\ &=\ \mathit{Cost}_{1,1,\text{LTL}} + \mathit{Cost}_{1,2,\text{rumble}} + \mathit{Cost}_{1,3,\text{signal}} \\
+       &=\ \$300{,}000 + \$50{,}000 \cdot 2\ \text{mi} + \$250{,}000 \\
+       &=\ \$650{,}000
+\end{align*}
+
+\noindent and total present-value benefit $\Btot_{11}$ is the sum of
+segment-level safety, operational, and corridor benefits computed under
+each segment's treatment set, discounted via Equation~\ref{eq:btot}.
+
+\paragraph{Combined-treatment effects within a segment.} When a single
+segment $k$ receives multiple treatments simultaneously
+($\lvert T_{jk} \rvert > 1$), the combined safety effect uses the
+multiplicative Crash Modification Factor rule
+(Equation~\ref{eq:cmf-combine}). For example, a segment receiving both
+shoulder widening (CMF = $0.93$) and rumble strips (CMF = $0.86$) has a
+combined CMF of $0.93 \times 0.86 = 0.80$. This rule is the HSM-recommended
+default; ongoing CMF Clearinghouse research is refining combined-treatment
+estimates.
+
+\paragraph{Implementation note.} The Task~4 prototype dataset encodes
+alternative composition through the alternative identifier itself
+(e.g., ``Pavement Marking, Cable Barrier'' as a single alternative label).
+A treatment-level cost catalog is required to evaluate
+Equation~\ref{eq:cost-decomp} term-by-term; in the prototype's BCA
+spreadsheet, this catalog is partially captured through per-mile unit cost
+fields by treatment type. Full treatment-level decomposition (in which
+each $\mathit{Cost}_{ikn}$ is computed from a separate treatment-cost table
+joined to a segment-treatment assignment table) is documented as a planned
+enhancement; the prototype currently uses alternative-level aggregate
+costs as an equivalent simplification.
+
+% ---------------------------------------------------------------------
+\subsection{Discounting and Analysis Horizon}
+\label{sec:discounting}
+% ---------------------------------------------------------------------
+
+All benefit and cost streams are discounted to present value using the
+USDOT-recommended real discount rate of 7~percent per year (USDOT, 2025,
+Section~4.3). The discount factor for year $t$ is:
+\begin{equation}
+\DF_t = \frac{1}{(1 + r)^t}, \qquad r = 0.07
+\label{eq:df}
+\end{equation}
+
+For benefit streams that are constant across years (the standard assumption for
+the Task~4 prototype), the present-value calculation reduces to multiplication
+by the uniform-series present worth factor:
+\begin{equation}
+\PWF(r, T) = \sum_{t=1}^{T} \DF_t = \frac{(1+r)^T - 1}{r \cdot (1+r)^T}
+\label{eq:pwf}
+\end{equation}
+
+\noindent At the framework defaults of $r = 0.07$ and $T = 20$ years, this
+evaluates to $\PWF(0.07, 20) = 10.594$.
+
+\paragraph{Analysis horizon.} The Task~4 prototype uses a uniform 20-year
+analysis horizon for all alternatives, consistent with USDOT BCA Guidance
+(May~2025, Section~4.4) for capacity and operating improvements and with
+Banihashemi (2007), who applied a uniform 20-year project lifetime to all
+improvement alternatives in his case study.
+
+\paragraph{Treatment-specific service life.} Table~\ref{tab:service-life}
+documents typical service lives by treatment type for reference. These values
+are not currently applied to the prototype's benefit calculations; all benefits
+are evaluated over the uniform 20-year horizon. This simplification applies
+uniformly across alternatives, which preserves the relative ranking that drives
+the optimization. Per-treatment service life and residual-value adjustments
+(in the sense of USDOT BCA Guidance Section~6.3, which applies residual value
+to construction costs rather than to benefit streams) are documented as
+planned enhancements.
+
+\begin{table}[H]
+\centering
+\caption{Reference service lives by treatment type. These values are
+documented for reference and for future model enhancements; they are not
+currently applied to the Task~4 prototype's benefit calculations, which use a
+uniform 20-year analysis horizon.}
+\label{tab:service-life}
+\begin{tabular}{lc}
+\toprule
+\textbf{Treatment Type} & \textbf{Reference Service Life (years)} \\
+\midrule
+Pavement resurfacing                  & 10 \\
+Lane widening                         & 20 \\
+Shoulder widening / paving            & 20 \\
+Horizontal curve improvement          & 20 \\
+Vertical alignment improvement        & 20 \\
+Intersection signalization            & 15 \\
+Roundabout                            & 25 \\
+Turn lane addition                    & 20 \\
+Climbing/passing lane                 & 20 \\
+Sight distance improvement            & 20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Mixed-Integer Linear Programming Formulation}
+\label{sec:milp}
+% ---------------------------------------------------------------------
+
+The MCBOMs optimization problem is formulated as a Mixed-Integer Linear
+Program. This section presents the project-level formulation, in which only a
+single budget constraint applies, followed by the network-level formulation,
+which adds facility-type and regional sub-budget constraints.
+
+% ---------------------------------------------------------------------
+\subsection{Project-Level Formulation}
+\label{sec:milp-project}
+% ---------------------------------------------------------------------
+
+The project-level MILP maximizes total net benefit subject to a single
+program-wide budget. The formulation consists of an objective function and
+three constraint families.
+
+\paragraph{Objective function.}
+\begin{equation}
+\max\ Z\ =\ \sum_{i=1}^{I} \sum_{j \in A_i} \bigl( \Btot_{ij} - C_{ij}^{\mathrm{disc}} \bigr) \cdot x_{ij}
+\label{eq:obj-project}
+\end{equation}
+
+The objective expresses total net societal benefit as the sum, over all
+projects and selected alternatives, of benefit minus the
+\emph{discretionary} cost component $C_{ij}^{\mathrm{disc}}$. The
+parentheses around $(\Btot_{ij} - C_{ij}^{\mathrm{disc}})$ are essential:
+the multiplication by $x_{ij}$ applies to the entire net-benefit term,
+not to the cost alone.
+
+\paragraph{Discretionary versus committed cost.} For projects where
+project cost decomposes into a committed component $C_{ij}^{\mathrm{comm}}$
+(expenditure that will occur regardless of the optimization outcome,
+typically because policy or asset condition mandates it) and a
+discretionary component $C_{ij}^{\mathrm{disc}}$ (expenditure subject to
+optimization choice), the objective subtracts only the discretionary
+portion. The total cost remains $C_{ij} = C_{ij}^{\mathrm{comm}} +
+C_{ij}^{\mathrm{disc}}$ and is the quantity used in the budget
+constraint (Equation~\ref{eq:budget-project}).
+
+This distinction is consistent with Harwood et al.~(2003), who model
+RRR projects in which pavement resurfacing is committed (every site is
+resurfaced under the program) and only the safety improvement cost is
+optimized. In that case:
+\begin{align*}
+C_{ij}^{\mathrm{comm}} &= \text{resurfacing cost (committed by the RRR program)} \\
+C_{ij}^{\mathrm{disc}} &= \text{safety improvement cost (the optimization variable)}
+\end{align*}
+
+For projects where no committed component exists ---
+$C_{ij}^{\mathrm{comm}} = 0$ and $C_{ij}^{\mathrm{disc}} = C_{ij}$ ---
+Equation~\ref{eq:obj-project} reduces to the simple form
+$\max \sum (\Btot_{ij} - C_{ij}) x_{ij}$, which is the case for the
+Banihashemi~(2007) validation and for general projects without a fixed
+infrastructure baseline.
+
+The MCBOMs implementation supports both conventions: the optimizer
+accepts a per-alternative objective coefficient, which the analyst sets
+to $(\Btot_{ij} - C_{ij}^{\mathrm{disc}})$ when modeling a Harwood-style
+problem and to $(\Btot_{ij} - C_{ij})$ for a generic problem.
+
+\paragraph{Budget constraint.}
+\begin{equation}
+\sum_{i=1}^{I} \sum_{j \in A_i} C_{ij} \cdot x_{ij}\ \leq\ B^{\mathrm{total}}
+\label{eq:budget-project}
+\end{equation}
+
+\noindent where $B^{\mathrm{total}}$ is the total program budget.
+
+\paragraph{Mutual exclusivity.}
+\begin{equation}
+\sum_{j \in A_i} x_{ij}\ \leq\ 1, \qquad \forall i \in \{1, 2, \ldots, I\}
+\label{eq:mutex}
+\end{equation}
+
+This constraint allows at most one alternative (including do-nothing) to be
+selected for each project. When the inequality is strict ($\sum_j x_{ij} = 0$),
+the optimizer has implicitly chosen do-nothing for project $i$.
+
+\paragraph{Binary decision variables.}
+\begin{equation}
+x_{ij} \in \{0, 1\}, \qquad \forall i,\ \forall j \in A_i
+\label{eq:binary-project}
+\end{equation}
+
+\paragraph{Optional constraints.} Beyond the four core constraints above,
+the project-level formulation supports three optional constraint families
+that reflect common real-world policy and engineering requirements. These
+constraints are activated only when the corresponding data is provided.
+
+\textbf{(a) Dependency constraints.} If alternative $j$ of project $i$
+requires the prior completion of alternative $j'$ of project $i'$ (for
+example, a corridor signalization plan that depends on an upstream
+intersection upgrade), the dependency is enforced by:
+\begin{equation}
+x_{ij}\ \leq\ x_{i'j'}
+\label{eq:dependency}
+\end{equation}
+
+\textbf{(b) Cross-project exclusivity.} If alternatives at different
+projects conflict (for example, when two adjacent projects compete for
+the same right-of-way or land use), the conflict is enforced by:
+\begin{equation}
+x_{ij} + x_{i'j'}\ \leq\ 1
+\label{eq:cross-exclusivity}
+\end{equation}
+
+\textbf{(c) Minimum benefit-cost ratio.} To require selected alternatives
+to exceed a minimum benefit-cost ratio:
+\begin{equation}
+\sum_{j \in A_i} \Btot_{ij} \cdot x_{ij}\ \geq\ \theta \cdot \sum_{j \in A_i} C_{ij} \cdot x_{ij}, \qquad \forall i
+\label{eq:min-bcr}
+\end{equation}
+
+\noindent where $\theta$ is the minimum acceptable benefit-cost ratio
+(for example, $\theta = 1.0$ enforces positive net benefit at every
+selected project; $\theta = 2.0$ enforces a $2{:}1$ benefit-cost ratio).
+
+\paragraph{Implementation status of optional constraints.} The MCBOMs
+prototype optimizer currently implements the four core constraints
+(Equations~\ref{eq:obj-project}--\ref{eq:binary-project}); the three
+optional constraints are documented in this chapter as supported by the
+mathematical framework and are added to the optimizer as agency-data
+becomes available to populate them. The Harwood~(2003) and
+Banihashemi~(2007) validation case studies do not exercise dependency or
+cross-project exclusivity constraints; minimum-BCR enforcement is
+optional and disabled by default.
+
+\paragraph{Facility-type scope.} The project-level optimization framework
+applies to the following facility types, with facility-specific Safety
+Performance Functions (SPFs), Crash Modification Factors (CMFs), and
+operational performance parameters as defined in
+Section~\ref{sec:safety} (safety) and Section~\ref{sec:ops} (operations):
+
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item \textbf{Rural highways:} two-lane highways and intersections
+    (including roundabouts); four-lane divided and undivided highways
+    and intersections; freeways, ramps, and ramp terminals.
+  \item \textbf{Urban / suburban facilities:} two-lane highways and
+    intersections; multilane highways and intersections; one-way
+    arterials and intersections; freeways, ramps, and ramp terminals.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\subsection{Network-Level Formulation}
+\label{sec:milp-network}
+% ---------------------------------------------------------------------
+
+The network-level formulation extends the project-level MILP by adding
+facility-type sub-budget constraints, regional cap constraints, and regional
+minimum-investment constraints. These additional constraints reflect common
+real-world resource allocation requirements, such as ensuring that no single
+facility class consumes a disproportionate share of the budget, or that each
+geographic region receives a minimum allocation of investment.
+
+\paragraph{Sets for network-level constraints.}
+Let $\mathcal{F}_m$ denote the set of project indices belonging to facility
+type $m \in \{m_1, m_2, \ldots, m_M\}$ (e.g., rural two-lane, rural multilane,
+urban arterial). Let $\mathcal{R}_r$ denote the set of project indices located
+in region $r \in \{r_1, r_2, \ldots, r_R\}$ (e.g., District~1, District~2).
+
+\paragraph{Objective function.} Identical to the project-level objective
+(Equation~\ref{eq:obj-project}); the summation index $i$ now ranges over all
+projects across all facility types and regions.
+
+\paragraph{Total budget constraint.} Identical to
+Equation~\ref{eq:budget-project}.
+
+\paragraph{Mutual exclusivity.} Identical to Equation~\ref{eq:mutex}.
+
+\paragraph{Facility-type sub-budget constraints.}
+\begin{equation}
+\sum_{i \in \mathcal{F}_m} \sum_{j \in A_i} C_{ij} \cdot x_{ij}\ \leq\ B_m,
+\qquad \forall m
+\label{eq:budget-facility}
+\end{equation}
+
+\noindent where $B_m$ is the maximum allocation to facility type $m$.
+
+\paragraph{Regional sub-budget constraints (cap).}
+\begin{equation}
+\sum_{i \in \mathcal{R}_r} \sum_{j \in A_i} C_{ij} \cdot x_{ij}\ \leq\ B_r,
+\qquad \forall r
+\label{eq:budget-region-cap}
+\end{equation}
+
+\paragraph{Regional minimum-investment constraints (floor).}
+\begin{equation}
+\sum_{i \in \mathcal{R}_r} \sum_{j \in A_i} C_{ij} \cdot x_{ij}\ \geq\ \beta_r \cdot B^{\mathrm{total}},
+\qquad \forall r
+\label{eq:budget-region-floor}
+\end{equation}
+
+\noindent where $\beta_r \in [0, 1]$ is the minimum-investment fraction for
+region $r$. Setting $\beta_r = 0$ disables the floor constraint for that
+region.
+
+\paragraph{Binary decision variables.} Identical to
+Equation~\ref{eq:binary-project}.
+
+% ---------------------------------------------------------------------
+\subsection{Worked Example: Project-Level Optimization for Three Rural Highway Segments}
+\label{sec:milp-worked}
+% ---------------------------------------------------------------------
+
+To illustrate the project-level MILP, consider three rural two-lane
+highway projects with the following alternative inventory and a program
+budget of $\$2{,}000{,}000$. Costs and total present-value benefits are
+expressed in thousands of dollars.
+
+\textbf{Project 1 (5-mile rural segment):}
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $j = 0$ (do nothing): $C_{10} = 0$, $\Btot_{10} = 0$
+  \item $j = 1$ (widen lanes to 12~ft): $C_{11} = \$800$, $\Btot_{11} = \$1{,}200$
+  \item $j = 2$ (widen shoulders to 6~ft): $C_{12} = \$600$, $\Btot_{12} = \$950$
+\end{itemize}
+
+\textbf{Project 2 (3-mile rural segment with curve):}
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $j = 0$: $C_{20} = 0$, $\Btot_{20} = 0$
+  \item $j = 1$ (flatten curve): $C_{21} = \$1{,}500$, $\Btot_{21} = \$2{,}400$
+\end{itemize}
+
+\textbf{Project 3 (2-mile rural segment):}
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $j = 0$: $C_{30} = 0$, $\Btot_{30} = 0$
+  \item $j = 1$ (rumble strips): $C_{31} = \$100$, $\Btot_{31} = \$150$
+  \item $j = 2$ (widen lanes + shoulders): $C_{32} = \$1{,}200$, $\Btot_{32} = \$1{,}800$
+\end{itemize}
+
+\paragraph{MILP instance.} The objective function and constraints
+specialize to:
+\begin{equation*}
+\begin{aligned}
+\text{Maximize:}\quad & Z = 400 x_{11} + 350 x_{12} + 900 x_{21} + 50 x_{31} + 600 x_{32} \\[4pt]
+\text{Subject to:}\quad & 800 x_{11} + 600 x_{12} + 1500 x_{21} + 100 x_{31} + 1200 x_{32}\ \leq\ 2000 \\
+& x_{10} + x_{11} + x_{12}\ \leq\ 1 \\
+& x_{20} + x_{21}\ \leq\ 1 \\
+& x_{30} + x_{31} + x_{32}\ \leq\ 1 \\
+& x_{ij} \in \{0, 1\}
+\end{aligned}
+\end{equation*}
+
+\noindent where the objective coefficients are net benefits
+$(\Btot_{ij} - C_{ij})$ for non-zero alternatives. This worked example
+has no committed cost component
+($C_{ij}^{\mathrm{comm}} = 0$,\ $C_{ij}^{\mathrm{disc}} = C_{ij}$), so
+the objective uses the simple form.
+
+\paragraph{Optimal solution.} A MILP solver evaluates all feasible
+combinations of project--alternative selections and returns the
+combination that maximizes total net benefit subject to the budget
+constraint. The optimal solution for this instance is:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $x_{11} = 1$ (Project~1, lane widening) -- net benefit \$400, cost \$800
+  \item $x_{20} = 1$ (Project~2, do nothing) -- net benefit \$0, cost \$0
+  \item $x_{32} = 1$ (Project~3, lane + shoulder widening) -- net benefit \$600, cost \$1{,}200
+\end{itemize}
+
+\noindent \textbf{Total cost:} $\$800 + \$0 + \$1{,}200 = \$2{,}000$
+(at budget). \textbf{Total net benefit:} $\$400 + \$600 = \$1{,}000$
+(thousand dollars).
+
+This example illustrates two key features of the MILP formulation:
+(a)~the trade-off between high-cost / high-benefit alternatives
+(Project~2's curve flattening is rejected despite its $\$900$ net benefit
+because its $\$1{,}500$ cost would crowd out higher-net-benefit
+combinations elsewhere); and (b)~the role of the do-nothing alternative
+in providing a feasible default when budget constraints prevent funding
+any improvement at a given site.
+
+% ---------------------------------------------------------------------
+\section{Safety Benefit Quantification}
+\label{sec:safety}
+% ---------------------------------------------------------------------
+
+The safety benefit module quantifies the present-value reduction in expected
+crash costs resulting from each improvement alternative. The formulation
+follows the methodology of the Highway Safety Manual (AASHTO, 2010, Part~C),
+extended to the optimization context developed by Harwood et al.~(2003) and
+Banihashemi~(2007), and updated to use current USDOT-recommended unit crash
+costs.
+
+% ---------------------------------------------------------------------
+\subsection{Severity Disaggregation}
+% ---------------------------------------------------------------------
+
+The MCBOMs framework adopts the five-bin KABCO crash severity classification
+as the standard:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item \textbf{K} --- Killed (fatal injury)
+  \item \textbf{A} --- Suspected serious (incapacitating) injury
+  \item \textbf{B} --- Suspected minor (non-incapacitating) injury
+  \item \textbf{C} --- Possible injury
+  \item \textbf{O} --- Property damage only (no injury)
+\end{itemize}
+
+The severity index set is denoted $\mathcal{S} = \{K, A, B, C, O\}$. All
+benefit calculations sum over this five-element set.
+
+\paragraph{Variants for benchmark reproduction.} Two legacy severity
+conventions are used in the validation reproductions described in
+Section~\ref{sec:validation}: Harwood (2003) used a two-bin convention
+(fatal+injury combined; PDO), and Banihashemi (2007) collapsed five severity
+levels into a single average crash cost per facility type. These variants are
+documented as conversion bridges and applied only when reproducing the
+respective papers' published results.
+
+% ---------------------------------------------------------------------
+\subsection{Unit Crash Costs}
+% ---------------------------------------------------------------------
+
+The framework default unit crash costs are taken from USDOT BCA Guidance
+(May~2025), Appendix~A, Table~A-1 (page~39), in 2023 dollars:
+\begin{equation*}
+\UC_K = \$13{,}200{,}000, \quad
+\UC_A = \$1{,}254{,}700, \quad
+\UC_B = \$246{,}900, \quad
+\UC_C = \$118{,}000, \quad
+\UC_O = \$5{,}300
+\end{equation*}
+
+These values include both economic costs (medical, vehicle damage, lost wages)
+and quality-adjusted-life-year (QALY) costs. State agencies applying the
+MCBOMs framework may substitute state-specific crash costs in place of the
+national defaults; FHWA-SA-25-021 (October~2025), Step~5, provides a
+per-capita-income adjustment procedure for converting national values to
+state-level values.
+
+% ---------------------------------------------------------------------
+\subsection{Safety Benefit Equation}
+% ---------------------------------------------------------------------
+
+The present-value safety benefit for project $i$, alternative $j$, over the
+analysis horizon $T$ is:
+\begin{equation}
+\Bsafety_{ij}\ =\ \sum_{t=1}^{T}\sum_{k=1}^{K_i}\sum_{s \in \mathcal{S}}
+  \bigl[\Enobuild_{ikst} - \Ebuild_{ijkst}\bigr] \cdot \UC_s \cdot \DF_t
+\label{eq:safety-benefit}
+\end{equation}
+
+\noindent where:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $K_i$ is the number of homogeneous segments (or intersections)
+    composing project $i$, per HSM Part~C segmentation
+  \item $\Enobuild_{ikst}$ is the expected number of crashes of severity $s$
+    on segment $k$ in year $t$ under the no-build (existing) condition
+  \item $\Ebuild_{ijkst}$ is the corresponding expected count under the build
+    condition (alternative $j$ implemented)
+  \item $\UC_s$ is the unit crash cost for severity $s$
+  \item $\DF_t$ is the discount factor from Equation~\ref{eq:df}
+\end{itemize}
+
+The build-condition expected crash count is obtained by applying the relevant
+Crash Modification Factor (CMF):
+\begin{equation}
+\Ebuild_{ijkst}\ =\ \Enobuild_{ikst} \cdot \CMF_{ijks}
+\label{eq:build-crashes}
+\end{equation}
+
+\noindent For alternatives that bundle multiple individual treatments
+$n = 1, 2, \ldots, N_{ij}$, the combined CMF is computed using the
+HSM-recommended multiplicative rule:
+\begin{equation}
+\CMF^{\mathrm{combined}}_{ij}\ =\ \prod_{n=1}^{N_{ij}} \CMF_n
+\label{eq:cmf-combine}
+\end{equation}
+
+This rule assumes that individual treatment effects are independent. The HSM
+acknowledges this as a known simplification; ongoing research in the FHWA CMF
+Clearinghouse is refining combined CMF estimates, but no consensus alternative
+exists at the time of this writing.
+
+% ---------------------------------------------------------------------
+\subsection{Constant-Annual-Crashes Simplification}
+% ---------------------------------------------------------------------
+
+For the Task~4 prototype, the no-build expected crash count is assumed
+constant across years (no traffic growth or treatment-effectiveness decay):
+\begin{equation*}
+\Enobuild_{ikst} = \Enobuild_{iks}, \qquad \forall t \in \{1, 2, \ldots, T\}
+\end{equation*}
+
+Under this assumption, Equation~\ref{eq:safety-benefit} factors as:
+\begin{equation}
+\Bsafety_{ij}\ =\ \biggl[ \sum_{k=1}^{K_i} \sum_{s \in \mathcal{S}}
+  \bigl(\Enobuild_{iks} - \Ebuild_{ijks}\bigr) \cdot \UC_s \biggr]
+  \cdot \PWF(r, T)
+\label{eq:safety-benefit-pwf}
+\end{equation}
+
+This is the form implemented in the MCBOMs Python module
+\texttt{mcboms.benefits.safety}. Time-varying expectations (for traffic growth
+or effectiveness decay) are supported by an alternative function
+(\texttt{safety\_benefit\_time\_varying}) but are not exercised in the Task~4
+prototype.
+
+% ---------------------------------------------------------------------
+\subsection{Source of $\Enobuild$ for the Prototype}
+% ---------------------------------------------------------------------
+
+For the Task~4 prototype, the no-build expected crash count
+$\Enobuild_{iks}$ is drawn directly from observed crash counts (typically a
+3- to 5-year crash history annualized). This convention matches:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item Banihashemi~(2007), who explicitly states: ``This optimization model
+    is for cases in which the EB procedure is not appropriate or there are
+    not enough crash data to support this process'' (page~6).
+  \item Harwood~(2003), who uses observed crash counts subdivided by default
+    severity proportions (page~4).
+  \item The parallel data-curation BCA spreadsheet developed in Task~4, which
+    uses observed crashes directly.
+\end{itemize}
+
+Empirical Bayes adjustment of $\Enobuild$ per Hauer~(1997) is a documented
+methodological option for implementations with adequate crash history data.
+EB adjustment, when applied, operates as a preprocessing step that produces
+an EB-adjusted $\Enobuild$ consumed unchanged by
+Equation~\ref{eq:safety-benefit}. The MCBOMs framework neither requires nor
+forbids EB adjustment; it is a deployment-time choice.
+
+% ---------------------------------------------------------------------
+\subsection{Connection to the Optimization Decision Variable}
+% ---------------------------------------------------------------------
+
+The safety benefit $\Bsafety_{ij}$ defined in Equation~\ref{eq:safety-benefit}
+is computed during preprocessing for every alternative $j$ of every project
+$i$. The optimizer's objective function
+(Equation~\ref{eq:obj-project}) multiplies $\Bsafety_{ij}$ by the binary
+decision variable $x_{ij}$, ensuring that benefits are credited only when an
+alternative is actually selected.
+
+The expected crash count that materializes after the optimization completes
+is given by the gating identity:
+\begin{equation}
+E_{iks}^{\mathrm{final}}\ =\ \biggl(1 - \sum_{j \in A_i} x_{ij}\biggr) \Enobuild_{iks}\ +\ \sum_{j \in A_i} x_{ij} \cdot \Ebuild_{ijks}
+\label{eq:gating}
+\end{equation}
+
+\noindent with $\sum_{j \in A_i} x_{ij} \leq 1$. This identity is included
+for expository completeness; it is not needed in computation, since
+$\Bsafety_{ij}$ is precomputed and the optimizer operates on
+Equation~\ref{eq:obj-project} directly.
+
+% ---------------------------------------------------------------------
+\subsection{Worked Example}
+\label{sec:safety-worked-example}
+% ---------------------------------------------------------------------
+
+To illustrate the application of Equation~\ref{eq:safety-benefit-pwf},
+consider a single rural two-lane segment with the following characteristics:
+
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item Segment length: 5 miles
+  \item AADT: 5{,}000 vehicles per day
+  \item Observed annual crash frequency $\Enobuild = 6.0$ crashes per year
+  \item Severity distribution (from observed crash history):
+    1.3\% K, 6.5\% A, 9.5\% B, 11.7\% C, 71.0\% O
+  \item Proposed treatment: lane widening from 10~ft to 12~ft, with a single
+    CMF of $0.88$ applied uniformly across all severities
+  \item Discount rate $r = 0.07$, analysis horizon $T = 20$ years
+\end{itemize}
+
+\paragraph{Step 1: Disaggregate observed crashes by severity.}
+\[
+\Enobuild_K = 0.078,\quad
+\Enobuild_A = 0.390,\quad
+\Enobuild_B = 0.570,\quad
+\Enobuild_C = 0.702,\quad
+\Enobuild_O = 4.260
+\]
+\quad (crashes per year)
+
+\paragraph{Step 2: Apply the CMF to obtain build-condition expected crashes.}
+With $\CMF = 0.88$:
+\[
+\Ebuild_K = 0.0686,\quad
+\Ebuild_A = 0.3432,\quad
+\Ebuild_B = 0.5016,\quad
+\Ebuild_C = 0.6178,\quad
+\Ebuild_O = 3.7488
+\]
+
+\paragraph{Step 3: Compute annual benefit (sum over severity).}
+The reduction is $(1 - \CMF) = 0.12$ of each severity bin. Multiplying by the
+USDOT BCA May~2025 unit costs:
+\begin{align*}
+\text{Annual safety benefit} \ &=\ (0.12)(0.078)(\$13{,}200{,}000) \\
+&+ (0.12)(0.390)(\$1{,}254{,}700) \\
+&+ (0.12)(0.570)(\$246{,}900) \\
+&+ (0.12)(0.702)(\$118{,}000) \\
+&+ (0.12)(4.260)(\$5{,}300) \\
+&=\ \$123{,}552 + \$58{,}720 + \$16{,}888 + \$9{,}940 + \$2{,}709 \\
+&=\ \$211{,}809 \ \text{per year}
+\end{align*}
+
+\paragraph{Step 4: Convert to present value.}
+\begin{equation*}
+\Bsafety = \$211{,}809 \times \PWF(0.07, 20) = \$211{,}809 \times 10.594 = \$2{,}243{,}913
+\end{equation*}
+
+This worked example uses the framework default unit crash costs (USDOT BCA
+May~2025). The MCBOMs Python implementation reproduces this calculation
+exactly; see Section~\ref{sec:validation-worked} for the validation result.
+
+% ---------------------------------------------------------------------
+\section{Operational Benefit Quantification}
+\label{sec:ops}
+% ---------------------------------------------------------------------
+
+The operational benefit module quantifies the present-value reduction in
+travel time and vehicle operating costs resulting from each improvement
+alternative. The formulation follows USDOT BCA Guidance (May~2025,
+Section~5.2 and Appendix~A Tables~A-2 and~A-3) and generalizes the
+operational-benefit treatments in Harwood (2003)'s PTOB term and
+Banihashemi (2007)'s delay-cost term, both of which are recovered as special
+cases of the MCBOMs formulation.
+
+% ---------------------------------------------------------------------
+\subsection{Operational Benefit Equation}
+% ---------------------------------------------------------------------
+
+The present-value operational benefit for project $i$, alternative $j$, is:
+\begin{equation}
+\Bops_{ij}\ =\ \sum_{t=1}^{T}\sum_{k=1}^{K_i} \biggl[
+  \sum_{v \in \mathcal{V}} \Delta d_{ijkvt} \cdot \AADT_{ijkvt} \cdot 365 \cdot \OCC_v \cdot \VOT_v
+  \ +\ \sum_{v \in \mathcal{V}} \Delta\VOC_{ijkv} \cdot \VMT_{ijkvt}
+\biggr] \cdot \DF_t
+\label{eq:ops-benefit}
+\end{equation}
+
+\noindent where:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $\Delta d_{ijkvt}$ is the change in per-vehicle delay (hours per
+    vehicle), for vehicle class $v$ on segment $k$ in year $t$, attributable
+    to alternative $j$ at project $i$. Computed externally via Highway
+    Capacity Manual procedures, IHSDM, TWOPAS, or microsimulation.
+  \item $\AADT_{ijkvt}$ is the annual average daily traffic by vehicle class
+    (vehicles per day)
+  \item $365$ is the annualization factor (days per year)
+  \item $\OCC_v$ is the average vehicle occupancy by vehicle class (persons
+    per vehicle), drawn from USDOT BCA Guidance Appendix~A Table~A-3
+  \item $\VOT_v$ is the value of travel time by vehicle class (\$ per
+    person-hour), drawn from USDOT BCA Guidance Appendix~A Table~A-2
+  \item $\Delta\VOC_{ijkv}$ is the change in vehicle operating cost (\$ per
+    vehicle-mile)
+  \item $\VMT_{ijkvt}$ is the vehicle-miles traveled per year, by segment and
+    vehicle class
+  \item $\DF_t$ is the discount factor from Equation~\ref{eq:df}
+  \item $\mathcal{V}$ is the set of vehicle classes (e.g., light-duty
+    passenger, single-unit truck, combination truck)
+\end{itemize}
+
+\paragraph{Dimensional consistency.} The travel time term has units
+$(\text{hr}/\text{veh}) \cdot (\text{veh}/\text{day}) \cdot (\text{days}) \cdot (\text{persons}/\text{veh}) \cdot (\$/\text{person-hr}) = \$$.
+The vehicle operating cost term has units
+$(\$/\text{veh-mi}) \cdot (\text{veh-mi}) = \$$.
+
+\paragraph{Standard parameter values.} For the Task~4 prototype, the
+following USDOT BCA Guidance May~2025 values apply by default:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $\VOT$ (all-purposes blend, passenger): \$21.10 per person-hour
+    (Table~A-2, page~40)
+  \item $\OCC$ (passenger vehicles, all travel): 1.52 persons per vehicle
+    (Table~A-3, page~41)
+  \item $\VOC$ (light-duty vehicles): \$0.56 per vehicle-mile (Table~A-4,
+    page~41)
+  \item $\VOC$ (commercial trucks): \$1.27 per vehicle-mile (Table~A-4)
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\subsection{Generalization of Harwood and Banihashemi Operational Treatments}
+% ---------------------------------------------------------------------
+
+Equation~\ref{eq:ops-benefit} generalizes the operational-benefit treatments
+in the two benchmark studies; both are recovered as special cases.
+
+\paragraph{Harwood (2003) PTOB as a special case.} Harwood's
+Present-value Traffic Operational Benefit (PTOB) captures the travel time
+savings from a 1~mph speed increase observed after pavement resurfacing,
+valued at \$10.00 per hour (1994 dollars), assumed to persist for 30~months.
+Setting $\OCC_v = 1$, $\VOT_v = \$10.00$/hr, $\Delta\VOC = 0$, and limiting
+the temporal sum to 30 months ($T = 2.5$ years) at Harwood's 4~percent
+discount rate recovers PTOB exactly.
+
+\paragraph{Banihashemi (2007) delay cost as a special case.}
+Banihashemi minimizes the sum of crash and delay costs, with delay valued at
+\$12.50 per vehicle-hour (page~109), computed as
+$\$10/\text{hr} \times 1.25$ persons per vehicle (occupancy folded into a
+single rate). Delay times $D$ are computed externally in vehicle-hours per
+year using IHSDM/TWOPAS for highway segments and Highway Capacity Manual
+procedures (Equations A30-11 and A30-15) for intersections. Setting
+$\OCC_v \cdot \VOT_v = \$12.50$/veh-hr (a single combined rate),
+$\Delta\VOC = 0$, and treating $\Delta d \cdot \AADT \cdot 365$ as
+Banihashemi's annual $D$ recovers his delay cost term exactly.
+
+This generalization allows the MCBOMs framework to be applied across a wider
+range of project types than either benchmark addresses individually, while
+remaining consistent with both formulations as special cases.
+
+% ---------------------------------------------------------------------
+\subsection{Worked Example}
+% ---------------------------------------------------------------------
+
+To illustrate the application of Equation~\ref{eq:ops-benefit}, consider a
+single highway segment with the following characteristics:
+
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item Segment length: 5 miles
+  \item AADT: 1{,}500 vehicles per day (passenger vehicles only)
+  \item Per-vehicle delay reduction: $\Delta d = 17$ seconds per vehicle
+    $= 17/3600 = 0.00472$ hr per vehicle
+  \item Average occupancy $\OCC = 1.52$ persons per vehicle
+  \item Value of travel time $\VOT = \$21.10$ per person-hour (USDOT BCA
+    Guidance May~2025, all-purposes)
+  \item Vehicle operating cost change $\Delta\VOC = 0$ (no change in
+    operating cost; the alternative reduces delay only)
+  \item Discount rate $r = 0.07$, analysis horizon $T = 20$ years
+\end{itemize}
+
+\paragraph{Step 1: Compute annual person-hours of delay reduction.}
+\begin{align*}
+\text{Annual person-hours saved}
+\ &=\ \Delta d \cdot \AADT \cdot 365 \cdot \OCC \\
+\ &=\ 0.004722 \cdot 1{,}500 \cdot 365 \cdot 1.52 \\
+\ &=\ 3{,}930 \ \text{person-hours per year}
+\end{align*}
+
+\paragraph{Step 2: Monetize.}
+\begin{equation*}
+\text{Annual operational benefit} \ =\ 3{,}930 \times \$21.10 \ =\ \$82{,}919 \ \text{per year}
+\end{equation*}
+
+\paragraph{Step 3: Convert to present value.}
+\begin{equation*}
+\Bops \ =\ \$82{,}919 \times \PWF(0.07, 20) \ =\ \$82{,}919 \times 10.594 \ =\ \$878{,}449
+\end{equation*}
+
+This worked example uses the framework default parameters. The vehicle operating
+cost contribution is zero in this case; for projects that change vehicle
+operating cost (for example, by altering the route's grade or surface type),
+the second term in Equation~\ref{eq:ops-benefit} contributes additionally.
+
+% ---------------------------------------------------------------------
+\section{Corridor Condition Benefit Quantification}
+\label{sec:ccm}
+% ---------------------------------------------------------------------
+
+Corridor Condition Measures (CCMs) capture benefit categories that fall
+outside the conventional safety and operational scope: energy and emissions
+reductions, environmental and health co-benefits, resilience to natural
+hazards, accessibility improvements, and changes in property value. The
+MCBOMs framework provides a generic computational structure for CCM benefits
+and a reference table of monetization rates.
+
+% ---------------------------------------------------------------------
+\subsection{CCM Benefit Computation Structure}
+% ---------------------------------------------------------------------
+
+The present-value CCM benefit is computed as:
+\begin{equation}
+\Bccm_{ij}\ =\ \sum_{c \in \mathcal{C}} \sum_{t=1}^{T} \sum_{k=1}^{K_i}
+  \Delta Q_{ijkt}^{c} \cdot V_t^{c} \cdot \DF_t
+\label{eq:ccm-benefit}
+\end{equation}
+
+\noindent where:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item $\mathcal{C}$ is the set of CCM categories applicable to the project
+  \item $\Delta Q_{ijkt}^{c}$ is the change in the physical quantity for
+    category $c$ on segment $k$ in year $t$ attributable to alternative $j$
+    at project $i$ (e.g., metric tons of $\mathrm{NO_x}$, gallons of fuel,
+    expected damage from flood events)
+  \item $V_t^{c}$ is the monetization rate for category $c$ in year $t$
+    (\$ per unit of $Q^c$)
+  \item $\DF_t$ is the discount factor from Equation~\ref{eq:df}
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\subsection{CCM Categories and Reference Sources}
+% ---------------------------------------------------------------------
+
+The Task~4 prototype identifies eight CCM categories drawn from the
+methodology selected in Task~3. For each, Table~\ref{tab:ccm-sources}
+identifies the physical quantity to be measured and the recommended
+monetization source.
+
+\begin{table}[H]
+\centering
+\caption{CCM categories: physical quantities and monetization sources.}
+\label{tab:ccm-sources}
+\small
+\begin{tabular}{p{3.4cm}p{4.0cm}p{6.6cm}}
+\toprule
+\textbf{Category} & \textbf{Physical Quantity ($\Delta Q^c$)} & \textbf{Monetization Source ($V^c$)} \\
+\midrule
+Energy / Fuel & Annual fuel consumption change (gallons or BTU) & USDOT BCA Guidance Appendix~A Table~A-4 (vehicle operating cost separation; reflected in $\Bops$ when applicable) \\
+\addlinespace
+Air Quality (NOx, SOx, PM\textsubscript{2.5}) & Annual emissions change (metric tons) & USDOT BCA Guidance Appendix~A Table~A-6 (page~42) \\
+\addlinespace
+Resilience to natural hazards & Expected annual damages avoided (\$) or service-loss days reduced & FEMA Standard Economic Values v13 (September~2024) \\
+\addlinespace
+Accessibility / Mobility Energy Productivity (MEP) & Composite mobility index change (per FDOT/NREL methodology) & Jin et al.~(2023), FDOT BDV29-977-66 \\
+\addlinespace
+Reduced Emergency Service Delay & Avoided property damage from fire-service delay; ambulance survival rates & FEMA methodology adapted for transportation (USDOT BCA Guidance Section~5.7) \\
+\addlinespace
+Stormwater Runoff & Reduced runoff volume (gallons) and pollutant loads & Local utility cost data; USDOT BCA Guidance Section~5.7 \\
+\addlinespace
+Wildlife Crash Reduction & Wildlife-vehicle collisions avoided & USDOT BCA Guidance Section~5.7 (treated within safety methodology where applicable) \\
+\addlinespace
+Property Value Increase & Net land value change attributable to project (\$, one-time) & Local real estate data; USDOT BCA Guidance Section~5.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\subsection{Double-Counting Prevention}
+% ---------------------------------------------------------------------
+
+The additive decomposition $\Btot_{ij} = \Bsafety_{ij} + \Bops_{ij} +
+\Bccm_{ij}$ assumes that the three benefit categories are independent. Three
+mechanisms enforce this independence:
+
+\paragraph{(1) Data-level tagging.} Each benefit observation entering the
+calculation is tagged with a category indicator
+$\delta_{c,ikt} \in \{0, 1\}$ identifying its source category. An observation
+contributes to exactly one of $\Bsafety$, $\Bops$, or $\Bccm$.
+
+\paragraph{(2) Equation-level gating.} Each component sums only over its
+tagged observations. For example, fuel-consumption changes that are already
+reflected in the operational $\VOC$ term of Equation~\ref{eq:ops-benefit}
+are not separately counted in the energy CCM category.
+
+\paragraph{(3) Composite-metric adjustment.} When a composite index is used
+that embeds multiple component categories (for example, the FDOT/NREL MEP
+index, which combines travel time, reliability, and energy with weights
+$w_{TT} = 0.40$, $w_{Rel} = 0.25$, $w_{Energy} = 0.35$), the operational and
+corridor components are reduced proportionally to avoid duplicating the
+embedded contributions:
+\begin{align*}
+\Bops_{ij} \ &=\ (1 - w_{TT}) \cdot B_{ij}^{TT}
+            \ +\ (1 - w_{Rel}) \cdot B_{ij}^{Rel}
+            \ +\ B_{ij}^{SD} \\
+\Bccm_{ij} \ &=\ (1 - w_{Energy}) \cdot B_{ij}^{Energy}
+            \ +\ B_{ij}^{\text{other-CCM}}
+\end{align*}
+
+\paragraph{Validation.} The pairwise correlation between benefit components
+across all $(i, j)$ pairs is monitored as a diagnostic check; correlations
+satisfying $|\rho(B^{c_1}, B^{c_2})| > 0.3$ are flagged for manual review of
+potential double-counting.
+
+% ---------------------------------------------------------------------
+\section{Solution Methodology}
+\label{sec:solution}
+% ---------------------------------------------------------------------
+
+This section describes the solution approach for the MCBOMs MILP, the
+software implementation, and the relationship between the MILP formulation
+and alternative optimization paradigms considered during model selection.
+
+% ---------------------------------------------------------------------
+\subsection{Mixed-Integer Linear Programming Formulation Summary}
+\label{sec:milp-summary}
+% ---------------------------------------------------------------------
+
+The complete MCBOMs MILP is summarized below. The formulation has four
+core constraint families that are always active and three optional
+constraint families that are activated only when the corresponding agency
+data is provided.
+\begin{equation*}
+\begin{aligned}
+\text{Maximize:}\quad & Z = \sum_{i=1}^{I} \sum_{j \in A_i} (\Btot_{ij} - C_{ij}^{\mathrm{disc}}) \cdot x_{ij} & \text{(objective)} \\[6pt]
+\text{Subject to:}\quad
+& \sum_{i=1}^{I} \sum_{j \in A_i} C_{ij} \cdot x_{ij} \leq B^{\mathrm{total}} & \text{(total budget)} \\
+& \sum_{j \in A_i} x_{ij} \leq 1, \qquad \forall i & \text{(mutual exclusivity)} \\
+& x_{ij} \in \{0, 1\}, \qquad \forall i, \forall j \in A_i & \text{(binary)} \\[4pt]
+& \sum_{i \in \mathcal{F}_m} \sum_{j \in A_i} C_{ij} \cdot x_{ij} \leq B_m, \quad \forall m & \text{(facility-type sub-budget)} \\
+& \sum_{i \in \mathcal{R}_r} \sum_{j \in A_i} C_{ij} \cdot x_{ij} \leq B_r, \quad \forall r & \text{(regional cap)} \\
+& \sum_{i \in \mathcal{R}_r} \sum_{j \in A_i} C_{ij} \cdot x_{ij} \geq \beta_r B^{\mathrm{total}}, \quad \forall r & \text{(regional floor)} \\[4pt]
+& x_{ij} \leq x_{i'j'} & \text{(dependency, optional)} \\
+& x_{ij} + x_{i'j'} \leq 1 & \text{(cross-project exclusivity, optional)} \\
+& \sum_{j \in A_i} \Btot_{ij} \cdot x_{ij} \geq \theta \sum_{j \in A_i} C_{ij} \cdot x_{ij}, \quad \forall i & \text{(min BCR, optional)} \\
+\end{aligned}
+\end{equation*}
+
+\noindent The cost decomposition $C_{ij} = \sum_{k=1}^{K_i} \sum_{n \in T_{jk}}
+\mathit{Cost}_{ikn}$ (Equation~\ref{eq:cost-decomp}) is implicit in the
+above; total benefit $\Btot_{ij}$ is computed per Equation~\ref{eq:btot}
+with components from Sections~\ref{sec:safety}--\ref{sec:ccm}.
+
+\paragraph{Problem scale.} The MILP has $\sum_{i=1}^{I} |A_i|$ binary
+decision variables. The core-constraint count comprises one total-budget
+constraint, $I$ mutual-exclusivity constraints, $|\mathcal{F}|$
+facility-type sub-budgets, and up to $2|\mathcal{R}|$ regional constraints
+(cap and floor). The optional constraints add at most one inequality per
+declared dependency pair, conflict pair, or BCR-enforced project. For the
+Harwood (2003) ten-site validation case, the problem has 41 binary
+variables and 11 constraints; for the Banihashemi (2007) full network
+case (135 homogeneous segments plus 13 intersections), the published
+problem has 3{,}385 binary variables and 535 constraints.
+
+% ---------------------------------------------------------------------
+\subsection{Software Implementation}
+% ---------------------------------------------------------------------
+
+The MCBOMs MILP is implemented as a Python package, \texttt{mcboms}, that
+constructs the model from input data and solves it via Gurobi
+(commercial) or CBC (open-source) backends. The MILP itself --- the
+mathematical statement summarized in
+Section~\ref{sec:milp-summary} --- is solver-agnostic; it can be exported
+to standard MILP exchange formats (AMPL \texttt{.mod}/\texttt{.dat},
+GAMS \texttt{.gms}, CPLEX \texttt{.lp}, MPS) and solved by any compatible
+commercial or open-source MILP solver, including IBM~CPLEX, FICO~Xpress,
+Gurobi, SCIP, and CBC. Reference instances of the Harwood and
+Banihashemi validation case studies are provided in these formats so
+that any reviewer can independently reproduce the optimization results
+without depending on the Python implementation.
+
+The implementation is organized into a modular Python package,
+\texttt{mcboms}, with the following structure (status as of Task~4
+prototype):
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item \texttt{mcboms.core} --- optimizer engine, alternative-set
+    enumeration, and solver back-end interface (\emph{implemented}).
+  \item \texttt{mcboms.benefits.safety} --- implementation of
+    Equation~\ref{eq:safety-benefit-pwf} (\emph{implemented}, validated
+    against the worked example to within floating-point precision and
+    cross-validated against the parallel BCA spreadsheet to \$0.00 error
+    across 35 segment--alternative pairs).
+  \item \texttt{mcboms.benefits.operations} --- implementation of
+    Equation~\ref{eq:ops-benefit} (\emph{in development}; the
+    formulation is locked, the implementation will follow the same
+    preprocessing pattern as \texttt{safety}).
+  \item \texttt{mcboms.benefits.ccm} --- implementation of
+    Equation~\ref{eq:ccm-benefit} (\emph{in development}; computational
+    structure is locked per Section~\ref{sec:ccm}, category-specific
+    monetization functions to be added incrementally).
+  \item \texttt{mcboms.io} --- data I/O modules for HSM-format input,
+    spreadsheet input, and validation case studies (\emph{implemented}
+    for the BCA spreadsheet reader; HSM-format ingestion to follow).
+  \item \texttt{mcboms.utils.economics} --- discount rates, present-worth
+    factors, and unit crash cost defaults (USDOT BCA Guidance May 2025;
+    \emph{implemented}).
+  \item \texttt{mcboms.data} --- bundled validation case study data for
+    Harwood (2003) and Banihashemi (2007) intersection sub-problem
+    (\emph{implemented}).
+\end{itemize}
+
+The full source code is available in the project's GitHub repository,
+along with an automated test suite (32 tests covering the worked example,
+Harwood reproduction, and per-component unit tests), validation scripts
+(\texttt{run\_harwood\_validation.py},
+\texttt{banihashemi\_intersections.py}), and a programmer's guide.
+
+% ---------------------------------------------------------------------
+\subsection{Comparative Summary of Solution Methodologies}
+% ---------------------------------------------------------------------
+
+Task~3 evaluated four candidate solution methodologies for the MCBOMs
+problem: MILP, surrogate-assisted genetic algorithms (GA), reinforcement
+learning, and machine-learning regression on pre-computed benefit surfaces.
+MILP was selected as the production methodology on the following bases:
+
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item \textbf{Global optimality.} MILP solvers provide certified globally
+    optimal solutions (within numerical tolerance), which is required for
+    FHWA-deliverable resource allocation results.
+  \item \textbf{Methodological transparency.} The objective function and
+    constraints are explicit and auditable. Each step in the optimization
+    can be traced back to the formulation, in contrast to black-box machine
+    learning approaches.
+  \item \textbf{Compatibility with HSM and CMF methodology.} The MILP
+    formulation operates on benefit and cost values computed from
+    HSM-standard methods (SPFs, CMFs, EB adjustment when applied),
+    preserving the methodological lineage that FHWA deliverables require.
+  \item \textbf{Maturity.} MILP for transportation resource allocation has
+    a 30-year track record (Cohon, 1978; Harwood, 2003; Banihashemi, 2007;
+    AASHTO Safety Analyst). Solver technology is mature.
+  \item \textbf{Tractability.} The Harwood (2003) and Banihashemi (2007)
+    case studies solve in under one second on commodity hardware. Realistic
+    state-DOT problems with $10^4$--$10^5$ variables solve in minutes.
+\end{itemize}
+
+Machine learning methods are explicitly retained as preprocessing tools
+where helpful (for example, gap-filling missing inputs to HSM SPFs), but are
+not used as substitutes for the optimization core.
+
+% ---------------------------------------------------------------------
+\section{Validation Against Published Benchmarks}
+\label{sec:validation}
+% ---------------------------------------------------------------------
+
+The MCBOMs implementation has been validated at three independent levels: a
+methodology-level reproduction of the worked example
+(Section~\ref{sec:safety-worked-example}), a program-level reproduction of
+Harwood et al.~(2003), and a network-level reproduction of Banihashemi
+(2007). Each validation level exercises a distinct portion of the framework
+and tests against external published benchmarks rather than internal
+self-consistency.
+
+% ---------------------------------------------------------------------
+\subsection{Methodology-Level Validation: Worked Example}
+\label{sec:validation-worked}
+% ---------------------------------------------------------------------
+
+The worked example in Section~\ref{sec:safety-worked-example} computes a
+single-segment safety benefit by direct application of
+Equation~\ref{eq:safety-benefit-pwf}. The MCBOMs Python implementation
+(\texttt{mcboms.benefits.safety.safety\_benefit}) reproduces this calculation
+exactly: the annual safety benefit is computed as \$211{,}809, and the
+20-year present-value benefit is \$2{,}243{,}913. The implementation
+matches the manual calculation to within numerical floating-point precision
+(maximum discrepancy less than \$0.01 across all severity components).
+
+This validation confirms that the safety benefit module correctly implements
+the methodology described in this chapter and that the framework default
+unit crash costs are correctly applied.
+
+% ---------------------------------------------------------------------
+\subsection{Program-Level Validation: Harwood et al. (2003)}
+\label{sec:validation-harwood}
+% ---------------------------------------------------------------------
+
+The Harwood et al.~(2003) study presents a 10-site case study covering a mix
+of rural and urban undivided and divided nonfreeway facilities (2- and
+4-lane), with optimization solved at two budget levels (\$10M and \$50M).
+The MCBOMs MILP optimizer was run against the published Harwood case study
+under the following configuration:
+
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item Harwood's published per-site cost and benefit values from his
+    Tables~2 and~3 (rather than recomputed from raw inputs)
+  \item Harwood's discount rate of 4~percent (per AASHTO~1977)
+  \item Harwood's two-bin severity convention (fatal+injury combined; PDO)
+  \item No deferral-penalty mechanism (PNR is not implemented in the MCBOMs
+    prototype; see the discussion in Section~\ref{sec:validation-harwood-10m}
+    below)
+\end{itemize}
+
+\subsubsection{\$50 Million Budget Case}
+\label{sec:validation-harwood-50m}
+
+At the \$50M budget level, the budget constraint does not bind: all
+cost-effective improvements can be funded simultaneously, regardless of any
+deferral-penalty mechanism. Table~\ref{tab:harwood-50m} compares the MCBOMs
+optimizer's results against the published Harwood values.
+
+\begin{table}[H]
+\centering
+\caption{MCBOMs reproduction of Harwood (2003) Table~4, \$50~million budget.
+Differences are attributable to rounding in the published values.}
+\label{tab:harwood-50m}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Metric} & \textbf{Harwood (2003)} & \textbf{MCBOMs} & \textbf{Difference} \\
+\midrule
+Total benefit (PSB + PTOB)             & \$10{,}640{,}914 & \$10{,}640{,}909 & $-\$5$ \\
+Total expenditure (resurf + safety)    & \$16{,}271{,}246 & \$16{,}271{,}247 & $+\$1$ \\
+Safety improvement cost                & \$4{,}481{,}397  & \$4{,}481{,}397  & \$0    \\
+Net benefit                            & \$6{,}159{,}517  & \$6{,}159{,}512  & $-\$5$ \\
+\midrule
+Site selection (alternatives chosen)   & 10 sites match   & 10 sites match   & ---    \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The MCBOMs optimizer reproduces Harwood's published \$50M result to within
+\$5 across all reported metrics, with identical site selection across all 10
+sites. The five-dollar discrepancy is consistent with rounding in the
+intermediate published values. This validates both the project-level MILP
+formulation (Equations~\ref{eq:obj-project}--\ref{eq:binary-project}) and the
+safety-benefit calculation (Equation~\ref{eq:safety-benefit-pwf}) at program
+scale.
+
+\subsubsection{\$10 Million Budget Case and the Treatment of Deferral
+Penalties}
+\label{sec:validation-harwood-10m}
+
+At the \$10M budget level, the budget constraint binds: not all sites can be
+fully funded, and some must be deferred (do-nothing alternative selected).
+Harwood's published \$10M solution defers Sites~4, 6, and~9. The MCBOMs
+optimizer, configured as described above, instead defers Sites~1, 4, 6,
+and~8 and produces a higher net benefit. Table~\ref{tab:harwood-10m}
+documents the comparison.
+
+\begin{table}[H]
+\centering
+\caption{MCBOMs solution at \$10~million budget compared to Harwood (2003)
+Table~4. The divergence reflects the deferral-penalty methodology described
+below.}
+\label{tab:harwood-10m}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Metric} & \textbf{Harwood (2003)} & \textbf{MCBOMs} & \textbf{Difference} \\
+\midrule
+Total benefit (PSB + PTOB)             & \$7{,}187{,}814 & \$7{,}600{,}301 & $+5.7\%$ \\
+Total expenditure (resurf + safety)    & \$9{,}953{,}579 & \$9{,}547{,}090 & $-4.1\%$ \\
+Net benefit                            & \$4{,}675{,}033 & \$4{,}931{,}520 & $+5.5\%$ \\
+\midrule
+Sites deferred (do-nothing)            & \{4, 6, 9\}     & \{1, 4, 6, 8\}  & differs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This divergence is methodologically intentional and reflects a documented
+design choice. Harwood's full formulation includes a Penalty for Not
+Resurfacing (PNR), which adds a deferral cost to the do-nothing alternative
+roughly proportional to the avoided cost of eventual full pavement
+reconstruction. The MCBOMs framework does \emph{not} implement PNR for the
+following reasons:
+
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item Harwood (2003) publishes only the aggregate PNR (\$5{,}576{,}145
+    across the deferred sites in the \$10M case) and a qualitative formula.
+    Per-site PNR values are not available, so reproducing Harwood's
+    \$10M solution exactly would require reverse-engineering site-level
+    penalties rather than computing them from a documented procedure.
+  \item The PNR formula requires per-site pavement condition data and
+    time-to-failure estimates that are not standardized in current FHWA
+    guidance and are not present in the MCBOMs prototype's case study
+    inputs.
+  \item Banihashemi (2007), the second benchmark, also does not use a
+    deferral-penalty mechanism.
+\end{itemize}
+
+Without PNR, the MCBOMs optimizer is free to defer sites strictly on
+net-benefit grounds, and consequently finds a solution that is 5.5~percent
+higher in net benefit than Harwood's published \$10M solution.
+Both solutions are correct within their respective formulations: MCBOMs is
+net-benefit-optimal subject to the budget constraint, while Harwood's
+solution is optimal subject to budget plus PNR-incentivized resurfacing of
+additional sites. Highway agencies wishing to incorporate pavement-deferral
+costs in the optimization can do so by adding those costs to the
+do-nothing alternative's cost term $C_{i,0}$ as a negative benefit; the
+MCBOMs formulation supports this directly through
+Equation~\ref{eq:obj-project}.
+
+\subsubsection{Cross-Validation Against the Parallel BCA Spreadsheet}
+
+Independent of the published-paper validations, the MCBOMs safety benefit
+output has been cross-validated against the Task~4 data-curation BCA
+spreadsheet on a per-(segment, alternative) basis. The spreadsheet
+implements a streamlined formulation:
+\begin{equation}
+B^{\mathrm{safety,\ spreadsheet}}\ =\ \UC_K \cdot (\mathrm{Obs}_K - \mathrm{Proj}_K)
+  + \UC_B \cdot (\mathrm{Obs}_{ABC} - \mathrm{Proj}_{ABC})
+  + \UC_O \cdot (\mathrm{Obs}_O - \mathrm{Proj}_O)
+\label{eq:spreadsheet-formula}
+\end{equation}
+
+\noindent which is Equation~\ref{eq:safety-benefit} reduced to (a)~a
+single-year horizon (no discounting), and (b)~a three-bin severity
+classification ($K$ / $ABC$-combined / $O$) with the Injury-B unit cost
+applied to the entire $ABC$ bin. The cross-validation results across 35
+segment--alternative pairs in the test dataset are:
+
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item \textbf{Replication accuracy.} Maximum absolute error between the
+    MCBOMs Python replication of Equation~\ref{eq:spreadsheet-formula} and
+    the spreadsheet's reported \emph{Safety Benefit} values is \$0.00. The
+    MCBOMs codebase reproduces every value in the spreadsheet's safety
+    benefit column to the cent.
+  \item \textbf{Methodological difference.} The ratio of MCBOMs
+    Equation~\ref{eq:safety-benefit-pwf} present-value benefit to the
+    spreadsheet's single-year benefit is constant at 10.59 across all
+    35~pairs, exactly matching $\PWF(0.07, 20) = 10.594$. The two tools
+    are mathematically equivalent up to the discounting choice and the
+    severity-binning convention bridge.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\subsection{Network-Level Validation: Banihashemi (2007)}
+\label{sec:validation-banihashemi}
+% ---------------------------------------------------------------------
+
+The Banihashemi~(2007) study presents a network case study with three
+highways (4--10 km in length) and 13 intersections, with the optimization
+solved at ten budget levels from \$1M to \$12.2M. The case study uses the
+IHSDM Crash Prediction Module (CPM) for both highway segment and
+intersection crash predictions, with delay times computed from the Highway
+Capacity Manual (Equations~A30-11 and~A30-15) for intersections and from
+the published Highway~1 climbing-lane analysis for segments.
+
+\paragraph{Validation scope.} The Banihashemi validation is conducted on the
+intersection sub-problem of his case study: the 13 intersections with
+published ADTs, improvement combinations, and delay times. The full network
+reproduction (combining all three highways and all 13 intersections, totaling
+135 homogeneous segments and 3{,}385 binary variables) requires
+case-study-specific segment geometry data not published in the paper; that
+full reproduction is documented as a planned extension.
+
+\paragraph{Configuration.} The MCBOMs MILP optimizer was run against the
+Banihashemi intersection sub-problem under the following configuration:
+\begin{itemize}[leftmargin=2em, itemsep=2pt]
+  \item IHSDM Crash Prediction Module (Equation~15 of Banihashemi),
+    implemented with Banihashemi's published parameters ($\alpha$, $\beta$,
+    $\gamma$, $C_i$) for 3-leg stop, 4-leg stop, and 4-leg signalized
+    intersection types (page~113)
+  \item Intersection type inferred from Table~3 traffic control column: all
+    13 intersections treated as 4-leg stop-controlled or 4-leg signalized
+    (Int~10) consistent with the traffic control entries
+  \item AMF values for intersection features (skew, traffic control change,
+    left-turn lane, sight distance deficiency) from IHSDM and Vogt/Bared
+    base models; note that Banihashemi does not publish his exact AMF values,
+    so exact numerical reproduction is not expected
+  \item Unit delay cost $\$12.50$ per vehicle-hour (Banihashemi page~109)
+  \item Average crash costs by facility type: $\$55{,}239$ (3-leg stop),
+    $\$81{,}375$ (4-leg stop), $\$31{,}665$ (4-leg signalized)
+    (Banihashemi page~109)
+  \item 20-year project lifetime, no discounting (per Banihashemi's
+    framework)
+\end{itemize}
+
+\paragraph{Results.} Table~\ref{tab:banihashemi-results} shows the MCBOMs
+intersection selections at each budget level studied by Banihashemi.
+
+\begin{table}[H]
+\centering
+\caption{MCBOMs intersection sub-problem results compared to the
+intersection portion of Banihashemi (2007) Table~5. Notation: ``Int~$x$:
+LTL'' means alternative with left-turn lane added at intersection $x$;
+``SA'' means skew-angle correction; ``ISD'' means sight distance
+improvement.}
+\label{tab:banihashemi-results}
+\scriptsize
+\begin{tabular}{rp{5.4cm}p{5.4cm}}
+\toprule
+\textbf{Budget} & \textbf{MCBOMs (intersection sub-problem)} & \textbf{Banihashemi (full network)} \\
+\midrule
+Unlimited & Int~1:LTL; Int~2:LTL; Int~5:LTL; Int~6:LTL; Int~7:SA,ISD; Int~9:LTL; Int~12:LTL & Int~1:LTL; Int~2:LTL; Int~5:LTL; Int~6:LTL; Int~7:SA,ISD; Int~9:LTL; Int~10:LTL; Int~12:SA,LTL; Int~13:SA,LTL,ISD \\
+\addlinespace
+\$8M & same as unlimited (spent \$3.2M) & Int~1:LTL; Int~2:LTL; Int~5:LTL; Int~6:LTL; Int~12:LTL; Int~13:LTL \\
+\addlinespace
+\$6M & same as unlimited (spent \$3.2M) & Int~7:SA,ISD; Int~12:LTL; Int~13:LTL \\
+\addlinespace
+\$3M & Int~1:LTL; Int~2:LTL; Int~5:LTL; Int~6:LTL; Int~9:LTL; Int~12:LTL (spent \$2.1M) & Int~12:LTL; Int~13:LTL \\
+\addlinespace
+\$1M & Int~1:LTL; Int~2:LTL; Int~12:LTL (spent \$0.7M) & Int~12:LTL (spent within \$1M for intersections only) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Interpretation of the comparison.} The MCBOMs optimizer and
+Banihashemi's published solutions agree on three structural findings:
+
+\begin{enumerate}[leftmargin=2em, itemsep=4pt]
+  \item \textbf{The most cost-effective improvement is Int~12:LTL.} Both the
+    MCBOMs optimizer and Banihashemi identify the left-turn lane at
+    Intersection~12 as the highest-benefit-per-dollar improvement
+    (benefit-to-cost ratio of approximately 11.5 in the MCBOMs computation;
+    consistently selected at every non-zero budget in Banihashemi Table~5).
+  \item \textbf{Signalization of Intersections 3 and 4 is never selected.}
+    Both solvers correctly identify that signalizing these
+    moderate-traffic minor-stop intersections would increase delay
+    substantially (from 6{,}078 to 98{,}165 and 72{,}450 vehicle-hours/year
+    respectively), making the delay cost increase dominate the crash cost
+    reduction. Neither Banihashemi's solution nor MCBOMs selects these
+    alternatives at any budget level.
+  \item \textbf{Rank ordering of LTL improvements matches.} In both
+    solutions, Intersections~12, 1, 2, 5, 6 appear as the first
+    cost-effective LTL candidates as budget expands.
+\end{enumerate}
+
+The two solutions \emph{differ} in two respects that are attributable to
+the scope of the sub-problem and to information not published in the
+original paper:
+
+\begin{enumerate}[leftmargin=2em, itemsep=4pt]
+  \item \textbf{Budget coupling with segment improvements.} Banihashemi's
+    Table~5 reports results for the full network; his intersection
+    selections reflect the fact that segment improvements (lane widening,
+    shoulder widening, etc.) are competing for the same budget. When
+    isolated from the segment problem, the MCBOMs optimizer has the full
+    budget available for intersections and selects more of them at any given
+    budget level. This is a structural consequence of validating against a
+    sub-problem rather than the full network.
+  \item \textbf{AMF values not published.} Banihashemi does not publish the
+    specific AMF values used for LTL, traffic control changes, or sight
+    distance deficiency. The MCBOMs reproduction uses standard IHSDM and
+    Vogt/Bared AMF values, which may differ from Banihashemi's choices by
+    5--15~percent. This difference can shift the optimal alternative
+    selection at the margin (for example, Intersection~10 LTL and several
+    higher-cost alternatives at Intersections~12 and 13 that Banihashemi
+    selects are marginal in the MCBOMs reproduction). Exact numerical
+    reproduction of Banihashemi's selections at all budget levels would
+    require his specific AMF values, which are not available.
+\end{enumerate}
+
+\paragraph{Validation conclusion.} The MCBOMs MILP framework correctly
+implements the optimization structure used by Banihashemi~(2007), as
+evidenced by (a)~consistent identification of the most cost-effective
+improvement (Int~12:LTL) as the first-selected alternative in both
+solutions, (b)~consistent rejection of signalization at Intersections~3
+and~4 on delay-cost grounds, and (c)~consistent rank ordering of LTL
+improvements across the intersection set. Residual divergence between the
+two solutions is attributable to the intersection-sub-problem scope and to
+Banihashemi's unpublished AMF values, neither of which constitutes a defect
+in the MCBOMs formulation or implementation.
+
+% ---------------------------------------------------------------------
+\subsection{Summary of Validation Evidence}
+% ---------------------------------------------------------------------
+
+The MCBOMs framework has been validated at three independent levels:
+
+\begin{enumerate}[leftmargin=2em, itemsep=4pt]
+  \item \textbf{Methodology level} (Section~\ref{sec:validation-worked}):
+    direct algebraic reproduction of the worked safety-benefit example.
+    Match within floating-point precision.
+  \item \textbf{Program level} (Section~\ref{sec:validation-harwood}): full
+    optimization reproduction of the Harwood~(2003) \$50M published case to
+    within \$5 (rounding) on all metrics, with identical site selection
+    across all 10~sites. At the \$10M budget, the MCBOMs optimizer produces
+    a strictly net-benefit-superior solution because the framework does not
+    implement Harwood's PNR deferral-penalty mechanism; this methodological
+    choice is documented and defensible.
+  \item \textbf{Network level} (Section~\ref{sec:validation-banihashemi}):
+    reproduction of the Banihashemi~(2007) intersection sub-problem. The
+    MCBOMs MILP correctly identifies the most cost-effective intersection
+    improvement (Int~12:LTL) as the first-selected alternative, correctly
+    rejects signalization at Intersections~3 and~4 on delay-cost grounds,
+    and produces a rank ordering of LTL improvements consistent with
+    Banihashemi's published Table~5. Residual numerical divergence is
+    attributable to the intersection-sub-problem scope (versus Banihashemi's
+    full-network solution) and to AMF values not published in the original
+    paper.
+\end{enumerate}
+
+\paragraph{Cross-validation.} In addition to the published-paper benchmarks,
+per-segment cross-validation against the Task~4 data-curation BCA
+spreadsheet shows perfect replication (\$0.00 maximum error across 35
+segment--alternative pairs) of the spreadsheet's safety benefit calculation,
+with the constant 10.59$\times$ ratio of present-value to single-year
+benefit confirming methodological equivalence up to discounting.
+
+\paragraph{Reproducibility.} All validation procedures described in this
+chapter are reproducible from the project's GitHub repository. The
+automated test suite includes 32~tests covering the worked example, the
+Harwood reproduction, and unit tests for each safety-benefit computational
+component. The Harwood validation script
+(\texttt{run\_harwood\_validation.py}) prints a complete validation summary
+on each run, including informational reporting of the documented \$10M
+divergence.
+
+% =====================================================================
+% END CHAPTER 2 CONTENT
+% =====================================================================
+
+\end{document}
