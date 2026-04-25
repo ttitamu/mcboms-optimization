@@ -1,8 +1,8 @@
 # Run script for worked example
-# Usage: ampl worked_example.run
+# Usage: ampl 01_worked_example.run
 
 reset;
-model worked_example.mod;
+model 01_worked_example.mod;
 
 option solver cplex;
 option cplex_options 'mipdisplay=2';

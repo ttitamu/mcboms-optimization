@@ -224,14 +224,14 @@ Each format covers all four instances. That is 4 × 3 = 12 model instances total
 The AMPL folder contains:
 
 - **`optimization.mod`** — generic optimization-layer model with all 10 constraints (Eq 2.4–2.10 + 2.14–2.16) declared. Optional and network-level constraints are activated by populating the corresponding sets in the `.dat` file.
-- **`worked_example.mod` + `worked_example.run`** — the full Eq 2.18 chain end-to-end. Severity distribution, CMF, unit costs, and PWF are all parameters declared in the model. The optimizer recomputes the safety benefit from raw inputs every time the file is run.
+- **`01_worked_example.mod` + `01_worked_example.run`** — the full Eq 2.18 chain end-to-end. Severity distribution, CMF, unit costs, and PWF are all parameters declared in the model. The optimizer recomputes the safety benefit from raw inputs every time the file is run.
 - **`harwood.mod`** — paper-faithful aggregation. PSB and PTOB are inputs taken directly from Harwood Tables 2 and 3. Discretionary-cost objective convention.
-- **`harwood_50m.dat`, `harwood_10m.dat`, `harwood_50m.run`, `harwood_10m.run`** — Harwood instance data and run scripts.
-- **`banihashemi_intersections.mod` + `.dat` + `.run`** — full parametric IHSDM CPM. Per-intersection ADTs, skew angles, traffic control, LTL/ISD attributes are inputs; the model computes crashes per year from Banihashemi Eq 15 and (crash + delay) cost over 20 years.
+- **`02_harwood_50m.dat`, `02_harwood_10m.dat`, `02_harwood_50m.run`, `02_harwood_10m.run`** — Harwood instance data and run scripts.
+- **`03_banihashemi_intersections.mod` + `.dat` + `.run`** — full parametric IHSDM CPM. Per-intersection ADTs, skew angles, traffic control, LTL/ISD attributes are inputs; the model computes crashes per year from Banihashemi Eq 15 and (crash + delay) cost over 20 years.
 
 ### 5.3 What the GAMS files look like
 
-The GAMS folder contains a single self-contained `.gms` file per instance: `worked_example.gms`, `harwood_50m.gms`, `harwood_10m.gms`, `banihashemi_intersections.gms`. Each file declares sets, parameters, equations, variables, and a model definition, then solves it.
+The GAMS folder contains a single self-contained `.gms` file per instance: `01_worked_example.gms`, `02_harwood_50m.gms`, `02_harwood_10m.gms`, `03_banihashemi_intersections.gms`. Each file declares sets, parameters, equations, variables, and a model definition, then solves it.
 
 ### 5.4 What the LP files look like
 
@@ -242,31 +242,31 @@ The LP folder contains a single solver-native `.lp` file per instance. These fil
 **AMPL**:
 ```
 cd models/ampl
-ampl harwood_50m.run
+ampl 02_harwood_50m.run
 ```
 
 **GAMS**:
 ```
 cd models/gams
-gams harwood_50m.gms
+gams 02_harwood_50m.gms
 ```
 
 **LP** (with CPLEX):
 ```
 cplex
-> read models/lp/harwood_50m.lp
+> read models/lp/02_harwood_50m.lp
 > mipopt
 > display solution variables -
 ```
 
 **LP** (with Gurobi):
 ```
-gurobi_cl models/lp/harwood_50m.lp
+gurobi_cl models/lp/02_harwood_50m.lp
 ```
 
 **LP** (with CBC, free):
 ```
-cbc models/lp/harwood_50m.lp solve solu /dev/stdout
+cbc models/lp/02_harwood_50m.lp solve solu /dev/stdout
 ```
 
 Expected results are in Section 6 below.
@@ -304,9 +304,9 @@ A single 5-mile rural two-lane segment. We constructed this example specifically
 - Optimal MILP objective at $1M budget: **$1,493,914** (= PV − treatment cost)
 
 **How to reproduce:**
-- Solver-direct: open `models/lp/worked_example.lp` in any MILP solver
-- AMPL: `cd models/ampl && ampl worked_example.run`
-- GAMS: `cd models/gams && gams worked_example.gms`
+- Solver-direct: open `models/lp/01_worked_example.lp` in any MILP solver
+- AMPL: `cd models/ampl && ampl 01_worked_example.run`
+- GAMS: `cd models/gams && gams 01_worked_example.gms`
 
 ### 6.2 Harwood (2003) Case Study
 
@@ -325,9 +325,9 @@ A 10-site case study published in TRR 1840. Mix of rural and urban undivided/div
 The $10M divergence is intentional and documented in Chapter 2 Section 2.7.3. Harwood implements a "Penalty for Not Resurfacing" (PNR) that we cannot reproduce because Harwood does not publish per-site PNR values. Without PNR, MCBOMs is free to defer sites strictly on net-benefit grounds, finding a strictly better solution by net-benefit at the lower budget. This is consistent with Banihashemi (2007), which also omits PNR.
 
 **How to reproduce:**
-- Solver-direct: `models/lp/harwood_50m.lp` or `models/lp/harwood_10m.lp`
-- AMPL: `models/ampl/harwood_50m.run` or `harwood_10m.run`
-- GAMS: `models/gams/harwood_50m.gms` or `harwood_10m.gms`
+- Solver-direct: `models/lp/02_harwood_50m.lp` or `models/lp/02_harwood_10m.lp`
+- AMPL: `models/ampl/02_harwood_50m.run` or `harwood_10m.run`
+- GAMS: `models/gams/02_harwood_50m.gms` or `harwood_10m.gms`
 - Python: `python run_harwood_validation.py`
 
 ### 6.3 Banihashemi (2007) Intersection Sub-Problem
@@ -346,9 +346,9 @@ A 13-intersection sub-problem from Banihashemi's TRR 2019 paper. Each intersecti
 2. Banihashemi did not publish his exact AMF values; we use standard IHSDM/Vogt-Bared values
 
 **How to reproduce:**
-- Solver-direct: `models/lp/banihashemi_intersections.lp`
-- AMPL: `models/ampl/banihashemi_intersections.run`
-- GAMS: `models/gams/banihashemi_intersections.gms`
+- Solver-direct: `models/lp/03_banihashemi_intersections.lp`
+- AMPL: `models/ampl/03_banihashemi_intersections.run`
+- GAMS: `models/gams/03_banihashemi_intersections.gms`
 - Python: `python examples/banihashemi_intersections.py`
 
 ---
@@ -394,8 +394,8 @@ The framework can be accessed three ways. Pick whichever matches the tool you al
 Open these three files on GitHub or your local clone:
 
 1. **`docs/chapter2/chapter2.pdf`** — formal mathematical formulation, ~30 pages
-2. **`models/ampl/worked_example.mod`** — Eq 2.18 in solver-readable form, ~120 lines, easiest entry
-3. **`models/lp/harwood_50m.lp`** — actual MILP problem text for a real instance
+2. **`models/ampl/01_worked_example.mod`** — Eq 2.18 in solver-readable form, ~120 lines, easiest entry
+3. **`models/lp/02_harwood_50m.lp`** — actual MILP problem text for a real instance
 
 You now understand the math, the model, and one realistic instance. No software needed.
 
@@ -406,26 +406,26 @@ Run any instance directly. The expected objectives in Section 6 are what you sho
 ```
 # CPLEX
 cplex
-> read models/lp/harwood_50m.lp
+> read models/lp/02_harwood_50m.lp
 > mipopt
 > display solution objective       (expected: 6,159,512.00)
 ```
 
 ```
 # Gurobi
-gurobi_cl models/lp/harwood_50m.lp     (expected: Optimal objective: 6.159512e+06)
+gurobi_cl models/lp/02_harwood_50m.lp     (expected: Optimal objective: 6.159512e+06)
 ```
 
 ```
 # AMPL with CPLEX
 cd models/ampl
-ampl harwood_50m.run
+ampl 02_harwood_50m.run
 ```
 
 ```
 # GAMS with CPLEX
 cd models/gams
-gams harwood_50m.gms
+gams 02_harwood_50m.gms
 ```
 
 If you get the expected objective on any one instance, the framework is operational on your machine. No further setup required.
@@ -617,10 +617,10 @@ The final banner says:
 Same numerical result, different access methods:
 
 ```
-cd models/ampl && ampl harwood_50m.run        (CPLEX, Gurobi)
-cd models/gams && gams harwood_50m.gms        (CPLEX, CONOPT)
-cplex < models/lp/harwood_50m.lp              (CPLEX)
-gurobi_cl models/lp/harwood_50m.lp            (Gurobi)
+cd models/ampl && ampl 02_harwood_50m.run        (CPLEX, Gurobi)
+cd models/gams && gams 02_harwood_50m.gms        (CPLEX, CONOPT)
+cplex < models/lp/02_harwood_50m.lp              (CPLEX)
+gurobi_cl models/lp/02_harwood_50m.lp            (Gurobi)
 ```
 
 Each should print the optimal objective $6,159,512.
@@ -629,9 +629,9 @@ Each should print the optimal objective $6,159,512.
 
 ```
 python examples/banihashemi_intersections.py        (Python)
-ampl models/ampl/banihashemi_intersections.run      (AMPL)
-gams models/gams/banihashemi_intersections.gms      (GAMS)
-gurobi_cl models/lp/banihashemi_intersections.lp    (Gurobi LP)
+ampl models/ampl/03_banihashemi_intersections.run      (AMPL)
+gams models/gams/03_banihashemi_intersections.gms      (GAMS)
+gurobi_cl models/lp/03_banihashemi_intersections.lp    (Gurobi LP)
 ```
 
 The structural result (Int 12 LTL most cost-effective; signalization at Int 3 and Int 4 rejected) is what we validate.
@@ -645,12 +645,12 @@ Suppose you want to see what happens if the discount rate is 4% instead of 7%.
 DEFAULT_DISCOUNT_RATE = 0.04
 ```
 
-**In AMPL worked example:** edit `models/ampl/worked_example.mod`:
+**In AMPL worked example:** edit `models/ampl/01_worked_example.mod`:
 ```
 param r := 0.04;
 ```
 
-**In GAMS worked example:** edit `models/gams/worked_example.gms`:
+**In GAMS worked example:** edit `models/gams/01_worked_example.gms`:
 ```
 Scalar r 'discount rate' / 0.04 /;
 ```

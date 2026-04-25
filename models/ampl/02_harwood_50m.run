@@ -1,10 +1,10 @@
 # Run script for Harwood $50M instance
-# Usage: ampl harwood_50m.run
+# Usage: ampl 02_harwood_50m.run
 # Expected result: net benefit $6,159,517 (matches Harwood Table 4)
 
 reset;
-model harwood.mod;
-data harwood_50m.dat;
+model 02_harwood.mod;
+data 02_harwood_50m.dat;
 
 option solver cplex;
 option cplex_options 'mipdisplay=2';

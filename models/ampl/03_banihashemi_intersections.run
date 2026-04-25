@@ -1,11 +1,11 @@
 # Run script for Banihashemi intersection sub-problem
-# Usage: ampl banihashemi_intersections.run
+# Usage: ampl 03_banihashemi_intersections.run
 # Computes IHSDM CPM crash predictions and (crash + delay) costs
 # parametrically; selects intersection improvements that maximize net benefit.
 
 reset;
-model banihashemi_intersections.mod;
-data banihashemi_intersections.dat;
+model 03_banihashemi_intersections.mod;
+data 03_banihashemi_intersections.dat;
 
 option solver cplex;
 option cplex_options 'mipdisplay=2';
