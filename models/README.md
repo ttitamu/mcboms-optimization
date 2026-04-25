@@ -1,9 +1,8 @@
-# MCBOMs Solver-Format Files
+# MCBOMs Mathematical Models
 
-This folder contains the MCBOMs MILP and validation instances expressed in
-three industry-standard MILP exchange formats so that reviewers can audit
-and reproduce the optimization results without depending on the Python
-implementation.
+This folder contains the formal mathematical models for the MCBOMs MILP framework, expressed in three industry-standard MILP modeling languages.
+
+These are the primary models — the equations from Chapter 2 of the Task 4 Report rendered in solver-readable form. The Python implementation in `src/mcboms/` is one access method; the AMPL, GAMS, and LP files in this folder are another. Reviewers and analysts who use CPLEX, Gurobi, GAMS, or any other commercial MILP solver can run the models directly from this folder without involving Python.
 
 ## Formats
 

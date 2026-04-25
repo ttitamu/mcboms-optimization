@@ -7,6 +7,8 @@ A Python framework for optimizing transportation infrastructure investment decis
 
 Developed under FHWA Contract HRSO20240009PR by the Texas A&M Transportation Institute.
 
+> **New here?** See **[USER_MANUAL.md](USER_MANUAL.md)** for a complete walkthrough — what the framework does, how to install it, how to run the validation, how to extend it, and how to interpret results. The manual is the single document that takes you from clone to result.
+
 ## Overview
 
 MCBOMs supports transportation agencies in:
@@ -29,33 +31,43 @@ The mathematical formulation is documented in detail in `docs/chapter2/`.
 
 ```
 mcboms-optimization/
-├── src/mcboms/
-│   ├── core/                       # MILP optimizer
-│   │   ├── optimizer.py
-│   │   └── alternatives.py
+├── README.md                       Quick reference (this file)
+├── USER_MANUAL.md                  Complete walkthrough — start here
+├── INSTRUCTIONS.md                 Setup-only instructions
+│
+├── docs/
+│   ├── chapter2/                   Methodology chapter (LaTeX, PDF, Word)
+│   └── Harwood_2003_Methodology_Reference.md
+│
+├── models/                         Solver-language mathematical models
+│   ├── README.md
+│   ├── ampl/                       AMPL .mod + .dat + .run files
+│   ├── gams/                       GAMS .gms files
+│   └── lp/                         LP solver-native format files
+│
+├── src/mcboms/                     Python implementation
+│   ├── core/                       MILP optimizer
 │   ├── benefits/
-│   │   ├── safety.py               # Eq 2.18 (HSM-based)
-│   │   ├── operations.py           # Eq 2.21 (in development)
-│   │   └── ccm.py                  # Eq 2.27 (in development)
+│   │   ├── safety.py               Eq 2.18 (HSM-based)
+│   │   ├── operations.py           Eq 2.21 (in development)
+│   │   └── ccm.py                  Eq 2.27 (in development)
 │   ├── io/
 │   │   ├── readers.py
 │   │   ├── writers.py
-│   │   └── colleague_workbook.py   # Reader for the Task 4 BCA spreadsheet
-│   ├── utils/
-│   │   └── economics.py            # Discount factors, unit costs (USDOT BCA May 2025)
-│   └── data/
-│       └── harwood_alternatives.py # Harwood (2003) validation data
-├── examples/
-│   ├── banihashemi_intersections.py    # Banihashemi (2007) intersection sub-problem
-│   ├── banihashemi_alts.csv            # Generated alternative table
-│   └── solver-formats/                 # AMPL, GAMS, LP files for FHWA reviewers
-├── tests/                          # 32 tests; run with `pytest`
-├── docs/
-│   ├── chapter2/                   # Methodology chapter (LaTeX, PDF, Word)
-│   └── Harwood_2003_Methodology_Reference.md
-├── run_harwood_validation.py       # End-to-end Harwood reproduction script
-└── README.md
+│   │   └── colleague_workbook.py   Reader for the Task 4 BCA spreadsheet
+│   ├── utils/economics.py          Discount factors, unit costs (USDOT BCA May 2025)
+│   └── data/harwood_alternatives.py    Harwood (2003) validation data
+│
+├── tests/                          32 tests; run with `pytest`
+│
+├── examples/                       Reproducible Python examples
+│   ├── banihashemi_intersections.py    Banihashemi (2007) sub-problem
+│   └── banihashemi_alts.csv
+│
+└── run_harwood_validation.py       End-to-end Harwood reproduction script
 ```
+
+The framework is the same mathematics in three forms: the formal spec in `docs/chapter2/`, solver-language models in `models/`, and Python implementation in `src/mcboms/`. All three produce the same numerical results.
 
 ## Installation
 
@@ -132,13 +144,13 @@ python examples/banihashemi_intersections.py
 
 The MCBOMs MILP correctly identifies Int 12:LTL as the most cost-effective improvement (B/C ≈ 11.5), correctly rejects signalization at Intersections 3 and 4 on delay-cost grounds, and produces a rank ordering of LTL improvements consistent with Banihashemi's Table 5. Numerical divergence from Banihashemi's full-network solution is attributable to (a) intersection sub-problem scope and (b) AMF values not published in the original paper.
 
-## Solver-Format Files for FHWA Reviewers
+## Mathematical Models (`models/`)
 
-For reviewers working in standard MILP modeling environments rather than Python, the validation instances are provided in three exchange formats under `examples/solver-formats/`:
+The `models/` folder contains the formal mathematical models in three solver-language forms. For users running MILP problems in CPLEX, Gurobi, GAMS, AMPL, or any LP-format-aware solver, this is the entry point — Python is not required.
 
-- AMPL (`.mod` model + `.dat` data + `.run` script) — for use with CPLEX, Gurobi, or any AMPL-compatible solver
+- AMPL (`.mod` model + `.dat` data + `.run` script) — strongest semantic structure; model and data separate
 - GAMS (`.gms`) — combined model and data, single-file
-- LP (`.lp`) — solver-native, fully self-contained instance
+- LP (`.lp`) — solver-native, fully portable
 
 Each format contains four instances:
 
@@ -149,7 +161,7 @@ Each format contains four instances:
 
 LP files have been validated by solving with CBC; objective values match the Python implementation to the cent.
 
-See `examples/solver-formats/README.md` for run instructions and expected results per instance.
+See `models/README.md` for run instructions and expected results per instance.
 
 ## Mathematical Formulation (Summary)
 
