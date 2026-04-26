@@ -145,6 +145,7 @@ cython_debug/
 
 # Gurobi
 *.lp
+!models/lp/*.lp
 *.mps
 *.sol
 *.log
