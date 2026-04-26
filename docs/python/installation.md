@@ -1,15 +1,21 @@
 # Installation
 
-The framework can be installed locally on any machine with Python 3.11+, or executed in the browser through Google Colab without installation.
+There are two paths: install locally on your own machine, or run the example
+notebooks on Google Colab without installing anything.
 
-## Browser execution via Colab
+## Run on Google Colab (no install)
 
-The two reference notebooks are linked below. Each is self-contained — the first cell pulls the framework from this repository, the remaining cells run a complete case.
+The repository ships with two ready-to-run notebooks. Each one installs the
+framework with PuLP+CBC (no license required) and reproduces a validation
+case end-to-end.
 
 <div class="run-on-colab" markdown>
 [:simple-googlecolab: &nbsp; Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button }
 [:simple-googlecolab: &nbsp; Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button .colab-button }
 </div>
+
+The first cell of each notebook installs MCBOMs from this repository. Allow
+about 30 seconds for the install to complete, then run the remaining cells.
 
 ## Install locally
 
