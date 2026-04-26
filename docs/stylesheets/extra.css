@@ -135,3 +135,13 @@
     min-width: 100%;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Hide heading-anchor pilcrow icons
+   ───────────────────────────────────────────────────────────── */
+
+/* Reviewers cite the methodology PDF, not URL fragments. Hide the
+   per-heading "¶" link that appears on hover. */
+.md-typeset .headerlink {
+  display: none;
+}
