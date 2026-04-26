@@ -1,56 +1,56 @@
 # Mathematical Models
 
-The `models/` folder in the repository contains the formal mathematical models for MCBOMs in three industry-standard MILP modeling languages. These are the primary models — the equations from the MCBOMs Methodology document rendered in solver-readable form. The Python implementation is one access method; the AMPL, GAMS, and LP files are another.
+The `models/` directory contains the MCBOMs formulation in three solver-language representations: AMPL, GAMS, and the LP file format. These files are the formal model definitions; the Python implementation in `src/mcboms/` is a parallel access path that calls the same mathematics through Gurobi.
 
-Each format page below shows the **full source of every file inline** (click "View source" on any file to expand its content) and provides a **download button** for each file. No need to leave the documentation site to read or save the models.
+Each format page below renders every file inline with a download button. The full source is visible without leaving the documentation site.
 
 ## File organization
 
-Files are named with a numeric prefix indicating their tier:
+Files use a numeric prefix to indicate the tier of the instance:
 
-| Prefix | What |
+| Prefix | Instance |
 |---|---|
-| `00_` | Core MCBOMs MILP (Section 2.2 — abstract framework) |
-| `01_` | Worked example (Section 2.3.7 — Eq 2.18 from raw inputs) |
+| `00_` | Core MCBOMs MILP — the abstract optimization layer |
+| `01_` | Worked example — single-segment safety benefit from raw inputs |
 | `02_` | Harwood (2003) case study — paper-faithful aggregation |
-| `03_` | Banihashemi (2007) intersection sub-problem — full IHSDM CPM parametric |
+| `03_` | Banihashemi (2007) intersection sub-problem — IHSDM Crash Prediction Module |
 
-Same prefix groups files that belong together (e.g., AMPL `02_harwood.mod` + `02_harwood_50m.dat` + `02_harwood_50m.run`).
+Files sharing a prefix belong to the same instance (for example, AMPL `02_harwood.mod` + `02_harwood_50m.dat` + `02_harwood_50m.run`).
 
-## Three formats — same mathematics
+## Three formats, one mathematics
 
 <div class="grid cards" markdown>
 
 -   **[AMPL](ampl.md)**
 
-    `.mod` model + `.dat` data + `.run` script. Strongest semantic structure; the math is most readable directly from the file.
+    Separate `.mod` (model), `.dat` (data), and `.run` (script) files. Algebraic expressions are written close to the form used in the methodology document, which makes the model structure directly inspectable.
 
 -   **[GAMS](gams.md)**
 
-    `.gms` combined model and data, single-file. Common in policy and economics modeling.
+    Single `.gms` file combining model and data declarations. Compatible with the GAMS commercial solver suite and widely used in transportation policy work.
 
 -   **[LP Format](lp.md)**
 
-    Solver-native, fully self-contained. Numeric form, no symbolic expressions. Drop into any MILP solver.
+    Solver-native flat text. No symbolic expressions; the constraint matrix is fully expanded into numeric coefficients. Compatible with CPLEX, Gurobi, CBC, and any solver that reads the standard LP format.
 
 </div>
 
-## Validation results
+## Validation
 
-All five LP files have been validated by solving with CBC; objectives match the Python implementation and the AMPL/GAMS counterparts to the cent.
+The LP files have been solved with CBC; objective values agree with the Python implementation and the AMPL and GAMS counterparts to the cent.
 
-| Instance | Optimal Z | Notes |
+| Instance | Optimal objective | Notes |
 |---|---|---|
-| `00_optimization` | $300 | Illustrative 2-project example, $300K budget |
+| `00_optimization` | $300 | Illustrative two-project example at $300K budget |
 | `01_worked_example` | $1,493,914 | Net benefit at $1M budget |
-| `02_harwood_50m` | $6,159,512 | Matches Harwood Table 4 within $5 |
-| `02_harwood_10m` | $4,931,520 | +5.5% above Harwood (no PNR; documented) |
-| `03_banihashemi_intersections` | $5,177,251 | Net benefit at $12M unconstrained |
+| `02_harwood_50m` | $6,159,512 | Matches Harwood Table 4 within rounding tolerance |
+| `02_harwood_10m` | $4,931,520 | 5.5% above the published Harwood value; the difference is attributable to the PNR mechanism, which is documented and explained |
+| `03_banihashemi_intersections` | $5,177,251 | Net benefit at the unconstrained budget |
 
-## Honest data scope disclosure
+## Parametric depth across instances
 
-The four numbered tiers do not all reach the same level of parametric detail:
+The four tiers reach different levels of parametric detail, reflecting what the source literature publishes:
 
-- **`01_worked_example`** is fully parametric end-to-end. All raw inputs (annual crash count, severity distribution, CMF, unit costs, discount parameters) are declared in the model file. Use this instance to demonstrate Eq 2.18 to a reviewer who wants to see the full chain.
-- **`03_banihashemi_intersections`** is fully parametric for the IHSDM crash prediction module. Per-intersection ADTs, skew angles, traffic control, LTL/ISD attributes, and delay times are inputs; the model computes crashes/year via Banihashemi Eq 15. The AMF values used are standard IHSDM/Vogt-Bared values; Banihashemi did not publish his exact AMFs.
-- **`02_harwood_50m`** and **`02_harwood_10m`** use Harwood's published per-site, per-alternative values from Tables 2 and 3 directly. Harwood's RSRAP computes PSB internally from per-severity AMFs but only the aggregate values are published. Reconstructing his per-severity inputs would require fabricating data; the worked example demonstrates the full Eq 2.18 chain instead.
+- **`01_worked_example`** is fully parametric. Annual crash count, severity distribution, CMF, unit costs, and discount parameters are declared as named inputs in the model file. The full safety-benefit chain is therefore visible directly from the model.
+- **`03_banihashemi_intersections`** is fully parametric for the IHSDM Crash Prediction Module. Per-intersection ADTs, skew angles, traffic control, left-turn-lane and intersection-sight-distance attributes, and delay times appear as inputs; the model computes expected annual crashes per the published prediction equation. AMF values follow the standard IHSDM and Vogt-Bared (1998) tables, since the Banihashemi paper does not publish per-alternative AMF values.
+- **`02_harwood_50m`** and **`02_harwood_10m`** use the per-site, per-alternative cost and benefit values published in Harwood (2003) Tables 2 and 3 directly. The original RSRAP tool computes PSB internally from per-severity AMFs, but only the aggregate values appear in the publication. The worked example tier provides a fully parametric demonstration of the safety chain that the Harwood instance does not require.

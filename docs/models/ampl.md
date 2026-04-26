@@ -1,8 +1,8 @@
 # AMPL Models
 
-AMPL has the strongest semantic structure of the three formats — model and data are separate files, so the math reads directly from the file. Use AMPL with CPLEX, Gurobi, CBC, or any AMPL-compatible solver.
+AMPL separates the model declaration (`.mod`), the input data (`.dat`), and the run script (`.run`) into distinct files. This separation places the algebraic structure of the formulation directly in the model file, with no numerical clutter — the constraints and objective read close to the form used in the methodology document. The files are compatible with any AMPL-supported solver, including CPLEX, Gurobi, and CBC.
 
-This page shows the full content of every AMPL file in `models/ampl/`. Click any file's name to expand its content; use the download links to save individual files.
+This page renders every AMPL file in `models/ampl/`. Each file's source can be expanded inline; download buttons retrieve individual files.
 
 ---
 
@@ -20,7 +20,7 @@ Each `.run` script invokes the solver, prints the optimal objective, and lists w
 
 ## 00_optimization.mod — Core MCBOMs MILP
 
-The abstract optimization-layer model. Encodes Eq 2.4 through 2.10 (project-level) and Eq 2.14 through 2.16 (network-level extensions). Optional and network-level constraints are activated by populating the corresponding sets in the data file.
+The abstract optimization-layer model. Encodes the project-level core and the network-level extensions. Optional and network-level constraints are activated by populating the corresponding sets in the data file.
 
 [:material-download: Download `00_optimization.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/00_optimization.mod){ .md-button }
 
@@ -31,9 +31,9 @@ The abstract optimization-layer model. Encodes Eq 2.4 through 2.10 (project-leve
 
 ---
 
-## 01_worked_example.mod — Worked Example with Eq 2.18
+## 01_worked_example.mod — Worked Example
 
-Single-segment safety-only example with the full Eq 2.18 chain declared parametrically. Severity disaggregation, CMF application, and present-worth conversion are all visible in the model.
+Single-segment safety-only instance with the full safety-benefit derivation declared parametrically. Severity disaggregation, CMF application, and present-worth conversion are all expressed symbolically in the model file.
 
 [:material-download: Download `01_worked_example.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/01_worked_example.mod){ .md-button }
 [:material-download: Download `01_worked_example.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/01_worked_example.run){ .md-button }

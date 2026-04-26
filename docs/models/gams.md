@@ -1,8 +1,8 @@
 # GAMS Models
 
-GAMS combines model and data into a single file per instance. Common in policy and economics modeling.
+GAMS combines the model declaration and the input data into a single `.gms` file per instance. The format is widely used in transportation, energy, and economic modeling, and is compatible with the GAMS commercial solver suite.
 
-This page shows the full content of every GAMS file in `models/gams/`. Click any file's name to expand its content; use the download links to save individual files.
+This page renders every GAMS file in `models/gams/`. Each file's source can be expanded inline; download buttons retrieve individual files.
 
 ---
 
@@ -20,7 +20,7 @@ GAMS compiles the model, invokes the configured solver, and writes a results fil
 
 ## 00_optimization.gms — Core MCBOMs MILP
 
-The abstract optimization-layer model. Encodes Eq 2.4 through 2.10 (project-level) and Eq 2.14 through 2.16 (network-level extensions).
+The abstract optimization-layer model. Encodes the project-level core and the network-level extensions.
 
 [:material-download: Download `00_optimization.gms`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/gams/00_optimization.gms){ .md-button }
 
@@ -33,7 +33,7 @@ The abstract optimization-layer model. Encodes Eq 2.4 through 2.10 (project-leve
 
 ## 01_worked_example.gms — Worked Example
 
-Single-segment safety-only example with the full Eq 2.18 chain.
+Single-segment safety-only instance with the full safety-benefit derivation expressed symbolically.
 
 [:material-download: Download `01_worked_example.gms`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/gams/01_worked_example.gms){ .md-button }
 

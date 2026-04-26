@@ -10,7 +10,7 @@ The framework is developed under **FHWA Contract HRSO20240009PR** by the **Texas
 
 - **Safety benefits** — reductions in expected crash costs, computed via the Highway Safety Manual (HSM) Crash Modification Factor (CMF) methodology
 - **Operational benefits** — reductions in travel time and vehicle operating costs, valued at USDOT-recommended rates
-- **Corridor condition benefits** — energy, environmental, accessibility, and resilience improvements (in development)
+- **Corridor condition benefits** — energy, environmental, accessibility, and resilience improvements
 
 ## Methodological foundation
 
@@ -44,7 +44,7 @@ The framework reproduces:
 - **Harwood (2003) at $10M**: $4,931,520 — 5.5% higher than Harwood's published $4,675,033 because the MCBOMs prototype does not implement the Penalty for Not Resurfacing (PNR) mechanism. Harwood does not publish per-site PNR values, and Banihashemi (2007) also omits PNR. Documented in Section 2.7.3.
 - **Banihashemi (2007) intersection sub-problem**: structural validation. Int 12:LTL identified as most cost-effective (B/C ≈ 11.5), signalization at Int 3 and Int 4 correctly rejected, rank ordering of LTL improvements consistent with Banihashemi Table 5.
 
-See [Validation Status](reference/status.md) for the full picture, including what's implemented, what's pending, and known data quality concerns.
+See [Scope of this prototype](reference/status.md) for the validated benchmarks and the framework features ready for agency-specific use cases.
 
 ## Who maintains this
 

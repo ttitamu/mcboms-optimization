@@ -40,11 +40,11 @@ For formal proofs, derivations, and the full validation discussion, refer to the
 
 ```bibtex
 @techreport{mcboms_methodology_2026,
-  title  = {{MCBOMs} Methodology: Mathematical Formulation and Validation},
-  author = {Texas A\&M Transportation Institute},
-  year   = {2026},
-  institution = {Federal Highway Administration},
-  number      = {HRSO20240009PR},
-  type        = {Technical Report}
+  title       = {{MCBOMs} Methodology: Mathematical Formulation and Validation},
+  author      = {Texas {A\&M} Transportation Institute},
+  institution = {Texas {A\&M} Transportation Institute},
+  year        = {2026},
+  type        = {Technical Report},
+  note        = {Prepared for the Federal Highway Administration under Contract HRSO20240009PR}
 }
 ```

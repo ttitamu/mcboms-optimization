@@ -24,10 +24,11 @@
 
 ```bibtex
 @techreport{mcboms2026,
-  title  = {{MCBOMs}: Multidisciplinary Cost-Benefit Optimization Models, Task 4 Report},
-  author = {Texas A\&M Transportation Institute},
-  year   = {2026},
-  institution = {Federal Highway Administration},
-  number      = {HRSO20240009PR}
+  title       = {{MCBOMs}: Multidisciplinary Cost-Benefit Optimization Models, Task 4 Report},
+  author      = {Texas {A\&M} Transportation Institute},
+  institution = {Texas {A\&M} Transportation Institute},
+  year        = {2026},
+  type        = {Technical Report},
+  note        = {Prepared for the Federal Highway Administration under Contract HRSO20240009PR}
 }
 ```

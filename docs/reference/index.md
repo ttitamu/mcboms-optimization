@@ -6,9 +6,9 @@
 
     USDOT BCA Guidance May 2025 default values: discount rate, crash costs, value of time, vehicle operating costs.
 
--   **[Validation Status](status.md)**
+-   **[Scope of this prototype](status.md)**
 
-    What's validated, what's implemented but not yet validated, what's documented but not yet implemented, and known data quality concerns.
+    Validated benchmarks, framework features ready for agency data, and elements of the methodology that extend beyond the current prototype.
 
 -   **[Troubleshooting](troubleshooting.md)**
 

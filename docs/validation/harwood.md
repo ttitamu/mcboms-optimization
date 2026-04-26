@@ -30,7 +30,7 @@ The MCBOMs solution has higher net benefit than Harwood's because MCBOMs does no
 
 Harwood's PNR is a deferral penalty assigned to do-nothing alternatives. The penalty's magnitude depends on how close the pavement is to needing replacement (a function of remaining useful life and pavement condition).
 
-We chose not to implement PNR because:
+PNR is not implemented in MCBOMs for three reasons:
 
 1. **Per-site PNR values are not published** in Harwood (2003). The paper describes the PNR concept (page 152) but the actual values used in the case study are not in Tables 2 or 3.
 2. **Banihashemi (2007) also omits PNR**, so the deferred-penalty mechanism is not part of the published validation literature.

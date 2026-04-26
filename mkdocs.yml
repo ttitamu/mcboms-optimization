@@ -120,7 +120,7 @@ nav:
   - Reference:
       - reference/index.md
       - Default Parameters: reference/parameters.md
-      - Validation Status: reference/status.md
+      - Scope of this prototype: reference/status.md
       - Troubleshooting: reference/troubleshooting.md
       - Glossary: reference/glossary.md
       - References: reference/references.md

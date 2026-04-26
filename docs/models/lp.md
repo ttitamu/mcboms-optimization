@@ -1,8 +1,8 @@
 # LP Format Models
 
-LP files are flat numeric forms — they cannot represent the abstract model symbolically. Each LP file is an instantiation of the model with specific numeric coefficients. Drop into any MILP solver directly.
+The LP format is the standard solver-native flat representation of a linear or mixed-integer linear program. Unlike AMPL or GAMS, the LP format does not carry symbolic structure: each constraint appears as an explicit numeric row, and variables are listed individually. The format is read by every major MILP solver, including CPLEX, Gurobi, CBC, and MOSEK, without modification.
 
-This page shows the full content of every LP file in `models/lp/`. Click any file's name to expand its content; use the download links to save individual files.
+This page renders every LP file in `models/lp/`. Each file's source can be expanded inline; download buttons retrieve individual files.
 
 ---
 
@@ -35,7 +35,7 @@ Expected objectives are documented in [Validation](../validation/index.md). All 
 
 ## 00_optimization.lp — Core MCBOMs MILP (illustrative)
 
-LP cannot express abstract symbolic models. This file uses a small 2-project, 4-alternative illustrative example with extensive header comments explaining the structure that all other LP instances follow.
+The abstract optimization layer cannot be expressed symbolically in LP format. This file is a minimal two-project, four-alternative instance with extensive header comments documenting the constraint structure that the other LP instances expand on.
 
 [:material-download: Download `00_optimization.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/00_optimization.lp){ .md-button }
 

@@ -11,13 +11,13 @@ src/mcboms/
 ├── __init__.py                  Package init
 ├── core/                        MILP optimizer
 │   ├── __init__.py
-│   ├── optimizer.py             All 9 constraints (Eq 2.4–2.10, 2.14–2.16)
+│   ├── optimizer.py             Project-level and network-level constraints
 │   └── alternatives.py
 ├── benefits/                    Benefit calculation modules
 │   ├── __init__.py
-│   ├── safety.py                Eq 2.18 (HSM-based)
-│   ├── operations.py            Eq 2.21 (travel-time + VOC)
-│   └── ccm.py                   Eq 2.27 (energy, emissions, accessibility, resilience, pavement)
+│   ├── safety.py                HSM-based safety benefit
+│   ├── operations.py            Travel-time and vehicle-operating-cost benefit
+│   └── ccm.py                   Corridor condition measures (energy, emissions, accessibility, resilience, pavement)
 ├── io/                          Input/output modules
 │   ├── __init__.py
 │   ├── readers.py
@@ -37,24 +37,20 @@ src/mcboms/
 
 ### `optimizer.py` — main `Optimizer` class
 
-The MILP optimizer. Construct with sites, alternatives, budget, discount rate, and analysis horizon, plus optional kwargs for the additional constraints. Call `.solve()` to run the MILP. Uses Gurobi.
+The MILP optimizer. Construct with sites, alternatives, and budget; pass optional kwargs to activate additional constraints. Call `.solve()` to run the MILP. Uses Gurobi.
 
-The optimizer implements the full project-level and network-level formulation:
+The constructor accepts the following optional constraints, each activated only when the corresponding kwarg is provided:
 
-| Equation | Constraint | Activated by |
+| Constraint | Kwarg | Methodology |
 |---|---|---|
-| Eq 2.4 | Objective (max net benefit) | always |
-| Eq 2.5 | Total budget | always |
-| Eq 2.6 | Mutual exclusivity | always |
-| Eq 2.7 | Binary | always |
-| Eq 2.8 | Dependency | `dependencies=` kwarg |
-| Eq 2.9 | Cross-project exclusivity | `conflicts=` kwarg |
-| Eq 2.10 | Minimum BCR | `min_bcr=` kwarg |
-| Eq 2.14 | Facility-type sub-budget | `facility_budgets=` kwarg |
-| Eq 2.15 | Regional cap | `regional_caps=` kwarg |
-| Eq 2.16 | Regional minimum-investment floor | `regional_floors=` kwarg |
+| Project dependencies (alternative A requires alternative B) | `dependencies=` | Section 2.2.1 |
+| Cross-project exclusivity (two alternatives cannot both be selected) | `conflicts=` | Section 2.2.1 |
+| Minimum benefit-cost ratio per project | `min_bcr=` | Section 2.2.1 |
+| Facility-type sub-budgets | `facility_budgets=` | Section 2.2.2 |
+| Regional spending caps | `regional_caps=` | Section 2.2.2 |
+| Regional minimum-investment floors | `regional_floors=` | Section 2.2.2 |
 
-When optional constraints are not provided, the corresponding equations are vacuously satisfied — the same model handles project-level-only and network-level-extended cases.
+When optional kwargs are not provided, the corresponding constraints are inactive — the same class handles project-level-only and full network-level cases. The methodology PDF gives the formal mathematical statement of each constraint with its equation number.
 
 [:material-download: Download `optimizer.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/src/mcboms/core/optimizer.py){ .md-button }
 
@@ -81,17 +77,17 @@ When optional constraints are not provided, the corresponding equations are vacu
 
 ## `mcboms.benefits`
 
-This package houses the benefit-equation implementations.
+This package houses the three benefit-equation implementations.
 
-| Module | Equation | Tests |
+| Module | Purpose | Tests |
 |---|---|---|
-| `safety.py` | Eq 2.18 | 16 |
-| `operations.py` | Eq 2.21 | 26 |
-| `ccm.py` | Eq 2.27 | 34 |
+| `safety.py` | Safety benefit (HSM crash-modification methodology) | 16 |
+| `operations.py` | Operational benefit (travel-time + vehicle operating cost) | 26 |
+| `ccm.py` | Corridor condition benefit (energy, emissions, accessibility, resilience, pavement) | 34 |
 
-### `safety.py` — Eq 2.18 implementation
+### `safety.py`
 
-`compute_safety_benefit()` takes per-severity inputs and returns the present-value benefit. Validated against the worked example to the cent (16 unit tests in `tests/test_safety.py`).
+Computes the present-value safety benefit from per-severity inputs. Validated against the worked example to the cent.
 
 [:material-download: Download `safety.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/src/mcboms/benefits/safety.py){ .md-button }
 
@@ -100,9 +96,9 @@ This package houses the benefit-equation implementations.
     --8<-- "src/mcboms/benefits/safety.py"
     ```
 
-### `operations.py` — Eq 2.21 implementation
+### `operations.py`
 
-Travel-time savings and vehicle-operating-cost reductions, summed across vehicle classes and converted to present value via PWF. USDOT BCA May 2025 default unit values for VOT, OCC, VOC. Component functions for each term, an aggregator over vehicle classes, a convenience helper for the single-passenger-class case, and a DataFrame batch interface.
+Travel-time savings and vehicle-operating-cost reductions, summed across vehicle classes and converted to present value. USDOT BCA May 2025 default unit values for value of time, occupancy, and operating cost. Component functions for each term, an aggregator over vehicle classes, a convenience helper for the single-passenger-class case, and a DataFrame batch interface.
 
 [:material-download: Download `operations.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/src/mcboms/benefits/operations.py){ .md-button }
 
@@ -111,9 +107,9 @@ Travel-time savings and vehicle-operating-cost reductions, summed across vehicle
     --8<-- "src/mcboms/benefits/operations.py"
     ```
 
-### `ccm.py` — Eq 2.27 implementation
+### `ccm.py`
 
-Corridor Condition Measures across five categories: energy, emissions, accessibility, resilience, and pavement / asset condition. Per-category monetization functions, a top-level aggregator with explicit double-counting prevention against `operations.py` (the accessibility category overlaps with the operational benefit's mobility component), and a DataFrame batch interface. Default unit values from USDOT BCA May 2025, EPA Social Cost of Carbon, FEMA Standard Economic Values v13.
+Corridor Condition Measures across five categories: energy, emissions, accessibility, resilience, and pavement / asset condition. Per-category monetization functions and a top-level aggregator with explicit double-counting prevention against `operations.py` (the accessibility category overlaps with the operational benefit's mobility component). Default unit values from USDOT BCA May 2025, EPA Social Cost of Carbon, and FEMA Standard Economic Values v13.
 
 [:material-download: Download `ccm.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/src/mcboms/benefits/ccm.py){ .md-button }
 
@@ -216,7 +212,7 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 
 ## Tests
 
-`pytest tests/ -q` runs **109 tests** covering the worked example, Harwood reproduction, safety module, operations module, CCM module, and the new optimizer constraints (Eq 2.8–2.10, 2.14–2.16).
+`pytest tests/ -q` runs **109 tests** covering the worked example, Harwood reproduction, the safety module, the operations module, the CCM module, and the optional and network-level optimizer constraints.
 
 ### `test_harwood_validation.py` — Harwood reproduction tests
 

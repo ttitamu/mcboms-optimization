@@ -1,4 +1,4 @@
-# Safety Benefit (Eq 2.18)
+# Safety Benefit
 
 The safety benefit of an alternative is computed via the Highway Safety Manual (HSM) Crash Modification Factor (CMF) methodology, valued at USDOT-recommended unit crash costs.
 
@@ -88,12 +88,12 @@ $$
 B^{\mathrm{safety, PV}} = \$211{,}810 \cdot 10.594 = \$2{,}243{,}914
 $$
 
-This is the only validation instance where MCBOMs implements Eq 2.18 end-to-end from raw severity inputs. See [Worked Example validation](../validation/worked-example.md) for the full reproduction across all three solver formats.
+This is the only validation instance where MCBOMs implements the safety benefit equation end-to-end from raw severity inputs. See [Worked Example validation](../validation/worked-example.md) for the full reproduction across all three solver formats.
 
 ## Implementations
 
 - **Python**: `src/mcboms/benefits/safety.py` — `compute_safety_benefit()` function
-- **AMPL** (full chain): `models/ampl/01_worked_example.mod` declares severity proportions, unit costs, CMF, and the full Eq 2.18 chain as parametric expressions
+- **AMPL** (full chain): `models/ampl/01_worked_example.mod` declares severity proportions, unit costs, CMF, and the full safety-benefit chain as parametric expressions
 - **GAMS** (full chain): `models/gams/01_worked_example.gms`
 - **LP**: `models/lp/01_worked_example.lp` carries the evaluated coefficient ($1,493,914 net at $1M budget) with header comments showing the derivation
 

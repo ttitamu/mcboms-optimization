@@ -33,7 +33,7 @@ If you need to add a new constraint type:
 
 ## Code style
 
-- Plain, professional code comments. Reference equation numbers from the methodology document (e.g., `# Eq 2.18`).
+- Plain, professional code comments. Reference the methodology document for the formal equation numbers when needed.
 - Type hints where helpful but not required everywhere.
 - `pytest` for tests, `pandas` for data, `pulp` and `gurobipy` for optimization.
 - Match the existing module structure: classes for stateful objects, free functions for stateless calculations.

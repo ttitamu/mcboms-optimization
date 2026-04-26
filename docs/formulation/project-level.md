@@ -10,7 +10,7 @@ $$
 
 $x_{ij} = 1$ if alternative $j$ is selected for project $i$, $0$ otherwise.
 
-## Objective function (Eq 2.4)
+## Objective function
 
 $$
 \max \quad Z = \sum_{i=1}^{I} \sum_{j \in A_i} \left( B_{ij} - C_{ij}^{\mathrm{disc}} \right) x_{ij}
@@ -34,7 +34,7 @@ $$
 
 The total cost is used in the budget constraint. The discretionary cost is used in the objective.
 
-## Total benefit (Eq 2.2)
+## Total benefit
 
 The total benefit aggregates safety, operational, and corridor condition benefits over the analysis horizon:
 
@@ -46,7 +46,7 @@ Where $DF_t = 1 / (1+r)^t$ is the year-$t$ discount factor with discount rate $r
 
 ## Core constraints
 
-### Total budget (Eq 2.5)
+### Total budget
 
 $$
 \sum_{i=1}^{I} \sum_{j \in A_i} C_{ij} \cdot x_{ij} \leq B^{\mathrm{total}}
@@ -54,7 +54,7 @@ $$
 
 The full cost (including any committed component) is what counts against the budget.
 
-### Mutual exclusivity (Eq 2.6)
+### Mutual exclusivity
 
 $$
 \sum_{j \in A_i} x_{ij} \leq 1 \quad \forall i
@@ -62,7 +62,7 @@ $$
 
 At most one alternative can be selected per project. The inequality (rather than equality) allows for the "do nothing" option, encoded as $x_{ij} = 0$ for all $j \in A_i$.
 
-### Binary (Eq 2.7)
+### Binary
 
 $$
 x_{ij} \in \{0, 1\} \quad \forall i, j
@@ -74,7 +74,7 @@ Decision variables are binary integers.
 
 These constraints are activated when the relevant data is provided.
 
-### Dependency (Eq 2.8)
+### Dependency
 
 $$
 x_{ij} \leq x_{i'j'} \quad \text{for each } (i,j,i',j') \in D
@@ -82,7 +82,7 @@ $$
 
 Selecting alternative $(i,j)$ requires selecting alternative $(i',j')$. Useful for modeling phased improvements where one project must be completed before another.
 
-### Cross-project exclusivity (Eq 2.9)
+### Cross-project exclusivity
 
 $$
 x_{ij} + x_{i'j'} \leq 1 \quad \text{for each } (i,j,i',j') \in K
@@ -90,7 +90,7 @@ $$
 
 Alternatives $(i,j)$ and $(i',j')$ cannot both be selected. Useful for modeling alternatives that physically conflict or compete for the same resources.
 
-### Minimum benefit-cost ratio (Eq 2.10)
+### Minimum benefit-cost ratio
 
 $$
 \sum_{j \in A_i} B_{ij} x_{ij} \geq \theta \cdot \sum_{j \in A_i} C_{ij} x_{ij} \quad \forall i

@@ -12,7 +12,7 @@ The LP files have been validated by solving with CBC. If your solver rejects the
 
 ### AMPL or GAMS reports "set is empty" warnings
 
-The optimization model includes optional and network-level constraints (Eq 2.8–2.10, 2.14–2.16) that are activated only when the corresponding sets are populated in the data file. When the validation instances do not exercise these constraints, AMPL or GAMS may emit warnings; the warnings are expected and the solution remains optimal.
+The optimization model includes optional and network-level constraints that are activated only when the corresponding sets are populated in the data file. When the validation instances do not exercise these constraints, AMPL or GAMS may emit warnings; the warnings are expected and the solution remains optimal.
 
 ### Solver reports "infeasible" for an intersection sub-problem
 

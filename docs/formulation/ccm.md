@@ -1,9 +1,9 @@
-# Corridor Condition Benefit (Eq 2.27)
+# Corridor Condition Benefit
 
 The Corridor Condition Measures (CCM) capture multidisciplinary benefits beyond safety and operations: energy, emissions, accessibility, and resilience improvements.
 
 !!! note "Scope of the current prototype"
-    The mathematical structure is documented here and in Section 2.5 of the MCBOMs Methodology, and is implemented in `src/mcboms/benefits/ccm.py` (34 unit tests in `tests/test_ccm.py`). The Python module provides per-category monetization functions for energy, emissions, accessibility, resilience, and pavement, plus a top-level aggregator with explicit double-counting prevention against the operational benefit (Eq 2.21).
+    The mathematical structure is documented here and in Section 2.5 of the MCBOMs Methodology, and is implemented in `src/mcboms/benefits/ccm.py` (34 unit tests in `tests/test_ccm.py`). The Python module provides per-category monetization functions for energy, emissions, accessibility, resilience, and pavement, plus a top-level aggregator with explicit double-counting prevention against the operational benefit module.
 
     The validation instances (worked example, Harwood, Banihashemi) do not include CCM data, so this benefit is zero for those cases. The module is ready for use by an agency that supplies the per-category quantities (kWh saved, CO2 tons avoided, trips enabled, expected avoided damages, lane-miles improved).
 
@@ -28,7 +28,7 @@ Where:
 | Emissions reduction | metric tons CO₂-equivalent | USDOT BCA May 2025, EPA SCC |
 | Mobility & accessibility | trips, person-hours of access | USDOT BCA May 2025 |
 | Resilience | avoided disaster damages, expected | FEMA Standard Economic Values v13 (2024) |
-| Underserved-area access | accessibility-weighted demand | TBD per agency policy |
+| Underserved-area access | accessibility-weighted demand | Agency-specific |
 | Pavement / asset condition | IRI improvement, infrastructure life | Agency-specific |
 
 ## Double-counting prevention
@@ -56,6 +56,6 @@ Plus a top-level aggregator:
 - **`compute_corridor_benefit(inputs: CCMInputs, operations_already_computed=False, ...)`** — sums all categories and enforces the double-counting check against operations.py
 - **`compute_corridor_benefits_df(inputs_df)`** — DataFrame batch interface
 
-The double-counting check raises `ValueError` if accessibility (trips enabled) is non-zero AND the operational benefit (Eq 2.21) is also being computed AND the user has not explicitly confirmed they have handled the overlap by setting `accessibility_overlaps_with_operations=True` on the `CCMInputs` dataclass.
+The double-counting check raises `ValueError` if accessibility (trips enabled) is non-zero AND the operational benefit module is also being computed AND the user has not explicitly confirmed they have handled the overlap by setting `accessibility_overlaps_with_operations=True` on the `CCMInputs` dataclass.
 
 For the current validation instances (worked example, Harwood, Banihashemi), CCM benefits are zero because the source case studies do not include CCM data.

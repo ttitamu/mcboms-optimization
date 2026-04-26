@@ -1,6 +1,6 @@
 # Worked Example
 
-A single 5-mile rural two-lane segment, designed specifically to demonstrate the safety benefit chain (Eq 2.18) end-to-end with full per-severity inputs.
+A single 5-mile rural two-lane segment, designed specifically to demonstrate the safety benefit chain end-to-end with full per-severity inputs.
 
 ## Setup
 
@@ -71,6 +71,6 @@ Sixteen tests pass, including the worked example reproduction.
 
 ## Why this validation matters
 
-The worked example is the only validation instance where MCBOMs implements Eq 2.18 end-to-end from raw severity inputs all the way through to the optimization. The Harwood instance uses paper-aggregated PSB values (because Harwood does not publish per-severity data); the Banihashemi instance uses a different methodology (IHSDM CPM rather than HSM).
+The worked example is the only validation instance where MCBOMs implements the safety benefit chain end-to-end from raw severity inputs all the way through to the optimization. The Harwood instance uses paper-aggregated PSB values (because Harwood does not publish per-severity data); the Banihashemi instance uses a different methodology (IHSDM CPM rather than HSM).
 
 For a reviewer asking "does the safety benefit equation work as written?", this is the file to point to.

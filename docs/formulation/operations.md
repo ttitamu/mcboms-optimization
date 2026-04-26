@@ -1,4 +1,4 @@
-# Operational Benefit (Eq 2.21)
+# Operational Benefit
 
 The operational benefit captures travel time savings and vehicle operating cost reductions from infrastructure improvements.
 
@@ -8,7 +8,7 @@ The operational benefit captures travel time savings and vehicle operating cost 
     The validation instances do not exercise this module:
 
     - The **Harwood (2003)** instance uses the paper's published PTOB aggregate values rather than recomputing from raw delay inputs (the paper does not publish per-segment $\Delta d$ values).
-    - The **Banihashemi (2007)** intersection sub-problem uses delay-cost minimization at intersections; the inputs differ from Eq 2.21's segment-level form.
+    - The **Banihashemi (2007)** intersection sub-problem uses delay-cost minimization at intersections; the inputs differ from the segment-level form of the operational benefit equation.
 
     The module is ready for use by an agency that supplies the per-segment operational inputs.
 
@@ -57,7 +57,7 @@ See [Default Parameters](../reference/parameters.md) for the full table with sou
 
 The Python module exposes the equation through several entry points:
 
-- **`compute_travel_time_benefit(delta_d, aadt, occupancy, vot)`** — the first term of Eq 2.21
+- **`compute_travel_time_benefit(delta_d, aadt, occupancy, vot)`** — the travel-time savings term
 - **`compute_voc_benefit(delta_voc, vmt)`** — the second term
 - **`compute_operational_benefit(vehicle_classes, discount_rate, analysis_horizon)`** — the full present-value form aggregated across vehicle classes
 - **`compute_simple_operational_benefit(...)`** — convenience wrapper for the single passenger-class case (typical rural two-lane analysis)
@@ -65,4 +65,4 @@ The Python module exposes the equation through several entry points:
 
 Default unit values follow USDOT BCA Guidance May 2025: VOT $21.10/person-hour (all purposes), occupancy 1.52 (passenger), VOC $0.56/vehicle-mile (light-duty).
 
-The AMPL and GAMS solver-language files declare Eq 2.21 in the same parametric form. The LP files have evaluated coefficients with the derivation in header comments.
+The AMPL and GAMS solver-language files declare the same equation in parametric form. The LP files have evaluated coefficients with the derivation in header comments.

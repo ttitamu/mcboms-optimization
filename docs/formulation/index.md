@@ -18,40 +18,30 @@ The pages below document the formulation in detail. Pages are intended to be rea
 
 -   **[Project-Level MILP](project-level.md)**
 
-    The core formulation: decision variables, objective function, total benefit aggregation, and constraints (Eq 2.4–2.10). Includes optional dependency, cross-project exclusivity, and minimum-BCR constraints.
+    The core formulation: decision variables, objective function, total benefit aggregation, and the always-active constraints (budget, mutual exclusivity, binary). Optional constraints — dependency, cross-project exclusivity, minimum benefit-cost ratio — are documented here.
 
 -   **[Network-Level Extensions](network-level.md)**
 
-    Additional constraints that handle facility-type sub-budgets and regional caps and floors (Eq 2.14–2.16). Used when an agency must allocate budget across categories or geography.
+    Additional constraints for facility-type sub-budgets, regional spending caps, and regional minimum-investment floors. Used when an agency must allocate a single budget across categories or geography.
 
--   **[Safety Benefit (Eq 2.18)](safety.md)**
+-   **[Safety Benefit](safety.md)**
 
     The HSM Crash Modification Factor methodology applied to compute per-alternative safety benefits, with severity disaggregation, multi-CMF combination, and present-worth conversion.
 
--   **[Operational Benefit (Eq 2.21)](operations.md)**
+-   **[Operational Benefit](operations.md)**
 
-    Travel time savings and vehicle operating cost reductions, valued at USDOT-recommended rates. Documents the formulation; a parametric Python implementation is planned.
+    Travel time savings and vehicle operating cost reductions, summed across vehicle classes and converted to present value at USDOT-recommended unit rates.
 
--   **[Corridor Condition Benefit (Eq 2.27)](ccm.md)**
+-   **[Corridor Condition Benefit](ccm.md)**
 
-    Energy, emissions, accessibility, and resilience improvements. Documents the multi-category structure and double-counting prevention.
+    Energy, emissions, accessibility, resilience, and pavement improvements. Per-category monetization with explicit double-counting prevention against the operational benefit.
 
 -   **[MCBOMs Methodology (PDF)](methodology.md)**
 
-    The complete formulation in a single 30-page PDF. Includes proofs, validation discussion, and full bibliography.
+    The complete formulation in a single standalone document. Includes proofs, full validation discussion, and bibliography.
 
 </div>
 
-## Equation conventions
+## Cross-referencing the methodology PDF
 
-Equations are numbered consistently across this site and the methodology PDF:
-
-- **Eq 2.1, 2.2, 2.3** — project six-tuple, total benefit aggregation, discount factor
-- **Eq 2.4 – 2.7** — core MILP (objective, budget, mutual exclusivity, binary)
-- **Eq 2.8 – 2.10** — optional constraints (dependency, cross-project exclusivity, minimum BCR)
-- **Eq 2.14 – 2.16** — network-level constraints
-- **Eq 2.18** — safety benefit
-- **Eq 2.21** — operational benefit
-- **Eq 2.27** — corridor condition benefit
-
-Every equation in the solver-language models in `models/` carries the same equation number for cross-reference.
+Each equation in the methodology PDF carries a numeric label (e.g., the safety benefit equation appears as Eq 2.18). The same equations are rendered with the same labels on the formulation pages of this site, and on the AMPL, GAMS, and LP files in `models/`. This consistency lets readers move between the formal document, the rendered web pages, and the solver-readable code without losing track of which equation is which.
