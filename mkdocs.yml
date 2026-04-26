@@ -10,8 +10,6 @@ theme:
   logo: assets/tti_mark.png
   favicon: assets/tti_mark.png
   features:
-    - navigation.instant
-    - navigation.tracking
     - navigation.tabs
     - navigation.sections
     - navigation.expand
