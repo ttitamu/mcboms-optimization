@@ -20,14 +20,23 @@
   --md-typeset-a-color:         #B23A48;
 }
 
-/* Header logo sizing */
-.md-header__button.md-logo img,
-.md-header__button.md-logo svg {
-  height: 2.4rem;
-  width: auto;
+/* Header logo sizing - logo sits inside a white pill for legibility on maroon header */
+.md-header__button.md-logo {
+  background-color: #ffffff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3rem;
+  margin: 0.4rem 0.6rem 0.4rem 0;
+  box-shadow: 0 0.05rem 0.15rem rgba(0, 0, 0, 0.15);
 }
 
-/* Make the header taller to accommodate logo */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 2rem;
+  width: auto;
+  display: block;
+}
+
+/* Make the header taller to accommodate the logo with padding */
 .md-header {
   min-height: 3.6rem;
 }
