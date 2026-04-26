@@ -160,17 +160,42 @@ class Optimizer:
         budget: float,
         discount_rate: float = 0.07,
         analysis_horizon: int = 20,
+        # Optional constraints (Eq 2.8 - 2.10)
+        dependencies: list[tuple[int, int, int, int]] | None = None,
+        conflicts: list[tuple[int, int, int, int]] | None = None,
+        min_bcr: float | None = None,
+        # Network-level constraints (Eq 2.14 - 2.16)
+        facility_budgets: dict[str, float] | None = None,
+        regional_caps: dict[str, float] | None = None,
+        regional_floors: dict[str, float] | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize the optimizer.
         
         Args:
-            sites: DataFrame with site characteristics (site_id, adt, length, etc.)
-            alternatives: DataFrame with alternatives (site_id, alt_id, cost, benefit)
+            sites: DataFrame with site characteristics. Required column: site_id.
+                Optional columns: facility_type (for Eq 2.14), region (for Eq 2.15-2.16).
+            alternatives: DataFrame with alternatives (site_id, alt_id, total_cost, total_benefit)
             budget: Total available budget
             discount_rate: Annual discount rate
             analysis_horizon: Analysis period in years
-            **kwargs: Additional configuration options
+            dependencies: Optional. List of (i, j, ip, jp) tuples meaning alternative
+                (i,j) requires alternative (ip,jp). Implements Eq 2.8.
+            conflicts: Optional. List of (i, j, ip, jp) tuples meaning alternatives
+                (i,j) and (ip,jp) cannot both be selected. Implements Eq 2.9.
+            min_bcr: Optional. Minimum benefit-cost ratio per project. Implements
+                Eq 2.10. Set to 1.0 to enforce benefit >= cost on each selection.
+            facility_budgets: Optional. Dict mapping facility type to maximum spend.
+                Requires sites DataFrame to have 'facility_type' column.
+                Implements Eq 2.14.
+            regional_caps: Optional. Dict mapping region to maximum spend.
+                Requires sites DataFrame to have 'region' column.
+                Implements Eq 2.15.
+            regional_floors: Optional. Dict mapping region to minimum-investment
+                fraction (e.g., 0.20 = 20% of total budget). Requires sites
+                DataFrame to have 'region' column. Implements Eq 2.16.
+            **kwargs: Additional configuration options for OptimizerConfig
+                (time_limit, mip_gap, verbose).
         """
         self.sites = sites
         self.alternatives = alternatives
@@ -180,6 +205,16 @@ class Optimizer:
             analysis_horizon=analysis_horizon,
             **kwargs,
         )
+        
+        # Optional constraints (Eq 2.8 - 2.10)
+        self.dependencies = dependencies or []
+        self.conflicts = conflicts or []
+        self.min_bcr = min_bcr
+        
+        # Network-level constraints (Eq 2.14 - 2.16)
+        self.facility_budgets = facility_budgets or {}
+        self.regional_caps = regional_caps or {}
+        self.regional_floors = regional_floors or {}
         
         self._model: gp.Model | None = None
         self._variables: dict[tuple[int, int], Any] = {}
@@ -191,6 +226,18 @@ class Optimizer:
             f"Optimizer initialized with {len(sites)} sites, "
             f"{len(alternatives)} alternatives, budget=${budget:,.0f}"
         )
+        if self.dependencies:
+            logger.info(f"  Eq 2.8 (dependencies): {len(self.dependencies)} pairs")
+        if self.conflicts:
+            logger.info(f"  Eq 2.9 (conflicts): {len(self.conflicts)} pairs")
+        if self.min_bcr is not None:
+            logger.info(f"  Eq 2.10 (min BCR): {self.min_bcr}")
+        if self.facility_budgets:
+            logger.info(f"  Eq 2.14 (facility budgets): {len(self.facility_budgets)} types")
+        if self.regional_caps:
+            logger.info(f"  Eq 2.15 (regional caps): {len(self.regional_caps)} regions")
+        if self.regional_floors:
+            logger.info(f"  Eq 2.16 (regional floors): {len(self.regional_floors)} regions")
     
     def _validate_inputs(self) -> None:
         """Validate input data."""
@@ -212,6 +259,76 @@ class Optimizer:
         missing = site_ids_in_sites - site_ids_in_alts
         if missing:
             logger.warning(f"Sites without alternatives: {missing}")
+        
+        # Validate that facility_type column exists if facility_budgets are used
+        if self.facility_budgets and "facility_type" not in self.sites.columns:
+            raise ValueError(
+                "facility_budgets specified (Eq 2.14) but sites DataFrame "
+                "lacks 'facility_type' column. Add a 'facility_type' column to "
+                "sites with values matching the keys of facility_budgets."
+            )
+        if self.facility_budgets:
+            site_facility_types = set(self.sites["facility_type"].unique())
+            unknown_facilities = set(self.facility_budgets.keys()) - site_facility_types
+            if unknown_facilities:
+                logger.warning(
+                    f"facility_budgets references unknown facility types "
+                    f"(no sites match): {unknown_facilities}. Constraints will be "
+                    f"vacuous for these."
+                )
+        
+        # Validate that region column exists if regional caps/floors are used
+        if (self.regional_caps or self.regional_floors) and "region" not in self.sites.columns:
+            raise ValueError(
+                "regional_caps or regional_floors specified (Eq 2.15-2.16) but "
+                "sites DataFrame lacks 'region' column. Add a 'region' column to "
+                "sites with values matching the keys of these dicts."
+            )
+        if self.regional_caps or self.regional_floors:
+            site_regions = set(self.sites["region"].unique())
+            specified_regions = set(self.regional_caps.keys()) | set(self.regional_floors.keys())
+            unknown_regions = specified_regions - site_regions
+            if unknown_regions:
+                logger.warning(
+                    f"regional constraints reference unknown regions "
+                    f"(no sites match): {unknown_regions}. Constraints will be "
+                    f"vacuous for these."
+                )
+        
+        # Validate min_bcr is positive if specified
+        if self.min_bcr is not None and self.min_bcr < 0:
+            raise ValueError(f"min_bcr must be >= 0, got {self.min_bcr}")
+        
+        # Validate regional_floors fractions are in [0, 1]
+        for region, fraction in self.regional_floors.items():
+            if not 0 <= fraction <= 1:
+                raise ValueError(
+                    f"regional_floors[{region!r}] = {fraction} must be in [0, 1]. "
+                    f"This is the minimum FRACTION of total budget."
+                )
+        
+        # Validate dependency and conflict tuples reference valid (i, j) pairs
+        valid_pairs = set(zip(self.alternatives["site_id"], self.alternatives["alt_id"]))
+        for dep in self.dependencies:
+            if len(dep) != 4:
+                raise ValueError(
+                    f"Dependency must be 4-tuple (i, j, ip, jp), got {dep}"
+                )
+            i, j, ip, jp = dep
+            if (i, j) not in valid_pairs or (ip, jp) not in valid_pairs:
+                raise ValueError(
+                    f"Dependency {dep} references unknown alternative pair"
+                )
+        for conf in self.conflicts:
+            if len(conf) != 4:
+                raise ValueError(
+                    f"Conflict must be 4-tuple (i, j, ip, jp), got {conf}"
+                )
+            i, j, ip, jp = conf
+            if (i, j) not in valid_pairs or (ip, jp) not in valid_pairs:
+                raise ValueError(
+                    f"Conflict {conf} references unknown alternative pair"
+                )
     
     def _build_model(self) -> None:
         """Build the Gurobi MILP model."""
@@ -267,12 +384,108 @@ class Optimizer:
                     name=f"exclusivity_{site_id}"
                 )
         
-        # Constraint 2: Budget constraint
+        # Constraint 2: Budget constraint (Eq 2.5 — total budget)
         budget_expr = gp.quicksum(
             row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
             for _, row in self.alternatives.iterrows()
         )
         self._model.addConstr(budget_expr <= self.config.budget, name="budget")
+        
+        # ----------------------------------------------------------------
+        # Optional constraints (Eq 2.8 - 2.10)
+        # ----------------------------------------------------------------
+        
+        # Eq 2.8 — Dependency: x_ij <= x_i'j' for each (i,j,i',j') in dependencies
+        # Selecting alternative (i,j) requires selecting alternative (ip,jp).
+        for idx, (i, j, ip, jp) in enumerate(self.dependencies):
+            self._model.addConstr(
+                self._variables[(i, j)] <= self._variables[(ip, jp)],
+                name=f"dependency_{idx}_{i}_{j}_requires_{ip}_{jp}"
+            )
+        
+        # Eq 2.9 — Cross-project exclusivity: x_ij + x_i'j' <= 1
+        # Alternatives (i,j) and (ip,jp) cannot both be selected.
+        for idx, (i, j, ip, jp) in enumerate(self.conflicts):
+            self._model.addConstr(
+                self._variables[(i, j)] + self._variables[(ip, jp)] <= 1,
+                name=f"conflict_{idx}_{i}_{j}_vs_{ip}_{jp}"
+            )
+        
+        # Eq 2.10 — Minimum BCR per project
+        # If a project is selected (sum_j x_ij = 1), the chosen alternative's
+        # benefit must meet theta * cost. Linearized as:
+        #   sum_j (B_ij - theta * C_ij) * x_ij >= 0  for each project i
+        # When project not selected (all x_ij = 0), constraint is 0 >= 0 (satisfied).
+        if self.min_bcr is not None:
+            theta = self.min_bcr
+            for site_id in self.sites["site_id"].unique():
+                site_alts = self.alternatives[self.alternatives["site_id"] == site_id]
+                if len(site_alts) > 0:
+                    self._model.addConstr(
+                        gp.quicksum(
+                            (row["total_benefit"] - theta * row["total_cost"])
+                            * self._variables[(site_id, row["alt_id"])]
+                            for _, row in site_alts.iterrows()
+                        ) >= 0,
+                        name=f"min_bcr_{site_id}"
+                    )
+        
+        # ----------------------------------------------------------------
+        # Network-level constraints (Eq 2.14 - 2.16)
+        # ----------------------------------------------------------------
+        
+        # Eq 2.14 — Facility-type sub-budget
+        # sum over (i,j) where facility_type[i] = m of C_ij * x_ij <= B_m
+        if self.facility_budgets:
+            # Build site -> facility_type lookup
+            facility_lookup = dict(zip(self.sites["site_id"], self.sites["facility_type"]))
+            for facility_type, sub_budget in self.facility_budgets.items():
+                facility_alts = self.alternatives[
+                    self.alternatives["site_id"].map(facility_lookup) == facility_type
+                ]
+                if len(facility_alts) > 0:
+                    self._model.addConstr(
+                        gp.quicksum(
+                            row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
+                            for _, row in facility_alts.iterrows()
+                        ) <= sub_budget,
+                        name=f"facility_budget_{facility_type}"
+                    )
+        
+        # Eq 2.15 — Regional cap
+        # sum over (i,j) where region[i] = r of C_ij * x_ij <= B_r^cap
+        if self.regional_caps:
+            region_lookup = dict(zip(self.sites["site_id"], self.sites["region"]))
+            for region, cap in self.regional_caps.items():
+                region_alts = self.alternatives[
+                    self.alternatives["site_id"].map(region_lookup) == region
+                ]
+                if len(region_alts) > 0:
+                    self._model.addConstr(
+                        gp.quicksum(
+                            row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
+                            for _, row in region_alts.iterrows()
+                        ) <= cap,
+                        name=f"regional_cap_{region}"
+                    )
+        
+        # Eq 2.16 — Regional minimum-investment floor
+        # sum over (i,j) where region[i] = r of C_ij * x_ij >= beta_r * B_total
+        if self.regional_floors:
+            region_lookup = dict(zip(self.sites["site_id"], self.sites["region"]))
+            for region, fraction in self.regional_floors.items():
+                region_alts = self.alternatives[
+                    self.alternatives["site_id"].map(region_lookup) == region
+                ]
+                if len(region_alts) > 0:
+                    minimum_spend = fraction * self.config.budget
+                    self._model.addConstr(
+                        gp.quicksum(
+                            row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
+                            for _, row in region_alts.iterrows()
+                        ) >= minimum_spend,
+                        name=f"regional_floor_{region}"
+                    )
         
         self._model.update()
         

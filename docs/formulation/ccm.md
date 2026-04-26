@@ -3,9 +3,9 @@
 The Corridor Condition Measures (CCM) capture multidisciplinary benefits beyond safety and operations: energy, emissions, accessibility, and resilience improvements.
 
 !!! note "Scope of the current prototype"
-    The mathematical structure of the corridor condition benefit is documented in this work and in Section 2.5 of the MCBOMs Methodology. The validation instances (worked example, Harwood, Banihashemi) do not include CCM data, so this benefit is zero for those cases.
+    The mathematical structure is documented here and in Section 2.5 of the MCBOMs Methodology, and is implemented in `src/mcboms/benefits/ccm.py` (34 unit tests in `tests/test_ccm.py`). The Python module provides per-category monetization functions for energy, emissions, accessibility, resilience, and pavement, plus a top-level aggregator with explicit double-counting prevention against the operational benefit (Eq 2.21).
 
-    A future version of the framework will add `src/mcboms/benefits/ccm.py` with per-category monetization functions for energy, emissions, accessibility, and resilience improvements.
+    The validation instances (worked example, Harwood, Banihashemi) do not include CCM data, so this benefit is zero for those cases. The module is ready for use by an agency that supplies the per-category quantities (kWh saved, CO2 tons avoided, trips enabled, expected avoided damages, lane-miles improved).
 
 ## The equation
 
@@ -28,7 +28,7 @@ Where:
 | Emissions reduction | metric tons CO₂-equivalent | USDOT BCA May 2025, EPA SCC |
 | Mobility & accessibility | trips, person-hours of access | USDOT BCA May 2025 |
 | Resilience | avoided disaster damages, expected | FEMA Standard Economic Values v13 (2024) |
-| Equity / underserved access | accessibility-weighted demand | TBD per agency policy |
+| Underserved-area access | accessibility-weighted demand | TBD per agency policy |
 | Pavement / asset condition | IRI improvement, infrastructure life | Agency-specific |
 
 ## Double-counting prevention
@@ -41,12 +41,21 @@ $$
 
 This is documented in Section 2.5.4.
 
-## Future implementation
+## Implementation
 
-A standalone parametric implementation will follow the same pattern as the safety module:
+The Python module provides per-category monetization functions:
 
-- **Python**: `src/mcboms/benefits/ccm.py` with modular per-category monetization functions (one per CCM variable)
-- **AMPL/GAMS**: parametric chain in instance files when the corresponding raw inputs are available
-- **LP**: evaluated coefficients with derivation in header comments
+- **`compute_energy_benefit(annual_kwh_saved, value_per_kwh, ...)`** — energy category, default $0.12/kWh
+- **`compute_emissions_benefit(annual_co2_tons_avoided, scc_per_ton, ...)`** — emissions category, default Social Cost of Carbon $224/metric-ton (USDOT BCA May 2025)
+- **`compute_accessibility_benefit(annual_trips_enabled, value_per_trip, ...)`** — mobility/accessibility category, default $12/person-trip
+- **`compute_resilience_benefit(expected_avoided_damages, ...)`** — resilience category, takes annualized expected-value avoided damages directly (FEMA Standard Economic Values v13 typically used for the input estimation)
+- **`compute_pavement_benefit(lane_miles, ...)`** — pavement / asset condition category
+
+Plus a top-level aggregator:
+
+- **`compute_corridor_benefit(inputs: CCMInputs, operations_already_computed=False, ...)`** — sums all categories and enforces the double-counting check against operations.py
+- **`compute_corridor_benefits_df(inputs_df)`** — DataFrame batch interface
+
+The double-counting check raises `ValueError` if accessibility (trips enabled) is non-zero AND the operational benefit (Eq 2.21) is also being computed AND the user has not explicitly confirmed they have handled the overlap by setting `accessibility_overlaps_with_operations=True` on the `CCMInputs` dataclass.
 
 For the current validation instances (worked example, Harwood, Banihashemi), CCM benefits are zero because the source case studies do not include CCM data.

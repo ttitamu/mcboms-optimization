@@ -11,13 +11,13 @@ src/mcboms/
 ├── __init__.py                  Package init
 ├── core/                        MILP optimizer
 │   ├── __init__.py
-│   ├── optimizer.py
+│   ├── optimizer.py             All 9 constraints (Eq 2.4–2.10, 2.14–2.16)
 │   └── alternatives.py
 ├── benefits/                    Benefit calculation modules
 │   ├── __init__.py
-│   ├── safety.py                Eq 2.18 (HSM-based) — implemented
-│   ├── operations.py            Eq 2.21 — in development
-│   └── ccm.py                   Eq 2.27 — in development
+│   ├── safety.py                Eq 2.18 (HSM-based)
+│   ├── operations.py            Eq 2.21 (travel-time + VOC)
+│   └── ccm.py                   Eq 2.27 (energy, emissions, accessibility, resilience, pavement)
 ├── io/                          Input/output modules
 │   ├── __init__.py
 │   ├── readers.py
@@ -37,7 +37,24 @@ src/mcboms/
 
 ### `optimizer.py` — main `Optimizer` class
 
-The MILP optimizer. Construct with sites, alternatives, budget, discount rate, and analysis horizon. Call `.solve()` to run the MILP. Uses Gurobi if available, falls back to CBC via PuLP.
+The MILP optimizer. Construct with sites, alternatives, budget, discount rate, and analysis horizon, plus optional kwargs for the additional constraints. Call `.solve()` to run the MILP. Uses Gurobi.
+
+The optimizer implements the full project-level and network-level formulation:
+
+| Equation | Constraint | Activated by |
+|---|---|---|
+| Eq 2.4 | Objective (max net benefit) | always |
+| Eq 2.5 | Total budget | always |
+| Eq 2.6 | Mutual exclusivity | always |
+| Eq 2.7 | Binary | always |
+| Eq 2.8 | Dependency | `dependencies=` kwarg |
+| Eq 2.9 | Cross-project exclusivity | `conflicts=` kwarg |
+| Eq 2.10 | Minimum BCR | `min_bcr=` kwarg |
+| Eq 2.14 | Facility-type sub-budget | `facility_budgets=` kwarg |
+| Eq 2.15 | Regional cap | `regional_caps=` kwarg |
+| Eq 2.16 | Regional minimum-investment floor | `regional_floors=` kwarg |
+
+When optional constraints are not provided, the corresponding equations are vacuously satisfied — the same model handles project-level-only and network-level-extended cases.
 
 [:material-download: Download `optimizer.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/src/mcboms/core/optimizer.py){ .md-button }
 
@@ -66,11 +83,11 @@ The MILP optimizer. Construct with sites, alternatives, budget, discount rate, a
 
 This package houses the benefit-equation implementations.
 
-| Module | Status | Equation |
+| Module | Equation | Tests |
 |---|---|---|
-| `safety.py` | ✓ Implemented | Eq 2.18 |
-| `operations.py` | In development | Eq 2.21 |
-| `ccm.py` | In development | Eq 2.27 |
+| `safety.py` | Eq 2.18 | 16 |
+| `operations.py` | Eq 2.21 | 26 |
+| `ccm.py` | Eq 2.27 | 34 |
 
 ### `safety.py` — Eq 2.18 implementation
 
@@ -81,6 +98,28 @@ This package houses the benefit-equation implementations.
 ??? abstract "View source: safety.py"
     ```python
     --8<-- "src/mcboms/benefits/safety.py"
+    ```
+
+### `operations.py` — Eq 2.21 implementation
+
+Travel-time savings and vehicle-operating-cost reductions, summed across vehicle classes and converted to present value via PWF. USDOT BCA May 2025 default unit values for VOT, OCC, VOC. Component functions for each term, an aggregator over vehicle classes, a convenience helper for the single-passenger-class case, and a DataFrame batch interface.
+
+[:material-download: Download `operations.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/src/mcboms/benefits/operations.py){ .md-button }
+
+??? abstract "View source: operations.py"
+    ```python
+    --8<-- "src/mcboms/benefits/operations.py"
+    ```
+
+### `ccm.py` — Eq 2.27 implementation
+
+Corridor Condition Measures across five categories: energy, emissions, accessibility, resilience, and pavement / asset condition. Per-category monetization functions, a top-level aggregator with explicit double-counting prevention against `operations.py` (the accessibility category overlaps with the operational benefit's mobility component), and a DataFrame batch interface. Default unit values from USDOT BCA May 2025, EPA Social Cost of Carbon, FEMA Standard Economic Values v13.
+
+[:material-download: Download `ccm.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/src/mcboms/benefits/ccm.py){ .md-button }
+
+??? abstract "View source: ccm.py"
+    ```python
+    --8<-- "src/mcboms/benefits/ccm.py"
     ```
 
 ??? abstract "View source: benefits/__init__.py"
@@ -177,7 +216,7 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 
 ## Tests
 
-`pytest tests/ -q` runs 32 tests covering the worked example, Harwood reproduction, and per-component unit tests for the safety module.
+`pytest tests/ -q` runs **109 tests** covering the worked example, Harwood reproduction, safety module, operations module, CCM module, and the new optimizer constraints (Eq 2.8–2.10, 2.14–2.16).
 
 ### `test_harwood_validation.py` — Harwood reproduction tests
 
@@ -195,6 +234,33 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 ??? abstract "View source: test_safety.py"
     ```python
     --8<-- "tests/test_safety.py"
+    ```
+
+### `test_operations.py` — operations module unit tests
+
+[:material-download: Download `test_operations.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/tests/test_operations.py){ .md-button }
+
+??? abstract "View source: test_operations.py"
+    ```python
+    --8<-- "tests/test_operations.py"
+    ```
+
+### `test_ccm.py` — CCM module unit tests
+
+[:material-download: Download `test_ccm.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/tests/test_ccm.py){ .md-button }
+
+??? abstract "View source: test_ccm.py"
+    ```python
+    --8<-- "tests/test_ccm.py"
+    ```
+
+### `test_optimizer_constraints.py` — optional and network constraint tests
+
+[:material-download: Download `test_optimizer_constraints.py`](https://github.com/sa-ameen/mcboms-optimization/raw/main/tests/test_optimizer_constraints.py){ .md-button }
+
+??? abstract "View source: test_optimizer_constraints.py"
+    ```python
+    --8<-- "tests/test_optimizer_constraints.py"
     ```
 
 ---
