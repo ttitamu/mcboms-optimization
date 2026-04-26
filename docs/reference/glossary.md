@@ -4,7 +4,7 @@
 
 **AADT** — Annual Average Daily Traffic. Vehicles per day at a location, averaged over a year.
 
-**AMF** — Accident Modification Factor. Multiplier (typically 0.5–1.5) representing the safety effect of a treatment. AMF < 1 means crash reduction. Now usually called CMF.
+**AMF** — Accident Modification Factor. Multiplier (typically 0.5–1.5) representing the safety effect of a treatment on expected crashes. AMF < 1 means crash reduction. The current term in the literature is CMF; both terms are used interchangeably here.
 
 ## B
 
@@ -12,9 +12,9 @@
 
 ## C
 
-**CMF** — Crash Modification Factor. Modern term for AMF. Both terms appear in the literature; the framework treats them synonymously.
+**CMF** — Crash Modification Factor. The current term for what was historically called AMF. Both terms appear in the literature; this framework treats them synonymously.
 
-**CPM** — Crash Prediction Module. The IHSDM Crash Prediction Module (Banihashemi Eq 15) predicts expected annual crashes at intersections from ADTs and intersection attributes.
+**CPM** — Crash Prediction Module. A statistical model (originally implemented in IHSDM) that predicts expected annual crashes at intersections from ADTs and intersection attributes. The form used in MCBOMs is the IHSDM CPM as documented in FHWA-RD-99-207.
 
 ## H
 
@@ -22,27 +22,27 @@
 
 ## I
 
-**IHSDM** — Interactive Highway Safety Design Model. FHWA software with the original Crash Prediction Module that Banihashemi used.
+**IHSDM** — Interactive Highway Safety Design Model. FHWA software (FHWA-RD-99-207) that includes the original parametric crash prediction module for two-lane rural roads.
 
 ## K
 
-**KABCO** — Five-level crash severity scale: K = fatal, A = incapacitating injury, B = non-incapacitating injury, C = possible injury, O = property damage only.
+**KABCO** — Five-level crash severity scale used throughout U.S. transportation safety analysis: K = fatal, A = incapacitating injury, B = non-incapacitating injury, C = possible injury, O = property damage only.
 
 ## M
 
-**MILP** — Mixed-Integer Linear Programming. The optimization technique MCBOMs uses.
+**MILP** — Mixed-Integer Linear Programming. The optimization technique on which MCBOMs is built.
 
 ## P
 
-**PDO** — Property Damage Only. Same as KABCO level O.
+**PDO** — Property Damage Only. The "O" in KABCO.
 
-**PNR** — Penalty for Not Resurfacing. Harwood's mechanism for assigning a deferral cost to do-nothing alternatives. Not implemented in MCBOMs because per-site PNR values are not published.
+**PNR** — Penalty for Not Resurfacing. A deferral cost mechanism in the original RSRAP framework, applied to do-nothing alternatives. Not implemented in MCBOMs because per-site values are not published in the source literature.
 
-**PRP** — Penalty for Resurfacing-only Project. Harwood's penalty applied when a site is resurfaced without geometric improvements. Not implemented in MCBOMs.
+**PRP** — Penalty for Resurfacing-only Project. A penalty in the original RSRAP framework applied when a site is resurfaced without geometric improvements. Not implemented in MCBOMs.
 
-**PSB** — Present value of Safety Benefits. Harwood's notation for the safety benefit component.
+**PSB** — Present value of Safety Benefits. Notation from the RSRAP literature.
 
-**PTOB** — Present value of Traffic Operational Benefits. Harwood's notation for the operational benefit component.
+**PTOB** — Present value of Traffic Operational Benefits. Notation from the RSRAP literature.
 
 **PV** — Present Value.
 
@@ -50,9 +50,9 @@
 
 ## R
 
-**RRR** — Resurfacing, Restoration, Rehabilitation. The federal program that funds the kind of pavement work Harwood's case study addresses.
+**RRR** — Resurfacing, Restoration, Rehabilitation. The federal program category that funds the kind of pavement work the validation case studies address.
 
-**RSRAP** — Resurfacing Safety Resource Allocation Program. The software tool Harwood developed.
+**RSRAP** — Resurfacing Safety Resource Allocation Program. The original optimization tool for safety resource allocation within RRR projects, documented in Harwood et al. (2003).
 
 ## S
 
@@ -60,7 +60,7 @@
 
 ## T
 
-**TRR** — Transportation Research Record. The journal where Harwood (2003) and Banihashemi (2007) were published.
+**TRR** — Transportation Research Record. Peer-reviewed journal of the Transportation Research Board.
 
 ## V
 

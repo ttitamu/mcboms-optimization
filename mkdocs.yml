@@ -11,7 +11,7 @@ copyright: Texas A&M Transportation Institute • FHWA Contract HRSO20240009PR
 
 theme:
   name: material
-  logo: assets/tti_logo_full.png
+  logo: assets/tti_mark.png
   favicon: assets/tti_mark.png
   features:
     - navigation.instant
