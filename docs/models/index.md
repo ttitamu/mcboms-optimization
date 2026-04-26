@@ -1,6 +1,8 @@
 # Mathematical Models
 
-The `models/` folder in the repository contains the formal mathematical models for MCBOMs in three industry-standard MILP modeling languages. These are the primary models — the equations from Chapter 2 rendered in solver-readable form. The Python implementation is one access method; the AMPL, GAMS, and LP files are another.
+The `models/` folder in the repository contains the formal mathematical models for MCBOMs in three industry-standard MILP modeling languages. These are the primary models — the equations from the MCBOMs Methodology document rendered in solver-readable form. The Python implementation is one access method; the AMPL, GAMS, and LP files are another.
+
+Each format page below shows the **full source of every file inline** (click "View source" on any file to expand its content) and provides a **download button** for each file. No need to leave the documentation site to read or save the models.
 
 ## File organization
 
@@ -8,8 +10,8 @@ Files are named with a numeric prefix indicating their tier:
 
 | Prefix | What |
 |---|---|
-| `00_` | Core MCBOMs MILP (Chapter 2 Section 2.2 — abstract framework) |
-| `01_` | Worked example (Chapter 2 Section 2.3.7 — Eq 2.18 from raw inputs) |
+| `00_` | Core MCBOMs MILP (Section 2.2 — abstract framework) |
+| `01_` | Worked example (Section 2.3.7 — Eq 2.18 from raw inputs) |
 | `02_` | Harwood (2003) case study — paper-faithful aggregation |
 | `03_` | Banihashemi (2007) intersection sub-problem — full IHSDM CPM parametric |
 

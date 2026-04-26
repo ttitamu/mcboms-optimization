@@ -3,7 +3,7 @@
 The Corridor Condition Measures (CCM) capture multidisciplinary benefits beyond safety and operations: energy, emissions, accessibility, and resilience improvements.
 
 !!! note "Implementation status"
-    The CCM module is **in development**. The mathematical structure is locked (per Chapter 2 Section 2.5) but per-category monetization functions and the Python implementation `src/mcboms/benefits/ccm.py` are not yet complete.
+    The CCM module is **in development**. The mathematical structure is locked (per Section 2.5) but per-category monetization functions and the Python implementation `src/mcboms/benefits/ccm.py` are not yet complete.
 
 ## The equation
 
@@ -37,7 +37,7 @@ $$
 B_{ij}^{\mathrm{operations}} \cap B_{ij}^{\mathrm{corridor, MEP}} = \emptyset
 $$
 
-This is documented in Chapter 2 Section 2.5.4.
+This is documented in Section 2.5.4.
 
 ## Implementations (planned)
 

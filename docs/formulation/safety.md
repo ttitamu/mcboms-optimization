@@ -59,7 +59,7 @@ For the USDOT default $r = 0.07$ and $T = 20$, $\mathrm{PWF} = 10.594$.
 
 ## Worked example
 
-Chapter 2 Section 2.3.7 walks through a complete example:
+Section 2.3.7 walks through a complete example:
 
 - 5-mile rural two-lane segment
 - Annual crash count: $N = 6.0$

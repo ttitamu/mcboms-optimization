@@ -1,57 +1,119 @@
 # AMPL Models
 
-AMPL has the strongest semantic structure of the three formats. The model and data are separate files, so the math is most readable directly from the file.
+AMPL has the strongest semantic structure of the three formats — model and data are separate files, so the math reads directly from the file. Use AMPL with CPLEX, Gurobi, CBC, or any AMPL-compatible solver.
 
-## Files in `models/ampl/`
+This page shows the full content of every AMPL file in `models/ampl/`. Click any file's name to expand its content; use the download links to save individual files.
 
-| File | Purpose |
-|---|---|
-| `00_optimization.mod` | Core MCBOMs MILP — abstract model, all 10 constraints declared |
-| `01_worked_example.mod` + `.run` | Worked example with full Eq 2.18 chain |
-| `02_harwood.mod` | Harwood model (paper-faithful aggregation) |
-| `02_harwood_50m.dat` + `.run` | Harwood $50M instance data and script |
-| `02_harwood_10m.dat` + `.run` | Harwood $10M instance |
-| `03_banihashemi_intersections.mod` + `.dat` + `.run` | Banihashemi sub-problem with full IHSDM CPM |
+---
 
-## Running
+## How to run
 
-From the `models/ampl/` directory:
+Place all the `.mod`, `.dat`, and `.run` files in the same directory. Then from a shell:
 
 ```bash
 ampl 02_harwood_50m.run
-ampl 02_harwood_10m.run
-ampl 03_banihashemi_intersections.run
-ampl 01_worked_example.run
 ```
 
-Each `.run` script invokes the solver, displays the optimal objective, and shows which alternatives were selected.
+Each `.run` script invokes the solver, prints the optimal objective, and lists which alternatives were selected. Expected results are documented in [Validation](../validation/index.md).
 
-## What `00_optimization.mod` looks like
+---
 
-The core MILP is declared abstractly. Sets, parameters, decision variables, objective, and all 10 constraints (Eq 2.4 through 2.10 plus 2.14 through 2.16) are declared. Optional and network-level constraints are activated by populating the corresponding sets in the data file; when the sets are empty, the constraints are vacuously satisfied.
+## 00_optimization.mod — Core MCBOMs MILP
 
-```ampl
-# Eq 2.4 - Objective
-maximize NetBenefit:
-    sum {i in PROJECTS, j in ALTERNATIVES[i]}
-        (Benefit[i,j] - Cost_disc[i,j]) * x[i,j];
+The abstract optimization-layer model. Encodes Eq 2.4 through 2.10 (project-level) and Eq 2.14 through 2.16 (network-level extensions). Optional and network-level constraints are activated by populating the corresponding sets in the data file.
 
-# Eq 2.5 - total budget
-subject to TotalBudget:
-    sum {i in PROJECTS, j in ALTERNATIVES[i]} Cost[i,j] * x[i,j] <= B_total;
+[:material-download: Download `00_optimization.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/00_optimization.mod){ .md-button }
 
-# Eq 2.6 - mutual exclusivity
-subject to MutualExclusivity {i in PROJECTS}:
-    sum {j in ALTERNATIVES[i]} x[i,j] <= 1;
-```
+??? abstract "View source"
+    ```ampl
+    --8<-- "models/ampl/00_optimization.mod"
+    ```
 
-The full file is at `models/ampl/00_optimization.mod` in the repository.
+---
 
-## Solver compatibility
+## 01_worked_example.mod — Worked Example with Eq 2.18
 
-The AMPL files run in any AMPL-compatible solver, including:
+Single-segment safety-only example with the full Eq 2.18 chain declared parametrically. Severity disaggregation, CMF application, and present-worth conversion are all visible in the model.
 
-- **CPLEX** (commercial, common in transportation research)
-- **Gurobi** (commercial, fastest for MILPs of this size)
-- **CBC** (open-source)
-- **SCIP** (academic, free for non-commercial use)
+[:material-download: Download `01_worked_example.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/01_worked_example.mod){ .md-button }
+[:material-download: Download `01_worked_example.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/01_worked_example.run){ .md-button }
+
+??? abstract "View 01_worked_example.mod"
+    ```ampl
+    --8<-- "models/ampl/01_worked_example.mod"
+    ```
+
+??? abstract "View 01_worked_example.run"
+    ```ampl
+    --8<-- "models/ampl/01_worked_example.run"
+    ```
+
+---
+
+## 02_harwood — Harwood (2003) Case Study
+
+Paper-faithful Harwood reproduction. Uses Tables 2 and 3 of the paper directly (PSB and PTOB as published aggregates). Two budget instances: $50M and $10M.
+
+The model file is shared between the two budget instances; only the data and run files differ.
+
+[:material-download: Download `02_harwood.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood.mod){ .md-button }
+
+??? abstract "View 02_harwood.mod (model file, shared by both budgets)"
+    ```ampl
+    --8<-- "models/ampl/02_harwood.mod"
+    ```
+
+### $50M instance
+
+[:material-download: Download `02_harwood_50m.dat`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood_50m.dat){ .md-button }
+[:material-download: Download `02_harwood_50m.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood_50m.run){ .md-button }
+
+??? abstract "View 02_harwood_50m.dat"
+    ```ampl
+    --8<-- "models/ampl/02_harwood_50m.dat"
+    ```
+
+??? abstract "View 02_harwood_50m.run"
+    ```ampl
+    --8<-- "models/ampl/02_harwood_50m.run"
+    ```
+
+### $10M instance
+
+[:material-download: Download `02_harwood_10m.dat`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood_10m.dat){ .md-button }
+[:material-download: Download `02_harwood_10m.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood_10m.run){ .md-button }
+
+??? abstract "View 02_harwood_10m.dat"
+    ```ampl
+    --8<-- "models/ampl/02_harwood_10m.dat"
+    ```
+
+??? abstract "View 02_harwood_10m.run"
+    ```ampl
+    --8<-- "models/ampl/02_harwood_10m.run"
+    ```
+
+---
+
+## 03_banihashemi_intersections — Banihashemi (2007) Sub-Problem
+
+Full parametric IHSDM Crash Prediction Module. Per-intersection ADTs, skew angles, traffic control, LTL/ISD attributes are inputs; the model computes crashes/year from Banihashemi Eq 15.
+
+[:material-download: Download `03_banihashemi_intersections.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.mod){ .md-button }
+[:material-download: Download `03_banihashemi_intersections.dat`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.dat){ .md-button }
+[:material-download: Download `03_banihashemi_intersections.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.run){ .md-button }
+
+??? abstract "View 03_banihashemi_intersections.mod"
+    ```ampl
+    --8<-- "models/ampl/03_banihashemi_intersections.mod"
+    ```
+
+??? abstract "View 03_banihashemi_intersections.dat"
+    ```ampl
+    --8<-- "models/ampl/03_banihashemi_intersections.dat"
+    ```
+
+??? abstract "View 03_banihashemi_intersections.run"
+    ```ampl
+    --8<-- "models/ampl/03_banihashemi_intersections.run"
+    ```

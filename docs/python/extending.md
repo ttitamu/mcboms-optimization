@@ -4,7 +4,7 @@
 
 Suppose you want to add a "construction emissions" benefit category:
 
-1. **Math** — define the equation in Chapter 2 (LaTeX edit). Number it 2.x to fit the existing scheme.
+1. **Math** — define the equation in the MCBOMs Methodology document (LaTeX edit). Number it 2.x to fit the existing scheme.
 2. **AMPL** — add the parametric definition to a new instance `.mod` file in `models/ampl/`.
 3. **GAMS** — mirror the implementation in `.gms`.
 4. **Python** — create `src/mcboms/benefits/construction_emissions.py` following the pattern of `safety.py`. Implement a function `compute_construction_emissions_benefit()` that takes inputs and returns a present-value dollar amount.
@@ -19,13 +19,13 @@ The convention is: **lock the math first, then propagate to all three forms** (A
 2. **Solver instances** — generate the AMPL/GAMS/LP files for the new case (use the existing Banihashemi script as a template).
 3. **Python script** — create `examples/your_case_study.py`.
 4. **Tests** — add validation tests in `tests/test_your_case_study.py`.
-5. **Document** — add a section to Chapter 2 and update the [Validation](../validation/index.md) section of this site.
+5. **Document** — add a section to the MCBOMs Methodology document and update the [Validation](../validation/index.md) section of this site.
 
 ## Modifying the optimizer
 
 If you need to add a new constraint type:
 
-1. **Math** — edit Chapter 2 Section 2.2.
+1. **Math** — edit Section 2.2.
 2. **AMPL** — edit `models/ampl/00_optimization.mod` to add the new constraint.
 3. **GAMS** — mirror in `models/gams/00_optimization.gms`.
 4. **Python** — edit `src/mcboms/core/optimizer.py` to add the constraint inside `_build_model()`.
@@ -33,7 +33,7 @@ If you need to add a new constraint type:
 
 ## Code style
 
-- Plain, professional code comments. Reference Chapter 2 equation numbers (e.g., `# Eq 2.18`).
+- Plain, professional code comments. Reference equation numbers from the methodology document (e.g., `# Eq 2.18`).
 - Type hints where helpful but not required everywhere.
 - `pytest` for tests, `pandas` for data, `pulp` and `gurobipy` for optimization.
 - Match the existing module structure: classes for stateful objects, free functions for stateless calculations.

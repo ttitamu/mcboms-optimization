@@ -2,51 +2,75 @@
 
 GAMS combines model and data into a single file per instance. Common in policy and economics modeling.
 
-## Files in `models/gams/`
+This page shows the full content of every GAMS file in `models/gams/`. Click any file's name to expand its content; use the download links to save individual files.
 
-| File | Purpose |
-|---|---|
-| `00_optimization.gms` | Core MCBOMs MILP — abstract model |
-| `01_worked_example.gms` | Worked example with Eq 2.18 |
-| `02_harwood_50m.gms` | Harwood $50M instance |
-| `02_harwood_10m.gms` | Harwood $10M instance |
-| `03_banihashemi_intersections.gms` | Banihashemi sub-problem |
+---
 
-## Running
+## How to run
 
-From the `models/gams/` directory:
+From a shell:
 
 ```bash
 gams 02_harwood_50m.gms
-gams 02_harwood_10m.gms
-gams 03_banihashemi_intersections.gms
-gams 01_worked_example.gms
 ```
 
-GAMS will compile the model, invoke the configured solver, and write a results file.
+GAMS compiles the model, invokes the configured solver, and writes a results file. Expected results are documented in [Validation](../validation/index.md).
 
-## What `00_optimization.gms` looks like
+---
 
-The core MILP follows the same equation structure as AMPL with GAMS syntax:
+## 00_optimization.gms — Core MCBOMs MILP
 
-```gams
-* Eq 2.4 - Objective
-Objective ..
-   Z =E= sum(ij(i,j), (Benefit(i,j) - Cost_disc(i,j)) * x(i,j));
+The abstract optimization-layer model. Encodes Eq 2.4 through 2.10 (project-level) and Eq 2.14 through 2.16 (network-level extensions).
 
-* Eq 2.5 - total budget
-TotalBudget ..
-   sum(ij(i,j), Cost(i,j) * x(i,j)) =L= B_total;
+[:material-download: Download `00_optimization.gms`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/gams/00_optimization.gms){ .md-button }
 
-* Eq 2.6 - mutual exclusivity
-MutualExclusivity(i) ..
-   sum(ij(i,j), x(i,j)) =L= 1;
-```
+??? abstract "View source"
+    ```gams
+    --8<-- "models/gams/00_optimization.gms"
+    ```
 
-## Solver compatibility
+---
 
-GAMS runs with any of its supported solvers. Common choices for MILP:
+## 01_worked_example.gms — Worked Example
 
-- **CPLEX** (default in many GAMS installations)
-- **Gurobi**
-- **XA**, **CBC**, **SCIP**, etc.
+Single-segment safety-only example with the full Eq 2.18 chain.
+
+[:material-download: Download `01_worked_example.gms`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/gams/01_worked_example.gms){ .md-button }
+
+??? abstract "View source"
+    ```gams
+    --8<-- "models/gams/01_worked_example.gms"
+    ```
+
+---
+
+## 02_harwood_50m.gms — Harwood $50M
+
+[:material-download: Download `02_harwood_50m.gms`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/gams/02_harwood_50m.gms){ .md-button }
+
+??? abstract "View source"
+    ```gams
+    --8<-- "models/gams/02_harwood_50m.gms"
+    ```
+
+---
+
+## 02_harwood_10m.gms — Harwood $10M
+
+[:material-download: Download `02_harwood_10m.gms`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/gams/02_harwood_10m.gms){ .md-button }
+
+??? abstract "View source"
+    ```gams
+    --8<-- "models/gams/02_harwood_10m.gms"
+    ```
+
+---
+
+## 03_banihashemi_intersections.gms — Banihashemi Sub-Problem
+
+[:material-download: Download `03_banihashemi_intersections.gms`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/gams/03_banihashemi_intersections.gms){ .md-button }
+
+??? abstract "View source"
+    ```gams
+    --8<-- "models/gams/03_banihashemi_intersections.gms"
+    ```

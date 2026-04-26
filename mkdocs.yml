@@ -1,4 +1,4 @@
-site_name: MCBOMs Documentation
+site_name: MCBOMs Optimization
 site_description: Multidisciplinary Cost-Benefit Optimization Models — FHWA Contract HRSO20240009PR
 site_author: Texas A&M Transportation Institute
 site_url: https://sa-ameen.github.io/mcboms-optimization/
@@ -62,10 +62,19 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      base_path:
+        - .
+        - docs
+        - models
+        - src
+      check_paths: true
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 extra_javascript:
   - javascripts/mathjax.js
@@ -87,7 +96,7 @@ nav:
       - Safety Benefit (Eq 2.18): formulation/safety.md
       - Operational Benefit (Eq 2.21): formulation/operations.md
       - Corridor Condition Benefit (Eq 2.27): formulation/ccm.md
-      - Chapter 2 (Full PDF): formulation/chapter2.md
+      - MCBOMs Methodology (PDF): formulation/methodology.md
   - Mathematical Models:
       - models/index.md
       - AMPL: models/ampl.md

@@ -3,7 +3,7 @@
 The operational benefit captures travel time savings and vehicle operating cost reductions from infrastructure improvements.
 
 !!! note "Implementation status"
-    The operational benefit module is **in development**. The mathematical formulation is locked (per Chapter 2 Section 2.4) but the Python implementation in `src/mcboms/benefits/operations.py` is not yet complete. The AMPL/GAMS/LP files in `models/` do not currently exercise this equation; the validation instances use either pre-computed PTOB values (Harwood) or delay-cost minimization (Banihashemi).
+    The operational benefit module is **in development**. The mathematical formulation is locked (per Section 2.4) but the Python implementation in `src/mcboms/benefits/operations.py` is not yet complete. The AMPL/GAMS/LP files in `models/` do not currently exercise this equation; the validation instances use either pre-computed PTOB values (Harwood) or delay-cost minimization (Banihashemi).
 
 ## The equation
 

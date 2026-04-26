@@ -36,7 +36,7 @@ We chose not to implement PNR because:
 2. **Banihashemi (2007) also omits PNR**, so the deferred-penalty mechanism is not part of the published validation literature.
 3. **Reconstructing PNR would require fabricating data**, which the framework avoids on principle.
 
-The +5.5% MCBOMs solution at $10M is the strictly net-benefit-optimal solution given the available data. This is documented in **Chapter 2 Section 2.7.3**.
+The +5.5% MCBOMs solution at $10M is the strictly net-benefit-optimal solution given the available data. This is documented in **Section 2.7.3**.
 
 ## Reproducing
 

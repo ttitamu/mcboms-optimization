@@ -6,7 +6,7 @@ The MCBOMs framework is validated against three benchmarks. Each is reproducible
 
 -   **[Worked Example](worked-example.md)**
 
-    Single-segment safety-only example from Chapter 2 Section 2.3.7. Demonstrates Eq 2.18 end-to-end with full per-severity inputs.
+    Single-segment safety-only example from Section 2.3.7. Demonstrates Eq 2.18 end-to-end with full per-severity inputs.
 
     Expected: $1,493,914 net benefit at $1M budget.
 

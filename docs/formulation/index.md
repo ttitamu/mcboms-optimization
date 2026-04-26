@@ -1,6 +1,6 @@
 # Mathematical Formulation
 
-The full formulation is in [Chapter 2 PDF](chapter2.md). The pages in this section give you a navigable web version with rendered equations.
+The full formulation is in [MCBOMs Methodology (PDF)](methodology.md). The pages in this section give you a navigable web version with rendered equations.
 
 ## Sections
 
@@ -26,7 +26,7 @@ The full formulation is in [Chapter 2 PDF](chapter2.md). The pages in this secti
 
     Multi-category corridor condition measures: energy, emissions, accessibility, resilience.
 
--   **[Chapter 2 (Full PDF)](chapter2.md)**
+-   **[MCBOMs Methodology (PDF)](methodology.md)**
 
     Direct link to the full 30-page LaTeX-rendered mathematical specification.
 
@@ -34,7 +34,7 @@ The full formulation is in [Chapter 2 PDF](chapter2.md). The pages in this secti
 
 ## Equation conventions
 
-Throughout this documentation, equations are numbered to match Chapter 2 of the Task 4 Report:
+Throughout this documentation, equations are numbered to match the MCBOMs Methodology document:
 
 - **Eq 2.1, 2.2, 2.3** — Project six-tuple definition, total benefit decomposition, discount factor formula
 - **Eq 2.4 – 2.7** — Core MILP (objective, budget, mutual exclusivity, binary)
@@ -44,4 +44,4 @@ Throughout this documentation, equations are numbered to match Chapter 2 of the 
 - **Eq 2.21** — Operational benefit
 - **Eq 2.27** — Corridor condition benefit
 
-Every equation in the solver-language models in `models/` is labeled with its Chapter 2 number for cross-reference.
+Every equation in the solver-language models in `models/` is labeled with its equation number from the MCBOMs Methodology document for cross-reference.

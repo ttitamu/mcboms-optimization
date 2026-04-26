@@ -14,7 +14,7 @@ Developed under FHWA Contract HRSO20240009PR by the Texas A&M Transportation Ins
 
     ---
 
-    Start with the mathematical formulation. Chapter 2 of the Task 4 Report is the formal specification.
+    Start with the mathematical formulation. the MCBOMs Methodology document is the formal specification.
 
     [:octicons-arrow-right-24: Mathematical Formulation](formulation/index.md)
 
@@ -64,7 +64,7 @@ MCBOMs is mathematically a single optimization model. That single model is expre
 
 | Form | Where it lives | Best for |
 |---|---|---|
-| **Formal mathematical specification** | [Chapter 2 PDF](formulation/chapter2.md) | Reading the math; auditing the formulation; citing in reports |
+| **Formal mathematical specification** | [MCBOMs Methodology (PDF)](formulation/methodology.md) | Reading the math; auditing the formulation; citing in reports |
 | **Solver-language models** (AMPL, GAMS, LP) | [`models/`](models/index.md) | Running the validation in CPLEX, Gurobi, or any commercial MILP solver |
 | **Python implementation** | [`src/mcboms/`](python/index.md) | Programmatic use, custom data integration, building extensions |
 
@@ -76,7 +76,7 @@ These three forms produce the same numerical results to the cent. A reviewer who
 
 | Instance | Optimal objective | Status |
 |---|---|---|
-| Worked example | $1,493,914 | Matches Chapter 2 Section 2.3.7 |
+| Worked example | $1,493,914 | Matches Section 2.3.7 |
 | Harwood $50M | $6,159,512 | Matches Harwood Table 4 within $5 |
 | Harwood $10M | $4,931,520 | +5.5% above Harwood (no PNR; documented) |
 | Banihashemi sub-problem | $5,177,251 | Structural validation passes |

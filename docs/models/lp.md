@@ -1,72 +1,93 @@
 # LP Format Models
 
-LP files are flat numeric forms — they cannot represent the abstract model symbolically. Each LP file is an instantiation of the model with specific numbers. Drop into any MILP solver directly.
+LP files are flat numeric forms — they cannot represent the abstract model symbolically. Each LP file is an instantiation of the model with specific numeric coefficients. Drop into any MILP solver directly.
 
-## Files in `models/lp/`
+This page shows the full content of every LP file in `models/lp/`. Click any file's name to expand its content; use the download links to save individual files.
 
-| File | Purpose |
-|---|---|
-| `00_optimization.lp` | Core model structure with annotated 2-project illustrative example |
-| `01_worked_example.lp` | Worked example evaluated to numeric coefficients |
-| `02_harwood_50m.lp` | Harwood $50M evaluated coefficients |
-| `02_harwood_10m.lp` | Harwood $10M evaluated coefficients |
-| `03_banihashemi_intersections.lp` | Banihashemi sub-problem evaluated coefficients |
+---
 
-## Running
+## How to run
 
 With CPLEX:
 
 ```
 cplex
-> read models/lp/02_harwood_50m.lp
+> read 02_harwood_50m.lp
 > mipopt
 > display solution objective
 ```
 
-Expected: `Objective value of the MIP = 6,159,512.00`.
-
 With Gurobi:
 
 ```bash
-gurobi_cl models/lp/02_harwood_50m.lp
+gurobi_cl 02_harwood_50m.lp
 ```
-
-Expected: `Optimal objective: 6.159512e+06`.
 
 With CBC (free, open-source):
 
 ```bash
-cbc models/lp/02_harwood_50m.lp solve
+cbc 02_harwood_50m.lp solve
 ```
 
-## What an LP file looks like
+Expected objectives are documented in [Validation](../validation/index.md). All five LP files have been validated with CBC; the optimal objective values match the AMPL/GAMS/Python implementations to the cent.
 
-LP files contain:
+---
 
-- An `OBJ:` line with the objective function (max or min, listing each variable's coefficient)
-- A `Subject To:` block with constraint rows (e.g., `Constraint_name: 100 x_1 + 200 x_2 <= 500`)
-- A `Binaries` block listing all binary variables
-- An `End` marker
+## 00_optimization.lp — Core MCBOMs MILP (illustrative)
 
-Example excerpt from `02_harwood_50m.lp`:
+LP cannot express abstract symbolic models. This file uses a small 2-project, 4-alternative illustrative example with extensive header comments explaining the structure that all other LP instances follow.
 
-```
-\* Harwood et al. (2003) - Harwood 50M *\
-\* Per-alternative coefficient = total_benefit - safety_improvement_cost *\
-\* Expected optimal objective Z = $6,159,512 *\
-Maximize
-OBJ: 1356661 x_10_1 + 35107 x_1_1 + 279756 x_2_1 + 628606 x_3_1
-   + 261392 x_4_1 + 1168618 x_5_1 + 341437 x_6_1 + 680641 x_7_1
-   + 525644 x_8_1 + 590056 x_8_2 + 817238 x_9_1
-Subject To
-MutEx_1: x_1_0 + x_1_1 <= 1
-...
-```
+[:material-download: Download `00_optimization.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/00_optimization.lp){ .md-button }
 
-The header comments explain how each coefficient was derived from the source data (Harwood Tables 2 and 3 in this case).
+??? abstract "View source"
+    ```
+    --8<-- "models/lp/00_optimization.lp"
+    ```
 
-## Why we provide LP files
+---
 
-LP files are the universal exchange format. Every MILP solver reads LP. If a reviewer has CPLEX, Gurobi, CBC, SCIP, FICO Xpress, or any combination, they can read these files without any model-language compiler.
+## 01_worked_example.lp — Worked Example
 
-For symbolic readability, see the [AMPL](ampl.md) or [GAMS](gams.md) models, which retain the parametric structure.
+[:material-download: Download `01_worked_example.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/01_worked_example.lp){ .md-button }
+
+??? abstract "View source"
+    ```
+    --8<-- "models/lp/01_worked_example.lp"
+    ```
+
+---
+
+## 02_harwood_50m.lp — Harwood $50M
+
+Expected optimal objective: **$6,159,512** (matches Harwood Table 4 within $5).
+
+[:material-download: Download `02_harwood_50m.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/02_harwood_50m.lp){ .md-button }
+
+??? abstract "View source"
+    ```
+    --8<-- "models/lp/02_harwood_50m.lp"
+    ```
+
+---
+
+## 02_harwood_10m.lp — Harwood $10M
+
+Expected optimal objective: **$4,931,520** (5.5% above Harwood; documented divergence per Section 2.7.3).
+
+[:material-download: Download `02_harwood_10m.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/02_harwood_10m.lp){ .md-button }
+
+??? abstract "View source"
+    ```
+    --8<-- "models/lp/02_harwood_10m.lp"
+    ```
+
+---
+
+## 03_banihashemi_intersections.lp — Banihashemi Sub-Problem
+
+[:material-download: Download `03_banihashemi_intersections.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/03_banihashemi_intersections.lp){ .md-button }
+
+??? abstract "View source"
+    ```
+    --8<-- "models/lp/03_banihashemi_intersections.lp"
+    ```

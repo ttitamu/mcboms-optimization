@@ -2,7 +2,7 @@
 
 ## What is validated
 
-- **Worked example (Section 2.3.7)**: arithmetic verified against Chapter 2 to the cent, in Python and AMPL/GAMS/LP.
+- **Worked example (Section 2.3.7)**: arithmetic verified against the MCBOMs Methodology document to the cent, in Python and AMPL/GAMS/LP.
 - **Harwood $50M**: 4 of 4 rigorous metrics match Harwood Table 4 within $5 (rounding). 10 of 10 site selections match exactly.
 - **Harwood $10M**: documented +5.5% divergence on net benefit. The MCBOMs solution has higher net benefit than Harwood's because PNR is not implemented.
 - **Banihashemi intersection sub-problem**: structural validation passes. Int 12 LTL identified as most cost-effective, signalization at Int 3/4 rejected, rank ordering of LTL improvements consistent with Banihashemi Table 5.
@@ -21,7 +21,7 @@ The optional constraints (Eq 2.8 dependency, Eq 2.9 cross-project exclusivity, E
 ## What is documented as a deferred enhancement
 
 - **Banihashemi full-network validation**: the published Banihashemi case has 135 homogeneous segments plus 13 intersections (3,385 binary variables). We currently validate the intersection sub-problem. Full-network validation requires segment geometry data not published in the paper.
-- **Segment-level treatment composition**: Chapter 2 Section 2.1.2 documents this concept (per FHWA reviewer requirement) and the Eq 2.5a cost decomposition. The Python prototype currently uses alternative-level aggregate costs. Per-treatment decomposition will be added when an agency provides treatment-cost catalog data.
+- **Segment-level treatment composition**: Section 2.1.2 documents this concept (per FHWA reviewer requirement) and the Eq 2.5a cost decomposition. The Python prototype currently uses alternative-level aggregate costs. Per-treatment decomposition will be added when an agency provides treatment-cost catalog data.
 
 ## Known data quality concerns
 

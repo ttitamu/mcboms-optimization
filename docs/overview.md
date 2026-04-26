@@ -26,22 +26,22 @@ Default unit costs and economic parameters come from **USDOT Benefit-Cost Analys
 
 | Folder | What it contains |
 |---|---|
-| `docs/` | This documentation site, plus the Chapter 2 PDF specification |
+| `docs/` | This documentation site, plus the MCBOMs Methodology PDF specification |
 | `models/` | Solver-language mathematical models (AMPL, GAMS, LP) |
 | `src/mcboms/` | Python implementation |
 | `tests/` | Test suite (32 tests) |
 | `examples/` | Reproducible Python examples |
 | `notebooks/` | Jupyter notebooks |
 
-The mathematical formulation is documented in detail in [Chapter 2](formulation/chapter2.md).
+The mathematical formulation is documented in detail in [MCBOMs Methodology](formulation/methodology.md).
 
 ## Validation status
 
 The framework reproduces:
 
-- **Worked example** (Chapter 2 Section 2.3.7): $1,493,914 net benefit at $1M budget — matches arithmetic to the cent
+- **Worked example** (Section 2.3.7): $1,493,914 net benefit at $1M budget — matches arithmetic to the cent
 - **Harwood (2003) at $50M**: $6,159,512 net benefit — matches Harwood Table 4 within $5 rounding, all 10 site selections match exactly
-- **Harwood (2003) at $10M**: $4,931,520 — 5.5% higher than Harwood's published $4,675,033 because the MCBOMs prototype does not implement the Penalty for Not Resurfacing (PNR) mechanism. Harwood does not publish per-site PNR values, and Banihashemi (2007) also omits PNR. Documented in Chapter 2 Section 2.7.3.
+- **Harwood (2003) at $10M**: $4,931,520 — 5.5% higher than Harwood's published $4,675,033 because the MCBOMs prototype does not implement the Penalty for Not Resurfacing (PNR) mechanism. Harwood does not publish per-site PNR values, and Banihashemi (2007) also omits PNR. Documented in Section 2.7.3.
 - **Banihashemi (2007) intersection sub-problem**: structural validation. Int 12:LTL identified as most cost-effective (B/C ≈ 11.5), signalization at Int 3 and Int 4 correctly rejected, rank ordering of LTL improvements consistent with Banihashemi Table 5.
 
 See [Validation Status](reference/status.md) for the full picture, including what's implemented, what's pending, and known data quality concerns.
