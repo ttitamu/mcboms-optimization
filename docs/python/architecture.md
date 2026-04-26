@@ -4,12 +4,12 @@ The Python code is organized as a standard Python package under `src/mcboms/`. T
 
 ## Run the examples on Colab
 
-Two notebooks reproduce the validation cases without any local installation:
+Two notebooks reproduce the validation cases without any local installation. The first cell of each notebook installs MCBOMs from this repository with PuLP+CBC, so no Gurobi license is needed.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg) Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .md-button--primary }
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg) Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button }
-
-The first cell of each notebook installs MCBOMs from this repository with the open-source PuLP+CBC backend (no Gurobi license required).
+<div class="run-on-colab" markdown>
+[:simple-googlecolab: &nbsp; Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button }
+[:simple-googlecolab: &nbsp; Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button .colab-button }
+</div>
 
 ---
 
@@ -61,8 +61,10 @@ The constructor accepts the following optional constraints, each activated only 
 
 When optional kwargs are not provided, the corresponding constraints are inactive — the same class handles project-level-only and full network-level cases. The methodology PDF gives the formal mathematical statement of each constraint with its equation number.
 
-[:material-download: Download `optimizer.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/core/optimizer.py){ .md-button }
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb)
+<div class="action-buttons" markdown>
+[:material-download: &nbsp; Download `optimizer.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/core/optimizer.py){ .md-button .file-button }
+[:simple-googlecolab: &nbsp; Open in Colab](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button }
+</div>
 
 ??? abstract "View source: optimizer.py"
     ```python

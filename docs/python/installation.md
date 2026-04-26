@@ -7,10 +7,12 @@ notebooks on Google Colab without installing anything.
 
 The repository ships with two ready-to-run notebooks. Each one installs the
 framework with PuLP+CBC (no license required) and reproduces a validation
-case end-to-end. Click either badge to open in Colab:
+case end-to-end.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg) Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .md-button--primary }
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg) Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button }
+<div class="run-on-colab" markdown>
+[:simple-googlecolab: &nbsp; Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button }
+[:simple-googlecolab: &nbsp; Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button .colab-button }
+</div>
 
 The first cell of each notebook installs MCBOMs from this repository. Allow
 about 30 seconds for the install to complete, then run the remaining cells.

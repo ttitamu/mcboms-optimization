@@ -69,3 +69,69 @@
 .md-footer-meta {
   background-color: #500000;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Action button rows (Download + Open in Colab)
+   ───────────────────────────────────────────────────────────── */
+
+/* Container that keeps a row of action buttons aligned, with a small
+   gap, and lets them wrap cleanly on narrow screens. */
+.action-buttons,
+.run-on-colab {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.6rem 0 0.4rem;
+}
+
+.action-buttons > p,
+.run-on-colab > p {
+  /* MkDocs wraps consecutive links in a <p>; flatten that. */
+  display: contents;
+}
+
+/* Both action buttons share a uniform shape so they line up as a pair. */
+.md-typeset .file-button,
+.md-typeset .colab-button {
+  min-width: 14rem;
+  justify-content: center;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* File / download button — neutral surface, maroon accent on hover.
+   Uses the existing Material button defaults; we only tweak the icon. */
+.md-typeset .file-button .twemoji {
+  color: var(--md-primary-fg-color);
+}
+
+/* Colab button — neutral surface, recognizable Colab-orange icon prefix.
+   Avoids the loud yellow/orange of Google's official badge while still
+   being identifiable. */
+.md-typeset .colab-button {
+  color: var(--md-default-fg-color);
+  border-color: var(--md-default-fg-color--lighter);
+}
+
+.md-typeset .colab-button .twemoji {
+  color: #f9ab00;  /* Colab brand orange, used only on the icon */
+}
+
+.md-typeset .colab-button:hover {
+  background-color: var(--md-primary-fg-color);
+  color: #fff;
+  border-color: var(--md-primary-fg-color);
+}
+
+.md-typeset .colab-button:hover .twemoji {
+  color: #fff;
+}
+
+/* Mobile: let buttons fill the row width. */
+@media (max-width: 600px) {
+  .md-typeset .file-button,
+  .md-typeset .colab-button {
+    min-width: 100%;
+  }
+}
