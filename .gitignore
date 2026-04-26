@@ -178,3 +178,8 @@ Thumbs.db
 *.temp
 *.bak
 *~
+
+# staticrypt — only ignore the temporary encryption output dir.
+# .staticrypt.json IS committed because it contains the stable salt
+# that ensures "Remember me" cookies survive across deploys.
+encrypted_site/

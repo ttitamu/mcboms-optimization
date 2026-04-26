@@ -43,6 +43,45 @@ jobs:
       - name: Build site
         run: mkdocs build --strict
 
+      - name: Set up Node.js for staticrypt
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install staticrypt
+        run: npm install -g staticrypt
+
+      - name: Encrypt site with staticrypt
+        env:
+          STATICRYPT_PASSWORD: ${{ secrets.STATICRYPT_PASSWORD }}
+        run: |
+          if [ -z "$STATICRYPT_PASSWORD" ]; then
+            echo "::error::STATICRYPT_PASSWORD secret is not set. Add it in repo Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          # Encrypt the entire built site recursively. The output goes to
+          # encrypted_site/site/... so we then move it back to replace site/.
+          # --short suppresses the short-password warning.
+          # --remember 7 sets the Remember-me expiration to 7 days.
+          # --template-color-* applies our maroon theme to the prompt.
+          staticrypt site \
+            --password "$STATICRYPT_PASSWORD" \
+            --recursive \
+            --short \
+            --remember 7 \
+            --template-color-primary '#500000' \
+            --template-color-secondary '#6B0E1A' \
+            --template-title 'MCBOMs Optimization' \
+            --template-instructions 'This site is restricted. Please enter the access password.' \
+            --template-button 'Open' \
+            -d encrypted_site
+          # Replace the plaintext site/ with the encrypted version
+          rm -rf site
+          mv encrypted_site/site site
+          rm -rf encrypted_site
+          echo "Encryption complete. Encrypted file count:"
+          find site -name '*.html' | wc -l
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
