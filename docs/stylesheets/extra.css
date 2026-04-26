@@ -63,6 +63,9 @@
 }
 
 /* Footer */
+.md-footer {
+  background-color: #6B0E1A;
+}
 .md-footer-meta {
-  background-color: #2D0000;
+  background-color: #500000;
 }

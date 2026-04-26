@@ -1,27 +1,32 @@
-# MCBOMs Methodology — Full Document
+# MCBOMs Methodology
 
-The complete mathematical formulation and validation are documented in **MCBOMs Methodology**, a standalone professional document.
+The complete mathematical formulation and validation, in a single standalone document.
 
-## Download
+[Download PDF :material-download:](https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf){ .md-button .md-button--primary }
+[Open in new tab :material-open-in-new:](https://github.com/sa-ameen/mcboms-optimization/blob/main/docs/chapter2/mcboms_methodology.pdf){ .md-button }
 
-[**MCBOMs Methodology (PDF, 30 pages)**](https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf){ .md-button .md-button--primary }
+<iframe
+  src="https://docs.google.com/gview?url=https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf&embedded=true"
+  style="width: 100%; height: 800px; border: 1px solid #cccccc;"
+  frameborder="0">
+</iframe>
 
 ## What's in the document
 
 | Section | Content |
 |---|---|
 | Introduction | Framework overview, methodological foundation, document organization |
-| 2.1 | Foundational framework: project--alternative structure, benefit definition, discounting convention |
+| 2.1 | Foundational framework: project–alternative structure, benefit definition, discounting convention |
 | 2.2 | The MILP formulation — project-level core (2.2.1) and network-level extensions (2.2.2) |
 | 2.3 | Safety benefit derivation, including the worked example (Section 2.3.7) |
 | 2.4 | Operational benefit derivation |
 | 2.5 | Corridor condition measures |
 | 2.6 | Solution methodology and alternative enumeration in preprocessing |
-| 2.7 | Validation against Harwood (2003) and Banihashemi (2007), plus internal cross-validation |
+| 2.7 | Validation against Harwood (2003) and Banihashemi (2007), with internal cross-validation |
 
 ## Cross-reference
 
-This documentation site renders the key equations directly:
+The key equations are also rendered directly on this site:
 
 - [Project-Level MILP](project-level.md) — covers Section 2.2.1
 - [Network-Level Extensions](network-level.md) — covers Section 2.2.2
@@ -29,7 +34,7 @@ This documentation site renders the key equations directly:
 - [Operational Benefit](operations.md) — covers Section 2.4
 - [Corridor Condition Benefit](ccm.md) — covers Section 2.5
 
-For the formal proofs, derivations, and validation discussion, refer to the PDF.
+For formal proofs, derivations, and the full validation discussion, refer to the PDF above.
 
 ## Citation
 
