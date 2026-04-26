@@ -2,8 +2,10 @@
 
 The Corridor Condition Measures (CCM) capture multidisciplinary benefits beyond safety and operations: energy, emissions, accessibility, and resilience improvements.
 
-!!! note "Implementation status"
-    The CCM module is **in development**. The mathematical structure is locked (per Section 2.5) but per-category monetization functions and the Python implementation `src/mcboms/benefits/ccm.py` are not yet complete.
+!!! note "Scope of the current prototype"
+    The mathematical structure of the corridor condition benefit is documented in this work and in Section 2.5 of the MCBOMs Methodology. The validation instances (worked example, Harwood, Banihashemi) do not include CCM data, so this benefit is zero for those cases.
+
+    A future version of the framework will add `src/mcboms/benefits/ccm.py` with per-category monetization functions for energy, emissions, accessibility, and resilience improvements.
 
 ## The equation
 
@@ -39,12 +41,12 @@ $$
 
 This is documented in Section 2.5.4.
 
-## Implementations (planned)
+## Future implementation
 
-When the CCM module is complete:
+A standalone parametric implementation will follow the same pattern as the safety module:
 
-- **Python**: `src/mcboms/benefits/ccm.py` — modular per-category monetization functions
-- **AMPL/GAMS**: parametric chain in instance files
-- **LP**: evaluated coefficients
+- **Python**: `src/mcboms/benefits/ccm.py` with modular per-category monetization functions (one per CCM variable)
+- **AMPL/GAMS**: parametric chain in instance files when the corresponding raw inputs are available
+- **LP**: evaluated coefficients with derivation in header comments
 
 For the current validation instances (worked example, Harwood, Banihashemi), CCM benefits are zero because the source case studies do not include CCM data.

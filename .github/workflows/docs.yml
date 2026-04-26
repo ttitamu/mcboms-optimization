@@ -6,8 +6,14 @@ on:
       - main
     paths:
       - 'docs/**'
+      - 'models/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'examples/**'
+      - 'run_harwood_validation.py'
       - 'mkdocs.yml'
       - '.github/workflows/docs.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read

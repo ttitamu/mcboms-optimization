@@ -1,0 +1,59 @@
+/* MCBOMs Optimization custom theme - Aggie Maroon (#500000) */
+
+:root {
+  --md-primary-fg-color:        #500000;
+  --md-primary-fg-color--light: #6B0E1A;
+  --md-primary-fg-color--dark:  #3A0000;
+  --md-accent-fg-color:         #500000;
+}
+
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:        #500000;
+  --md-primary-bg-color:        #ffffff;
+  --md-accent-fg-color:         #500000;
+  --md-typeset-a-color:         #500000;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:        #6B0E1A;
+  --md-accent-fg-color:         #B23A48;
+  --md-typeset-a-color:         #B23A48;
+}
+
+/* Header logo sizing */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 2.4rem;
+  width: auto;
+}
+
+/* Make the header taller to accommodate logo */
+.md-header {
+  min-height: 3.6rem;
+}
+
+/* Subtle accent on active sidebar nav item */
+.md-nav__link--active {
+  color: var(--md-primary-fg-color) !important;
+  font-weight: 600;
+}
+
+/* Make the "Where to start" cards on home page feel a bit more grounded */
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid.cards > ol > li,
+.md-typeset .grid > .card {
+  border: 0.05rem solid var(--md-default-fg-color--lightest);
+  transition: border 0.25s, box-shadow 0.25s;
+}
+
+.md-typeset .grid.cards > ul > li:hover,
+.md-typeset .grid.cards > ol > li:hover,
+.md-typeset .grid > .card:hover {
+  border-color: var(--md-primary-fg-color);
+  box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.05);
+}
+
+/* Footer */
+.md-footer-meta {
+  background-color: #2D0000;
+}

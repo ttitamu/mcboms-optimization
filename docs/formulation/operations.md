@@ -2,8 +2,13 @@
 
 The operational benefit captures travel time savings and vehicle operating cost reductions from infrastructure improvements.
 
-!!! note "Implementation status"
-    The operational benefit module is **in development**. The mathematical formulation is locked (per Section 2.4) but the Python implementation in `src/mcboms/benefits/operations.py` is not yet complete. The AMPL/GAMS/LP files in `models/` do not currently exercise this equation; the validation instances use either pre-computed PTOB values (Harwood) or delay-cost minimization (Banihashemi).
+!!! note "Scope of the current prototype"
+    The mathematical formulation of the operational benefit is documented in this work and in Section 2.4 of the MCBOMs Methodology. A standalone Python module that computes operational benefits from raw inputs is not part of the current prototype. For the validation instances:
+
+    - The **Harwood (2003)** instance uses the paper's published PTOB aggregate values.
+    - The **Banihashemi (2007)** intersection sub-problem uses delay-cost minimization.
+
+    A future version of the framework will expose `src/mcboms/benefits/operations.py` for end-to-end parametric computation, in the same pattern as the existing `safety.py` module.
 
 ## The equation
 
@@ -46,11 +51,10 @@ USDOT BCA Guidance May 2025 default values (2023 dollars):
 
 See [Default Parameters](../reference/parameters.md) for the full table with sources.
 
-## Implementations (planned)
+## Future implementation
 
-When the operations module is complete, it will follow the same preprocessing pattern as `safety.py`:
+A standalone parametric implementation will follow the same pattern as the existing safety module (`safety.py`):
 
-- **Python**: `src/mcboms/benefits/operations.py`
-- **AMPL**: parametric chain in instance files (analogous to safety in `01_worked_example.mod`)
-- **GAMS**: parallel implementation
+- **Python**: `src/mcboms/benefits/operations.py` exposes `compute_operational_benefit()` taking $\Delta d$, AADT, OCC, VOT, $\Delta VOC$, and VMT as inputs and returning the present-value benefit
+- **AMPL/GAMS**: parametric chain analogous to the worked example for safety, declared in the relevant instance files
 - **LP**: evaluated coefficients with derivation in header comments

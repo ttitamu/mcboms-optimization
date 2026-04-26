@@ -1,4 +1,4 @@
-# MCBOMs Documentation
+# MCBOMs Optimization
 
 **Multidisciplinary Cost-Benefit Optimization Models** — a Mixed-Integer Linear Programming framework for transportation infrastructure investment decisions.
 
@@ -10,37 +10,37 @@ Developed under FHWA Contract HRSO20240009PR by the Texas A&M Transportation Ins
 
 <div class="grid cards" markdown>
 
--   :material-book-open-variant:{ .lg .middle } **I want to read the math**
+-   :material-book-open-variant:{ .lg .middle } **Mathematical Formulation**
 
     ---
 
-    Start with the mathematical formulation. the MCBOMs Methodology document is the formal specification.
+    The MCBOMs Methodology document is the formal specification of the framework, with the equations, variables, and constraints.
 
-    [:octicons-arrow-right-24: Mathematical Formulation](formulation/index.md)
+    [:octicons-arrow-right-24: Read the formulation](formulation/index.md)
 
--   :material-format-list-bulleted-square:{ .lg .middle } **I want to run the model in CPLEX/Gurobi/GAMS**
-
-    ---
-
-    The `models/` folder contains the MILP in three solver-language forms: AMPL, GAMS, and LP. No Python required.
-
-    [:octicons-arrow-right-24: Mathematical Models](models/index.md)
-
--   :material-language-python:{ .lg .middle } **I want to use the Python implementation**
+-   :material-format-list-bulleted-square:{ .lg .middle } **Solver-Language Models**
 
     ---
 
-    Install the package, run validation, integrate into your pipeline, or extend with new benefit categories.
+    The `models/` folder contains the MILP in three formats: AMPL, GAMS, and LP. Use these directly in CPLEX, Gurobi, or any commercial MILP solver. No Python required.
 
-    [:octicons-arrow-right-24: Python Implementation](python/index.md)
+    [:octicons-arrow-right-24: View the models](models/index.md)
 
--   :material-check-decagram:{ .lg .middle } **I want to verify the framework**
+-   :material-language-python:{ .lg .middle } **Python Implementation**
 
     ---
 
-    Three benchmark validations: a worked example, Harwood (2003), and Banihashemi (2007). All reproducible from the repository.
+    Install the package, run the validation, integrate into a Python pipeline, or extend the framework with new benefit categories.
 
-    [:octicons-arrow-right-24: Validation](validation/index.md)
+    [:octicons-arrow-right-24: Get started in Python](python/index.md)
+
+-   :material-check-decagram:{ .lg .middle } **Validation**
+
+    ---
+
+    Three benchmarks: a worked example, Harwood (2003), and Banihashemi (2007). All three are reproducible from the repository.
+
+    [:octicons-arrow-right-24: See validation results](validation/index.md)
 
 </div>
 
@@ -82,4 +82,3 @@ These three forms produce the same numerical results to the cent. A reviewer who
 | Banihashemi sub-problem | $5,177,251 | Structural validation passes |
 
 Full details on the [Validation](validation/index.md) page.
-
