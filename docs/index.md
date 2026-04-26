@@ -2,7 +2,7 @@
 
 **Multidisciplinary Cost-Benefit Optimization Models** — a Mixed-Integer Linear Programming framework for transportation infrastructure investment decisions.
 
-Developed under FHWA Contract HRSO20240009PR by the Texas A&M Transportation Institute.
+Developed at the Texas A&M Transportation Institute.
 
 ---
 

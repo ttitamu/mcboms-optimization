@@ -1,9 +1,9 @@
 site_name: MCBOMs Optimization
-site_description: Multidisciplinary Cost-Benefit Optimization Models — FHWA Contract HRSO20240009PR
+site_description: Multidisciplinary Cost-Benefit Optimization Models
 site_author: Texas A&M Transportation Institute
 site_url: https://ttitamu.github.io/mcboms-optimization/
 
-copyright: Texas A&M Transportation Institute • FHWA Contract HRSO20240009PR
+copyright: Texas A&M Transportation Institute
 
 theme:
   name: material

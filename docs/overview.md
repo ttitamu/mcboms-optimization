@@ -4,7 +4,7 @@
 
 MCBOMs is a Mixed-Integer Linear Programming (MILP) framework for optimizing transportation infrastructure investment decisions. Given a portfolio of candidate projects (sites or intersections), each with multiple possible improvement alternatives, MCBOMs selects the combination that maximizes total societal benefit subject to a budget constraint.
 
-The framework is developed under **FHWA Contract HRSO20240009PR** by the **Texas A&M Transportation Institute**.
+The framework is developed at the **Texas A&M Transportation Institute**.
 
 ## What benefits the framework quantifies
 
@@ -48,4 +48,4 @@ See [Scope of this prototype](reference/status.md) for the validated benchmarks 
 
 ## Who maintains this
 
-Texas A&M Transportation Institute, College Station, TX. For questions about MCBOMs methodology or implementation, contact TTI directly. For bugs or feature requests, [open a GitHub issue](https://github.com/sa-ameen/mcboms-optimization/issues).
+Texas A&M Transportation Institute, College Station, TX. For questions about MCBOMs methodology or implementation, contact TTI directly. For bugs or feature requests, [open a GitHub issue](https://github.com/ttitamu/mcboms-optimization/issues).

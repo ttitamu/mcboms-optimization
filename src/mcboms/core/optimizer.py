@@ -1,24 +1,23 @@
-"""
-Core MILP Optimizer for MCBOMs.
+"""MILP optimizer for transportation infrastructure investment decisions.
 
-This module implements the Mixed-Integer Linear Programming (MILP) formulation
-for optimizing transportation infrastructure investment decisions.
+The optimizer maximizes net benefit subject to budget, mutual exclusivity,
+dependency, conflict, BCR, facility-budget, and regional balance constraints.
 
-Mathematical Formulation:
-    
-    Objective:
-        max Σᵢ Σⱼ (Bᵢⱼ - Cᵢⱼ) × xᵢⱼ
-    
-    Subject to:
-        Σⱼ xᵢⱼ ≤ 1           ∀i  (mutual exclusivity)
-        Σᵢ Σⱼ Cᵢⱼ × xᵢⱼ ≤ B      (budget constraint)
-        xᵢⱼ ∈ {0, 1}         ∀i,j (binary)
+Backend selection
+-----------------
+Two solver backends are supported:
 
-References:
-    - Harwood et al. (2003). Systemwide optimization of safety improvements
-      for resurfacing, restoration, or rehabilitation projects.
-    - Banihashemi (2007). Optimization of highway safety and operation by
-      using crash prediction models with accident modification factors.
+* gurobi — preferred when available; commercial-grade, handles large instances
+* pulp   — uses CBC, an open-source solver; good for problems up to a few
+           thousand binary variables, no license required
+
+`Optimizer.solve()` auto-detects what's available and picks gurobi over pulp.
+Pass `solver="pulp"` to force the open-source backend (useful in environments
+without a Gurobi license, e.g. Google Colab).
+
+References
+----------
+Harwood et al. (2003); Banihashemi (2007).
 """
 
 from __future__ import annotations
@@ -30,29 +29,63 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pandas as pd
 
-if TYPE_CHECKING:
-    import gurobipy as gp
-
 from mcboms.utils.economics import calculate_discount_factors
 
 logger = logging.getLogger(__name__)
 
 
+def _gurobi_available() -> bool:
+    """Return True if gurobipy is importable. Doesn't check license validity —
+    that's only known at solve time."""
+    try:
+        import gurobipy  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def _pulp_available() -> bool:
+    """Return True if pulp is importable."""
+    try:
+        import pulp  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
 @dataclass
 class OptimizationResult:
     """Container for optimization results.
-    
-    Attributes:
-        status: Solver status (optimal, infeasible, etc.)
-        objective_value: Optimal objective function value
-        net_benefit: Total net benefit (benefits - costs)
-        total_cost: Total cost of selected alternatives
-        total_benefit: Total benefit of selected alternatives
-        selected_alternatives: DataFrame of selected alternatives by site
-        budget_utilization: Fraction of budget used
-        solve_time: Solver time in seconds
-        gap: Optimality gap (for MIP)
+
+    Attributes
+    ----------
+    status : str
+        Solver status — typically 'optimal', 'time_limit', or an error string.
+    objective_value : float
+        Value of the maximized objective at the solution.
+    net_benefit : float
+        Total net benefit of selected alternatives. Per the Harwood convention
+        this equals (total benefit) - (safety improvement cost) when the input
+        DataFrame includes a `safety_improvement_cost` column; otherwise
+        (total benefit) - (total cost).
+    total_cost, total_benefit : float
+        Aggregates over selected alternatives.
+    selected_alternatives : pd.DataFrame
+        One row per selected (site, alternative) pair, with cost/benefit columns.
+    budget_utilization : float
+        total_cost / config.budget; in [0, 1].
+    solve_time : float
+        Wall-clock seconds the backend spent in `optimize()` / `solve()`.
+    gap : float
+        Final MIP gap when reported by the backend (0.0 if not available).
+    sites_improved : int
+        Number of sites where a non-trivial alternative was selected (alt_id != 0).
+    sites_deferred : int
+        Sites where no alternative was selected (do-nothing).
+    solver_used : str
+        Which backend produced this result: 'gurobi' or 'pulp'.
     """
+
     status: str
     objective_value: float
     net_benefit: float
@@ -64,42 +97,87 @@ class OptimizationResult:
     gap: float = 0.0
     sites_improved: int = 0
     sites_deferred: int = 0
-    
+    solver_used: str = ""
+
     def __repr__(self) -> str:
         return (
-            f"OptimizationResult(\n"
-            f"  status='{self.status}',\n"
-            f"  net_benefit=${self.net_benefit:,.0f},\n"
-            f"  total_cost=${self.total_cost:,.0f},\n"
-            f"  budget_utilization={self.budget_utilization:.1%},\n"
-            f"  sites_improved={self.sites_improved},\n"
-            f"  solve_time={self.solve_time:.3f}s\n"
-            f")"
+            f"OptimizationResult(status={self.status!r}, "
+            f"net_benefit=${self.net_benefit:,.0f}, "
+            f"sites_improved={self.sites_improved}, "
+            f"solver={self.solver_used or '?'})"
         )
-    
+
     def summary(self) -> str:
-        """Generate a summary report of optimization results."""
+        """Human-readable summary of the result.
+
+        Returns a multi-line string suitable for printing or logging.
+        """
+        budget_used_pct = self.budget_utilization * 100
+
+        out = []
+        out.append("MCBOMs Optimization Result")
+        out.append("=" * 50)
+        out.append(f"Status                {self.status}")
+        if self.solver_used:
+            out.append(f"Solver                {self.solver_used}")
+        out.append(f"Solve time            {self.solve_time:.2f} s")
+        if self.gap > 0:
+            out.append(f"Final MIP gap         {self.gap:.4%}")
+        out.append("")
+
+        out.append("Selection")
+        out.append("-" * 50)
+        out.append(f"Sites improved        {self.sites_improved}")
+        out.append(f"Sites deferred        {self.sites_deferred}")
+        out.append("")
+
+        out.append("Financial")
+        out.append("-" * 50)
+        out.append(f"Total cost            ${self.total_cost:>15,.0f}")
+        out.append(f"Total benefit         ${self.total_benefit:>15,.0f}")
+        out.append(f"Net benefit           ${self.net_benefit:>15,.0f}")
+        out.append(f"Budget utilization    {budget_used_pct:>15.1f}%")
+        out.append("")
+
+        if len(self.selected_alternatives) > 0:
+            out.append("Selected alternatives")
+            out.append("-" * 50)
+            df = self.selected_alternatives.copy()
+            # Format currency columns inline for readability.
+            for col in ("total_cost", "total_benefit", "net_benefit",
+                        "safety_improvement_cost", "resurfacing_cost",
+                        "safety_benefit", "ops_benefit", "ccm_benefit"):
+                if col in df.columns:
+                    df[col] = df[col].apply(lambda v: f"${v:,.0f}" if pd.notna(v) else "")
+            out.append(df.to_string(index=False))
+
+        return "\n".join(out)
+
+    def to_markdown(self) -> str:
+        """Return the same summary as a Markdown-formatted string,
+        suitable for embedding in notebooks or reports."""
         lines = [
-            "=" * 60,
-            "MCBOMs OPTIMIZATION RESULTS",
-            "=" * 60,
-            f"Status: {self.status}",
-            f"Solve Time: {self.solve_time:.3f} seconds",
-            f"Optimality Gap: {self.gap:.4%}",
+            "## MCBOMs Optimization Result",
             "",
-            "FINANCIAL SUMMARY",
-            "-" * 40,
-            f"Total Cost:        ${self.total_cost:>15,.0f}",
-            f"Total Benefit:     ${self.total_benefit:>15,.0f}",
-            f"Net Benefit:       ${self.net_benefit:>15,.0f}",
-            f"Budget Utilization: {self.budget_utilization:>14.1%}",
-            "",
-            "PROJECT SUMMARY",
-            "-" * 40,
-            f"Sites Improved:    {self.sites_improved:>15d}",
-            f"Sites Deferred:    {self.sites_deferred:>15d}",
-            "=" * 60,
+            f"- **Status:** `{self.status}`",
         ]
+        if self.solver_used:
+            lines.append(f"- **Solver:** `{self.solver_used}`")
+        lines += [
+            f"- **Solve time:** {self.solve_time:.2f} s",
+            "",
+            "| Metric | Value |",
+            "|---|---|",
+            f"| Sites improved | {self.sites_improved} |",
+            f"| Sites deferred | {self.sites_deferred} |",
+            f"| Total cost | ${self.total_cost:,.0f} |",
+            f"| Total benefit | ${self.total_benefit:,.0f} |",
+            f"| Net benefit | **${self.net_benefit:,.0f}** |",
+            f"| Budget utilization | {self.budget_utilization:.1%} |",
+        ]
+        if len(self.selected_alternatives) > 0:
+            lines += ["", "### Selected alternatives", "",
+                      self.selected_alternatives.to_markdown(index=False)]
         return "\n".join(lines)
 
 
@@ -216,12 +294,13 @@ class Optimizer:
         self.regional_caps = regional_caps or {}
         self.regional_floors = regional_floors or {}
         
-        self._model: gp.Model | None = None
+        self._model: Any = None
         self._variables: dict[tuple[int, int], Any] = {}
-        
+        self._solver_used: str | None = None
+
         # Validate inputs
         self._validate_inputs()
-        
+
         logger.info(
             f"Optimizer initialized with {len(sites)} sites, "
             f"{len(alternatives)} alternatives, budget=${budget:,.0f}"
@@ -330,49 +409,40 @@ class Optimizer:
                     f"Conflict {conf} references unknown alternative pair"
                 )
     
-    def _build_model(self) -> None:
-        """Build the Gurobi MILP model."""
+    def _build_model_gurobi(self) -> None:
+        """Build the model with gurobipy."""
         import gurobipy as gp
         from gurobipy import GRB
-        
-        logger.info("Building MILP model...")
-        
-        # Create model
+
         self._model = gp.Model("MCBOMs")
-        
-        # Set parameters
         self._model.Params.TimeLimit = self.config.time_limit
         self._model.Params.MIPGap = self.config.mip_gap
         if not self.config.verbose:
             self._model.Params.OutputFlag = 0
         
-        # Create decision variables: x[i,j] = 1 if alternative j selected for site i
+        # x[i,j] = 1 if alternative j is selected at site i
         self._variables = {}
         for _, row in self.alternatives.iterrows():
             site_id = row["site_id"]
             alt_id = row["alt_id"]
-            var_name = f"x_{site_id}_{alt_id}"
             self._variables[(site_id, alt_id)] = self._model.addVar(
-                vtype=GRB.BINARY, name=var_name
+                vtype=GRB.BINARY, name=f"x_{site_id}_{alt_id}"
             )
-        
-        # Objective: Maximize net benefit
-        # Per Harwood (2003): NBjk = PSBjk + PTOBjk + PNRjk - PRPjk - CCjk
-        # If objective_value column exists (includes penalties), use it
-        # Otherwise fall back to total_benefit - safety_improvement_cost
+
+        # Objective coefficient: pre-computed objective_value if available,
+        # otherwise total_benefit - safety_improvement_cost (Harwood convention).
         def get_objective_coeff(row):
             if "objective_value" in row.index:
                 return row["objective_value"]
-            else:
-                return row["total_benefit"] - row.get("safety_improvement_cost", row["total_cost"])
-        
+            return row["total_benefit"] - row.get("safety_improvement_cost", row["total_cost"])
+
         obj_expr = gp.quicksum(
             get_objective_coeff(row) * self._variables[(row["site_id"], row["alt_id"])]
             for _, row in self.alternatives.iterrows()
         )
         self._model.setObjective(obj_expr, GRB.MAXIMIZE)
-        
-        # Constraint 1: Mutual exclusivity - at most one alternative per site
+
+        # Mutual exclusivity: at most one alternative per site.
         for site_id in self.sites["site_id"].unique():
             site_alts = self.alternatives[self.alternatives["site_id"] == site_id]
             if len(site_alts) > 0:
@@ -383,39 +453,30 @@ class Optimizer:
                     ) <= 1,
                     name=f"exclusivity_{site_id}"
                 )
-        
-        # Constraint 2: Budget constraint (Eq 2.5 — total budget)
+
+        # Budget.
         budget_expr = gp.quicksum(
             row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
             for _, row in self.alternatives.iterrows()
         )
         self._model.addConstr(budget_expr <= self.config.budget, name="budget")
-        
-        # ----------------------------------------------------------------
-        # Optional constraints (Eq 2.8 - 2.10)
-        # ----------------------------------------------------------------
-        
-        # Eq 2.8 — Dependency: x_ij <= x_i'j' for each (i,j,i',j') in dependencies
-        # Selecting alternative (i,j) requires selecting alternative (ip,jp).
+
+        # Dependencies: selecting (i,j) requires (ip,jp).
         for idx, (i, j, ip, jp) in enumerate(self.dependencies):
             self._model.addConstr(
                 self._variables[(i, j)] <= self._variables[(ip, jp)],
                 name=f"dependency_{idx}_{i}_{j}_requires_{ip}_{jp}"
             )
         
-        # Eq 2.9 — Cross-project exclusivity: x_ij + x_i'j' <= 1
-        # Alternatives (i,j) and (ip,jp) cannot both be selected.
+        # Conflicts: alternatives (i,j) and (ip,jp) cannot both be selected.
         for idx, (i, j, ip, jp) in enumerate(self.conflicts):
             self._model.addConstr(
                 self._variables[(i, j)] + self._variables[(ip, jp)] <= 1,
                 name=f"conflict_{idx}_{i}_{j}_vs_{ip}_{jp}"
             )
-        
-        # Eq 2.10 — Minimum BCR per project
-        # If a project is selected (sum_j x_ij = 1), the chosen alternative's
-        # benefit must meet theta * cost. Linearized as:
-        #   sum_j (B_ij - theta * C_ij) * x_ij >= 0  for each project i
-        # When project not selected (all x_ij = 0), constraint is 0 >= 0 (satisfied).
+
+        # Minimum BCR per project. Linearized form: sum_j (B - theta*C) * x_ij >= 0.
+        # Holds trivially when no alternative is selected at site i.
         if self.min_bcr is not None:
             theta = self.min_bcr
             for site_id in self.sites["site_id"].unique():
@@ -429,15 +490,9 @@ class Optimizer:
                         ) >= 0,
                         name=f"min_bcr_{site_id}"
                     )
-        
-        # ----------------------------------------------------------------
-        # Network-level constraints (Eq 2.14 - 2.16)
-        # ----------------------------------------------------------------
-        
-        # Eq 2.14 — Facility-type sub-budget
-        # sum over (i,j) where facility_type[i] = m of C_ij * x_ij <= B_m
+
+        # Facility-type sub-budgets.
         if self.facility_budgets:
-            # Build site -> facility_type lookup
             facility_lookup = dict(zip(self.sites["site_id"], self.sites["facility_type"]))
             for facility_type, sub_budget in self.facility_budgets.items():
                 facility_alts = self.alternatives[
@@ -451,9 +506,8 @@ class Optimizer:
                         ) <= sub_budget,
                         name=f"facility_budget_{facility_type}"
                     )
-        
-        # Eq 2.15 — Regional cap
-        # sum over (i,j) where region[i] = r of C_ij * x_ij <= B_r^cap
+
+        # Per-region spending caps.
         if self.regional_caps:
             region_lookup = dict(zip(self.sites["site_id"], self.sites["region"]))
             for region, cap in self.regional_caps.items():
@@ -468,9 +522,8 @@ class Optimizer:
                         ) <= cap,
                         name=f"regional_cap_{region}"
                     )
-        
-        # Eq 2.16 — Regional minimum-investment floor
-        # sum over (i,j) where region[i] = r of C_ij * x_ij >= beta_r * B_total
+
+        # Per-region minimum-investment floors (fraction of total budget).
         if self.regional_floors:
             region_lookup = dict(zip(self.sites["site_id"], self.sites["region"]))
             for region, fraction in self.regional_floors.items():
@@ -486,35 +539,189 @@ class Optimizer:
                         ) >= minimum_spend,
                         name=f"regional_floor_{region}"
                     )
-        
+
         self._model.update()
-        
-        logger.info(
-            f"Model built: {self._model.NumVars} variables, "
-            f"{self._model.NumConstrs} constraints"
-        )
     
-    def solve(self) -> OptimizationResult:
+    def _build_model_pulp(self) -> None:
+        """Build the model with pulp (CBC backend)."""
+        import pulp
+
+        prob = pulp.LpProblem("MCBOMs", pulp.LpMaximize)
+
+        # x[i,j] = 1 if alternative j is selected at site i
+        self._variables = {}
+        for _, row in self.alternatives.iterrows():
+            site_id = row["site_id"]
+            alt_id = row["alt_id"]
+            self._variables[(site_id, alt_id)] = pulp.LpVariable(
+                f"x_{site_id}_{alt_id}", cat="Binary"
+            )
+
+        def get_objective_coeff(row):
+            if "objective_value" in row.index:
+                return row["objective_value"]
+            return row["total_benefit"] - row.get("safety_improvement_cost", row["total_cost"])
+
+        prob += pulp.lpSum(
+            get_objective_coeff(row) * self._variables[(row["site_id"], row["alt_id"])]
+            for _, row in self.alternatives.iterrows()
+        )
+
+        # Mutual exclusivity.
+        for site_id in self.sites["site_id"].unique():
+            site_alts = self.alternatives[self.alternatives["site_id"] == site_id]
+            if len(site_alts) > 0:
+                prob += (
+                    pulp.lpSum(
+                        self._variables[(site_id, row["alt_id"])]
+                        for _, row in site_alts.iterrows()
+                    ) <= 1,
+                    f"exclusivity_{site_id}",
+                )
+
+        # Budget.
+        prob += (
+            pulp.lpSum(
+                row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
+                for _, row in self.alternatives.iterrows()
+            ) <= self.config.budget,
+            "budget",
+        )
+
+        # Dependencies.
+        for idx, (i, j, ip, jp) in enumerate(self.dependencies):
+            prob += (
+                self._variables[(i, j)] <= self._variables[(ip, jp)],
+                f"dependency_{idx}_{i}_{j}_requires_{ip}_{jp}",
+            )
+
+        # Conflicts.
+        for idx, (i, j, ip, jp) in enumerate(self.conflicts):
+            prob += (
+                self._variables[(i, j)] + self._variables[(ip, jp)] <= 1,
+                f"conflict_{idx}_{i}_{j}_vs_{ip}_{jp}",
+            )
+
+        # Minimum BCR per project.
+        if self.min_bcr is not None:
+            theta = self.min_bcr
+            for site_id in self.sites["site_id"].unique():
+                site_alts = self.alternatives[self.alternatives["site_id"] == site_id]
+                if len(site_alts) > 0:
+                    prob += (
+                        pulp.lpSum(
+                            (row["total_benefit"] - theta * row["total_cost"])
+                            * self._variables[(site_id, row["alt_id"])]
+                            for _, row in site_alts.iterrows()
+                        ) >= 0,
+                        f"min_bcr_{site_id}",
+                    )
+
+        # Facility-type sub-budgets.
+        if self.facility_budgets:
+            facility_lookup = dict(zip(self.sites["site_id"], self.sites["facility_type"]))
+            for facility_type, sub_budget in self.facility_budgets.items():
+                facility_alts = self.alternatives[
+                    self.alternatives["site_id"].map(facility_lookup) == facility_type
+                ]
+                if len(facility_alts) > 0:
+                    prob += (
+                        pulp.lpSum(
+                            row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
+                            for _, row in facility_alts.iterrows()
+                        ) <= sub_budget,
+                        f"facility_budget_{facility_type}",
+                    )
+
+        # Per-region spending caps.
+        if self.regional_caps:
+            region_lookup = dict(zip(self.sites["site_id"], self.sites["region"]))
+            for region, cap in self.regional_caps.items():
+                region_alts = self.alternatives[
+                    self.alternatives["site_id"].map(region_lookup) == region
+                ]
+                if len(region_alts) > 0:
+                    prob += (
+                        pulp.lpSum(
+                            row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
+                            for _, row in region_alts.iterrows()
+                        ) <= cap,
+                        f"regional_cap_{region}",
+                    )
+
+        # Per-region minimum-investment floors.
+        if self.regional_floors:
+            region_lookup = dict(zip(self.sites["site_id"], self.sites["region"]))
+            for region, fraction in self.regional_floors.items():
+                region_alts = self.alternatives[
+                    self.alternatives["site_id"].map(region_lookup) == region
+                ]
+                if len(region_alts) > 0:
+                    minimum_spend = fraction * self.config.budget
+                    prob += (
+                        pulp.lpSum(
+                            row["total_cost"] * self._variables[(row["site_id"], row["alt_id"])]
+                            for _, row in region_alts.iterrows()
+                        ) >= minimum_spend,
+                        f"regional_floor_{region}",
+                    )
+
+        self._model = prob
+
+    def solve(self, solver: str | None = None) -> OptimizationResult:
         """Solve the optimization problem.
-        
-        Returns:
-            OptimizationResult containing the optimal solution.
-        
-        Raises:
-            RuntimeError: If optimization fails.
+
+        Parameters
+        ----------
+        solver : {'gurobi', 'pulp', None}, optional
+            Backend to use. None (default) auto-detects: prefers gurobi
+            if installed, falls back to pulp+CBC.
+
+        Returns
+        -------
+        OptimizationResult
         """
+        backend = self._select_solver(solver)
+        self._solver_used = backend
+
+        if backend == "gurobi":
+            self._build_model_gurobi()
+            return self._solve_gurobi()
+        if backend == "pulp":
+            self._build_model_pulp()
+            return self._solve_pulp()
+        raise RuntimeError(f"Unknown solver backend: {backend}")
+
+    def _select_solver(self, requested: str | None) -> str:
+        """Pick a solver backend. Honor explicit request if available; otherwise
+        prefer gurobi over pulp."""
+        if requested == "gurobi":
+            if not _gurobi_available():
+                raise RuntimeError(
+                    "solver='gurobi' requested but gurobipy is not installed"
+                )
+            return "gurobi"
+        if requested == "pulp":
+            if not _pulp_available():
+                raise RuntimeError(
+                    "solver='pulp' requested but pulp is not installed"
+                )
+            return "pulp"
+        if requested is not None:
+            raise ValueError(f"solver must be 'gurobi', 'pulp', or None; got {requested!r}")
+        # Auto-detect.
+        if _gurobi_available():
+            return "gurobi"
+        if _pulp_available():
+            return "pulp"
+        raise RuntimeError(
+            "No solver available. Install gurobipy (commercial) or pulp (open source)."
+        )
+
+    def _solve_gurobi(self) -> OptimizationResult:
         from gurobipy import GRB
-        
-        # Build model if not already built
-        if self._model is None:
-            self._build_model()
-        
-        logger.info("Solving MILP...")
-        
-        # Solve
+
         self._model.optimize()
-        
-        # Check status
         status = self._model.Status
         status_map = {
             GRB.OPTIMAL: "optimal",
@@ -524,64 +731,84 @@ class Optimizer:
             GRB.INTERRUPTED: "interrupted",
         }
         status_str = status_map.get(status, f"unknown_{status}")
-        
         if status == GRB.INFEASIBLE:
-            logger.error("Model is infeasible")
             raise RuntimeError("Optimization problem is infeasible")
-        
         if status not in (GRB.OPTIMAL, GRB.TIME_LIMIT):
-            logger.error(f"Optimization failed with status: {status_str}")
             raise RuntimeError(f"Optimization failed: {status_str}")
-        
-        # Extract results
-        return self._extract_results(status_str)
-    
-    def _extract_results(self, status: str) -> OptimizationResult:
-        """Extract results from solved model."""
-        from gurobipy import GRB
-        
-        # Get selected alternatives
-        selected = []
-        for (site_id, alt_id), var in self._variables.items():
-            if var.X > 0.5:  # Binary variable selected
-                alt_row = self.alternatives[
-                    (self.alternatives["site_id"] == site_id) &
-                    (self.alternatives["alt_id"] == alt_id)
-                ].iloc[0]
-                row_data = {
-                    "site_id": site_id,
-                    "alt_id": alt_id,
-                    "description": alt_row.get("description", ""),
-                    "total_cost": alt_row["total_cost"],
-                    "total_benefit": alt_row["total_benefit"],
-                    "net_benefit": alt_row["total_benefit"] - alt_row["total_cost"],
-                }
-                # Add optional columns if present
-                for col in ["resurfacing_cost", "safety_improvement_cost", 
-                           "safety_benefit", "ops_benefit", "ccm_benefit"]:
-                    if col in alt_row:
-                        row_data[col] = alt_row[col]
-                selected.append(row_data)
-        
+        return self._extract_results_gurobi(status_str)
+
+    def _solve_pulp(self) -> OptimizationResult:
+        import pulp
+
+        solver = pulp.PULP_CBC_CMD(
+            msg=1 if self.config.verbose else 0,
+            timeLimit=self.config.time_limit,
+            gapRel=self.config.mip_gap,
+        )
+        self._model.solve(solver)
+
+        status_str = pulp.LpStatus[self._model.status].lower()
+        # CBC returns "Not Solved" when interrupted; normalize names.
+        status_map = {
+            "optimal": "optimal",
+            "infeasible": "infeasible",
+            "unbounded": "unbounded",
+            "not solved": "interrupted",
+            "undefined": "unknown",
+        }
+        status_str = status_map.get(status_str, status_str)
+        if status_str == "infeasible":
+            raise RuntimeError("Optimization problem is infeasible")
+        if status_str not in ("optimal", "time_limit"):
+            # CBC doesn't have a separate "time_limit" status; if a solution was
+            # found within the limit, treat as optimal-ish.
+            if pulp.value(self._model.objective) is None:
+                raise RuntimeError(f"Optimization failed: {status_str}")
+        return self._extract_results_pulp(status_str)
+
+    def _common_extract(self, selected: list[dict]) -> tuple[pd.DataFrame, float, float, float, int, int]:
+        """Shared post-processing of selected alternatives."""
         selected_df = pd.DataFrame(selected)
-        
-        # Calculate totals
         total_cost = selected_df["total_cost"].sum() if len(selected_df) > 0 else 0
         total_benefit = selected_df["total_benefit"].sum() if len(selected_df) > 0 else 0
-        
-        # Net benefit per Harwood: total_benefit - safety_improvement_cost (not total_cost)
         if len(selected_df) > 0 and "safety_improvement_cost" in selected_df.columns:
-            safety_cost = selected_df["safety_improvement_cost"].sum()
-            net_benefit = total_benefit - safety_cost
+            net_benefit = total_benefit - selected_df["safety_improvement_cost"].sum()
         else:
             net_benefit = total_benefit - total_cost
-        
-        # Count sites
         sites_improved = len(selected_df[selected_df["alt_id"] != 0]) if len(selected_df) > 0 else 0
-        total_sites = len(self.sites)
-        sites_deferred = total_sites - len(selected_df)
-        
-        result = OptimizationResult(
+        sites_deferred = len(self.sites) - len(selected_df)
+        return selected_df, total_cost, total_benefit, net_benefit, sites_improved, sites_deferred
+
+    def _selected_alternative_row(self, site_id, alt_id) -> dict:
+        """Build a row dict for a selected alternative, copying optional columns."""
+        alt_row = self.alternatives[
+            (self.alternatives["site_id"] == site_id)
+            & (self.alternatives["alt_id"] == alt_id)
+        ].iloc[0]
+        row_data = {
+            "site_id": site_id,
+            "alt_id": alt_id,
+            "description": alt_row.get("description", ""),
+            "total_cost": alt_row["total_cost"],
+            "total_benefit": alt_row["total_benefit"],
+            "net_benefit": alt_row["total_benefit"] - alt_row["total_cost"],
+        }
+        for col in ["resurfacing_cost", "safety_improvement_cost",
+                    "safety_benefit", "ops_benefit", "ccm_benefit"]:
+            if col in alt_row:
+                row_data[col] = alt_row[col]
+        return row_data
+
+    def _extract_results_gurobi(self, status: str) -> OptimizationResult:
+        selected = [
+            self._selected_alternative_row(site_id, alt_id)
+            for (site_id, alt_id), var in self._variables.items()
+            if var.X > 0.5
+        ]
+        selected_df, total_cost, total_benefit, net_benefit, sites_improved, sites_deferred = (
+            self._common_extract(selected)
+        )
+        return OptimizationResult(
             status=status,
             objective_value=self._model.ObjVal,
             net_benefit=net_benefit,
@@ -593,11 +820,35 @@ class Optimizer:
             gap=self._model.MIPGap if hasattr(self._model, "MIPGap") else 0,
             sites_improved=sites_improved,
             sites_deferred=sites_deferred,
+            solver_used="gurobi",
         )
-        
-        logger.info(f"Optimization complete: {result}")
-        
-        return result
+
+    def _extract_results_pulp(self, status: str) -> OptimizationResult:
+        import pulp
+
+        selected = [
+            self._selected_alternative_row(site_id, alt_id)
+            for (site_id, alt_id), var in self._variables.items()
+            if var.value() is not None and var.value() > 0.5
+        ]
+        selected_df, total_cost, total_benefit, net_benefit, sites_improved, sites_deferred = (
+            self._common_extract(selected)
+        )
+        obj_val = pulp.value(self._model.objective) or 0.0
+        return OptimizationResult(
+            status=status,
+            objective_value=obj_val,
+            net_benefit=net_benefit,
+            total_cost=total_cost,
+            total_benefit=total_benefit,
+            selected_alternatives=selected_df,
+            budget_utilization=total_cost / self.config.budget if self.config.budget > 0 else 0,
+            solve_time=self._model.solutionTime if hasattr(self._model, "solutionTime") else 0,
+            gap=0,  # CBC doesn't expose final MIP gap directly.
+            sites_improved=sites_improved,
+            sites_deferred=sites_deferred,
+            solver_used="pulp",
+        )
     
     def add_constraint(
         self,

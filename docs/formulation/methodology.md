@@ -2,11 +2,11 @@
 
 The complete mathematical formulation and validation, in a single standalone document.
 
-[Download PDF :material-download:](https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf){ .md-button .md-button--primary }
-[Open in fullscreen viewer :material-fullscreen:](https://docs.google.com/gview?url=https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf){ .md-button target="_blank" }
+[Download PDF :material-download:](https://github.com/ttitamu/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf){ .md-button .md-button--primary }
+[Open in fullscreen viewer :material-fullscreen:](https://docs.google.com/gview?url=https://github.com/ttitamu/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf){ .md-button target="_blank" }
 
 <iframe
-  src="https://docs.google.com/gview?url=https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf&embedded=true"
+  src="https://docs.google.com/gview?url=https://github.com/ttitamu/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf&embedded=true"
   style="width: 100%; height: 800px; border: 1px solid #cccccc;"
   frameborder="0">
 </iframe>

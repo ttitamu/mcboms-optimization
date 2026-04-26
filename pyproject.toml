@@ -36,13 +36,14 @@ classifiers = [
 dependencies = [
     "numpy>=1.26.0",
     "pandas>=2.1.0",
-    "gurobipy>=11.0.0",
     "pyyaml>=6.0.1",
     "tqdm>=4.66.0",
     "loguru>=0.7.2",
 ]
 
 [project.optional-dependencies]
+gurobi = ["gurobipy>=11.0.0"]
+pulp = ["pulp>=2.7.0"]
 dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
@@ -61,7 +62,7 @@ notebooks = [
     "matplotlib>=3.8.0",
     "seaborn>=0.13.0",
 ]
-all = ["mcboms[dev,docs,notebooks]"]
+all = ["mcboms[gurobi,pulp,dev,docs,notebooks]"]
 
 [project.urls]
 Homepage = "https://github.com/tamu-tti/mcboms-optimization"

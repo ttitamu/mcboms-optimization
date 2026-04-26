@@ -22,7 +22,7 @@ Each `.run` script invokes the solver, prints the optimal objective, and lists w
 
 The abstract optimization-layer model. Encodes the project-level core and the network-level extensions. Optional and network-level constraints are activated by populating the corresponding sets in the data file.
 
-[:material-download: Download `00_optimization.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/00_optimization.mod){ .md-button }
+[:material-download: Download `00_optimization.mod`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/00_optimization.mod){ .md-button }
 
 ??? abstract "View source"
     ```ampl
@@ -35,8 +35,8 @@ The abstract optimization-layer model. Encodes the project-level core and the ne
 
 Single-segment safety-only instance with the full safety-benefit derivation declared parametrically. Severity disaggregation, CMF application, and present-worth conversion are all expressed symbolically in the model file.
 
-[:material-download: Download `01_worked_example.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/01_worked_example.mod){ .md-button }
-[:material-download: Download `01_worked_example.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/01_worked_example.run){ .md-button }
+[:material-download: Download `01_worked_example.mod`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/01_worked_example.mod){ .md-button }
+[:material-download: Download `01_worked_example.run`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/01_worked_example.run){ .md-button }
 
 ??? abstract "View 01_worked_example.mod"
     ```ampl
@@ -56,7 +56,7 @@ Paper-faithful Harwood reproduction. Uses Tables 2 and 3 of the paper directly (
 
 The model file is shared between the two budget instances; only the data and run files differ.
 
-[:material-download: Download `02_harwood.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood.mod){ .md-button }
+[:material-download: Download `02_harwood.mod`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/02_harwood.mod){ .md-button }
 
 ??? abstract "View 02_harwood.mod (model file, shared by both budgets)"
     ```ampl
@@ -65,8 +65,8 @@ The model file is shared between the two budget instances; only the data and run
 
 ### $50M instance
 
-[:material-download: Download `02_harwood_50m.dat`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood_50m.dat){ .md-button }
-[:material-download: Download `02_harwood_50m.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood_50m.run){ .md-button }
+[:material-download: Download `02_harwood_50m.dat`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/02_harwood_50m.dat){ .md-button }
+[:material-download: Download `02_harwood_50m.run`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/02_harwood_50m.run){ .md-button }
 
 ??? abstract "View 02_harwood_50m.dat"
     ```ampl
@@ -80,8 +80,8 @@ The model file is shared between the two budget instances; only the data and run
 
 ### $10M instance
 
-[:material-download: Download `02_harwood_10m.dat`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood_10m.dat){ .md-button }
-[:material-download: Download `02_harwood_10m.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/02_harwood_10m.run){ .md-button }
+[:material-download: Download `02_harwood_10m.dat`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/02_harwood_10m.dat){ .md-button }
+[:material-download: Download `02_harwood_10m.run`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/02_harwood_10m.run){ .md-button }
 
 ??? abstract "View 02_harwood_10m.dat"
     ```ampl
@@ -99,9 +99,9 @@ The model file is shared between the two budget instances; only the data and run
 
 Full parametric IHSDM Crash Prediction Module. Per-intersection ADTs, skew angles, traffic control, LTL/ISD attributes are inputs; the model computes crashes/year from Banihashemi Eq 15.
 
-[:material-download: Download `03_banihashemi_intersections.mod`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.mod){ .md-button }
-[:material-download: Download `03_banihashemi_intersections.dat`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.dat){ .md-button }
-[:material-download: Download `03_banihashemi_intersections.run`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.run){ .md-button }
+[:material-download: Download `03_banihashemi_intersections.mod`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.mod){ .md-button }
+[:material-download: Download `03_banihashemi_intersections.dat`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.dat){ .md-button }
+[:material-download: Download `03_banihashemi_intersections.run`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/ampl/03_banihashemi_intersections.run){ .md-button }
 
 ??? abstract "View 03_banihashemi_intersections.mod"
     ```ampl

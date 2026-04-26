@@ -37,7 +37,7 @@ Expected objectives are documented in [Validation](../validation/index.md). All 
 
 The abstract optimization layer cannot be expressed symbolically in LP format. This file is a minimal two-project, four-alternative instance with extensive header comments documenting the constraint structure that the other LP instances expand on.
 
-[:material-download: Download `00_optimization.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/00_optimization.lp){ .md-button }
+[:material-download: Download `00_optimization.lp`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/lp/00_optimization.lp){ .md-button }
 
 ??? abstract "View source"
     ```
@@ -48,7 +48,7 @@ The abstract optimization layer cannot be expressed symbolically in LP format. T
 
 ## 01_worked_example.lp — Worked Example
 
-[:material-download: Download `01_worked_example.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/01_worked_example.lp){ .md-button }
+[:material-download: Download `01_worked_example.lp`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/lp/01_worked_example.lp){ .md-button }
 
 ??? abstract "View source"
     ```
@@ -61,7 +61,7 @@ The abstract optimization layer cannot be expressed symbolically in LP format. T
 
 Expected optimal objective: **$6,159,512** (matches Harwood Table 4 within $5).
 
-[:material-download: Download `02_harwood_50m.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/02_harwood_50m.lp){ .md-button }
+[:material-download: Download `02_harwood_50m.lp`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/lp/02_harwood_50m.lp){ .md-button }
 
 ??? abstract "View source"
     ```
@@ -74,7 +74,7 @@ Expected optimal objective: **$6,159,512** (matches Harwood Table 4 within $5).
 
 Expected optimal objective: **$4,931,520** (5.5% above Harwood; documented divergence per Section 2.7.3).
 
-[:material-download: Download `02_harwood_10m.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/02_harwood_10m.lp){ .md-button }
+[:material-download: Download `02_harwood_10m.lp`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/lp/02_harwood_10m.lp){ .md-button }
 
 ??? abstract "View source"
     ```
@@ -85,7 +85,7 @@ Expected optimal objective: **$4,931,520** (5.5% above Harwood; documented diver
 
 ## 03_banihashemi_intersections.lp — Banihashemi Sub-Problem
 
-[:material-download: Download `03_banihashemi_intersections.lp`](https://github.com/sa-ameen/mcboms-optimization/raw/main/models/lp/03_banihashemi_intersections.lp){ .md-button }
+[:material-download: Download `03_banihashemi_intersections.lp`](https://github.com/ttitamu/mcboms-optimization/raw/main/models/lp/03_banihashemi_intersections.lp){ .md-button }
 
 ??? abstract "View source"
     ```
