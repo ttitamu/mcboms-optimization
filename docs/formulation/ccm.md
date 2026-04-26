@@ -28,7 +28,6 @@ Where:
 | Emissions reduction | metric tons CO₂-equivalent | USDOT BCA May 2025, EPA SCC |
 | Mobility & accessibility | trips, person-hours of access | USDOT BCA May 2025 |
 | Resilience | avoided disaster damages, expected | FEMA Standard Economic Values v13 (2024) |
-| Underserved-area access | accessibility-weighted demand | Agency-specific |
 | Pavement / asset condition | IRI improvement, infrastructure life | Agency-specific |
 
 ## Double-counting prevention

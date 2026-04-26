@@ -1,6 +1,6 @@
 # Network-Level Extensions
 
-The project-level MILP treats every candidate project as competing equally for one shared budget. In practice, transportation agencies often have additional constraints that the project-level model cannot express: separate funding streams for different facility categories, caps on per-region spending, and minimum-investment floors that protect underserved areas. The network-level extensions add these constraints to the formulation while preserving the project-level structure intact.
+The project-level MILP treats every candidate project as competing equally for one shared budget. In practice, transportation agencies often have additional constraints that the project-level model cannot express: separate funding streams for different facility categories, caps on per-region spending, and minimum-investment floors that ensure baseline spending across regions. The network-level extensions add these constraints to the formulation while preserving the project-level structure intact.
 
 These constraints are optional: when their corresponding sets are empty (e.g., no facility types defined), the constraints are vacuously satisfied and the model reduces to the pure project-level form.
 
