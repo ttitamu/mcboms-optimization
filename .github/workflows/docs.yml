@@ -79,6 +79,10 @@ jobs:
           rm -rf site
           mv encrypted_site/site site
           rm -rf encrypted_site
+          # Pre-check the "Remember me" checkbox in every encrypted page so
+          # reviewers don't get re-prompted on every navigation. The flag is
+          # opt-out: reviewers can uncheck it if they want session-only auth.
+          find site -name '*.html' -exec sed -i 's|<input id="staticrypt-remember" type="checkbox" name="remember" />|<input id="staticrypt-remember" type="checkbox" name="remember" checked />|g' {} +
           echo "Encryption complete. Encrypted file count:"
           find site -name '*.html' | wc -l
 
