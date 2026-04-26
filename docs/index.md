@@ -82,3 +82,4 @@ These three forms produce the same numerical results to the cent. A reviewer who
 | Banihashemi sub-problem | $5,177,251 | Structural validation passes |
 
 Full details on the [Validation](validation/index.md) page.
+
