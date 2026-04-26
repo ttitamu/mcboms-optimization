@@ -1,4 +1,4 @@
-/* MCBOMs Optimization custom theme - Aggie Maroon (#500000) */
+/* MCBOMs custom theme - Aggie Maroon (#500000) */
 
 :root {
   --md-primary-fg-color:        #500000;
@@ -133,5 +133,33 @@
   .md-typeset .file-button,
   .md-typeset .colab-button {
     min-width: 100%;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Hide heading-anchor pilcrow icons
+   ───────────────────────────────────────────────────────────── */
+
+/* Reviewers cite the methodology PDF, not URL fragments. Hide the
+   per-heading "¶" link that appears on hover. */
+.md-typeset .headerlink {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Header site_name accommodates the expanded MCBOMs name
+   ───────────────────────────────────────────────────────────── */
+
+/* Slightly tighten the header title on narrower screens so the
+   full "Multidisciplinary Cost-Benefit Optimization Models (MCBOMs)"
+   stays readable rather than ellipsis-truncating. */
+@media (max-width: 1400px) {
+  .md-header__title {
+    font-size: 0.75rem;
+  }
+}
+@media (max-width: 1100px) {
+  .md-header__title {
+    font-size: 0.7rem;
   }
 }

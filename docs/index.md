@@ -1,8 +1,6 @@
-# MCBOMs Optimization
+# Multidisciplinary Cost-Benefit Optimization Models (MCBOMs)
 
-**Multidisciplinary Cost-Benefit Optimization Models** — a Mixed-Integer Linear Programming framework for transportation infrastructure investment decisions.
-
-Developed at the Texas A&M Transportation Institute.
+A mixed-integer linear programming framework for transportation infrastructure investment decisions, integrating safety, operations, and corridor condition measures into a single optimization model. Developed at the Texas A&M Transportation Institute.
 
 ---
 
