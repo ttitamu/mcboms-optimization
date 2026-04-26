@@ -87,6 +87,7 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 extra:
+  generator: false
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/sa-ameen/mcboms-optimization
@@ -98,9 +99,9 @@ nav:
       - formulation/index.md
       - Project-Level MILP: formulation/project-level.md
       - Network-Level Extensions: formulation/network-level.md
-      - Safety Benefit (Eq 2.18): formulation/safety.md
-      - Operational Benefit (Eq 2.21): formulation/operations.md
-      - Corridor Condition Benefit (Eq 2.27): formulation/ccm.md
+      - Safety Benefit: formulation/safety.md
+      - Operational Benefit: formulation/operations.md
+      - Corridor Condition Benefit: formulation/ccm.md
       - MCBOMs Methodology (PDF): formulation/methodology.md
   - Mathematical Models:
       - models/index.md
