@@ -3,7 +3,7 @@
 The complete mathematical formulation and validation, in a single standalone document.
 
 [Download PDF :material-download:](https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf){ .md-button .md-button--primary }
-[Open in new tab :material-open-in-new:](https://github.com/sa-ameen/mcboms-optimization/blob/main/docs/chapter2/mcboms_methodology.pdf){ .md-button }
+[Open in fullscreen viewer :material-fullscreen:](https://docs.google.com/gview?url=https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf){ .md-button target="_blank" }
 
 <iframe
   src="https://docs.google.com/gview?url=https://github.com/sa-ameen/mcboms-optimization/raw/main/docs/chapter2/mcboms_methodology.pdf&embedded=true"
