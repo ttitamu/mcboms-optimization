@@ -101,7 +101,7 @@ This package houses the three benefit-equation implementations.
 
 ### `safety.py`
 
-Computes the present-value safety benefit from per-severity inputs. Validated against the worked example to the cent.
+Computes the present-value safety benefit from per-severity inputs. Validated against the worked example to within numerical precision.
 
 [:material-download: Download `safety.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/benefits/safety.py){ .md-button .file-button target="_blank" rel="noopener" }
 

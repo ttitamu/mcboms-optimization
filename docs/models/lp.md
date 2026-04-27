@@ -29,7 +29,7 @@ With CBC (free, open-source):
 cbc 02_harwood_50m.lp solve
 ```
 
-Expected objectives are documented in [Validation](../validation/index.md). All five LP files have been validated with CBC; the optimal objective values match the AMPL/GAMS/Python implementations to the cent.
+Expected objectives are documented in [Validation](../validation/index.md). All five LP files have been validated with CBC; the optimal objective values match the AMPL/GAMS/Python implementations numerically.
 
 ---
 

@@ -37,7 +37,7 @@ Files sharing a prefix belong to the same instance (for example, AMPL `02_harwoo
 
 ## Validation
 
-The LP files have been solved with CBC; objective values agree with the Python implementation and the AMPL and GAMS counterparts to the cent.
+The LP files have been solved with CBC; objective values agree numerically with the Python implementation and the AMPL and GAMS counterparts.
 
 | Instance | Optimal objective | Notes |
 |---|---|---|

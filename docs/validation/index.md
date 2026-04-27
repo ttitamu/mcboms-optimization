@@ -33,4 +33,4 @@ Each instance is reproducible via four routes:
 3. **GAMS** — `gams <instance>.gms` from `models/gams/`
 4. **Python** — `python run_harwood_validation.py` or `python examples/banihashemi_intersections.py`
 
-All four produce identical results to the cent.
+All four produce numerically identical results.

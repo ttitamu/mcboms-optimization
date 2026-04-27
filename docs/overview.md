@@ -39,7 +39,7 @@ The mathematical formulation is documented in detail in [MCBOMs Methodology](for
 
 The framework reproduces:
 
-- **Worked example** (Section 2.3.7): $1,493,914 net benefit at $1M budget — matches arithmetic to the cent
+- **Worked example** (Section 2.3.7): $1,493,914 net benefit at $1M budget — matches the manual arithmetic to within numerical precision
 - **Harwood (2003) at $50M**: $6,159,512 net benefit — matches Harwood Table 4 within $5 rounding, all 10 site selections match exactly
 - **Harwood (2003) at $10M**: $4,931,520 — 5.5% higher than Harwood's published $4,675,033 because the MCBOMs prototype does not implement the Penalty for Not Resurfacing (PNR) mechanism. Harwood does not publish per-site PNR values, and Banihashemi (2007) also omits PNR. Documented in Section 2.7.3.
 - **Banihashemi (2007) intersection sub-problem**: structural validation. Int 12:LTL identified as most cost-effective (B/C ≈ 11.5), signalization at Int 3 and Int 4 correctly rejected, rank ordering of LTL improvements consistent with Banihashemi Table 5.

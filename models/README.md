@@ -113,7 +113,7 @@ gurobi_cl 02_harwood_50m.lp
 | `02_harwood_10m` | $4,931,520 | 5.5% above Harwood's published $4,675,033 (no PNR; documented in Chapter 2 Section 2.7.3) |
 | `03_banihashemi_intersections` | varies by budget | Int 12:LTL is most cost-effective (B/C ≈ 11.5) |
 
-The LP files have been validated by solving with CBC; the optimal objective values match the Python implementation to the cent.
+The LP files have been validated by solving with CBC; the optimal objective values match the Python implementation numerically.
 
 ## Data scope
 

@@ -105,4 +105,4 @@ This is the only validation instance where MCBOMs implements the safety benefit 
 - Single-CMF application
 - Multi-CMF multiplicative combination
 - PWF computation across discount rates and horizons
-- Reproduction of the worked example to the cent
+- Reproduces the worked example to within numerical precision
