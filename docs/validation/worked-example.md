@@ -69,8 +69,4 @@ pytest tests/test_safety.py -v
 
 Sixteen tests pass, including the worked example reproduction.
 
-## Why this validation matters
-
-The worked example is the only validation instance where MCBOMs implements the safety benefit chain end-to-end from raw severity inputs all the way through to the optimization. The Harwood instance uses paper-aggregated PSB values (because Harwood does not publish per-severity data); the Banihashemi instance uses a different methodology (IHSDM CPM rather than HSM).
-
-For a reviewer asking "does the safety benefit equation work as written?", this is the file to point to.
+The worked example is the only validation instance where MCBOMs implements the safety benefit chain end-to-end from raw severity inputs through to the optimization. The Harwood instance uses paper-aggregated PSB values; the Banihashemi instance uses IHSDM CPM rather than HSM.
