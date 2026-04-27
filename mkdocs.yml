@@ -97,6 +97,7 @@ nav:
       - AMPL: models/ampl.md
       - GAMS: models/gams.md
       - LP Format: models/lp.md
+      - Excel: models/excel/index.md
   - Validation:
       - validation/index.md
       - Worked Example: validation/worked-example.md

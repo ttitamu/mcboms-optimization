@@ -56,17 +56,18 @@ The framework builds on Harwood, Rabbani, and Richard (2003) and Banihashemi (20
 
 ---
 
-## Three forms of the same mathematics
+## Four forms of the same mathematics
 
-MCBOMs is mathematically a single optimization model. That single model is expressed in three forms in this repository, each suited to a different audience:
+MCBOMs is mathematically a single optimization model. That single model is expressed in four forms in this repository, each suited to a different audience:
 
 | Form | Where it lives | Best for |
 |---|---|---|
 | **Formal mathematical specification** | [MCBOMs Methodology (PDF)](formulation/methodology.md) | Reading the math; auditing the formulation; citing in reports |
 | **Solver-language models** (AMPL, GAMS, LP) | [`models/`](models/index.md) | Running the validation in CPLEX, Gurobi, or any commercial MILP solver |
 | **Python implementation** | [`src/mcboms/`](python/index.md) | Programmatic use, custom data integration, building extensions |
+| **Excel workbooks** | [`models/excel/`](models/excel/index.md) | Reviewers and analysts who want to inspect and re-run the model in Excel without installing software |
 
-These three forms produce numerically identical results. A reviewer who works in classical optimization software does not need to install or run Python.
+These four forms produce numerically identical results. A reviewer who works in classical optimization software does not need to install or run Python; a reviewer who prefers Excel does not need to install or run a commercial solver.
 
 ---
 

@@ -1,6 +1,6 @@
 # Mathematical Models
 
-The `models/` directory contains the MCBOMs formulation in three solver-language representations: AMPL, GAMS, and the LP file format. These files are the formal model definitions; the Python implementation in `src/mcboms/` is a parallel access path that calls the same mathematics through Gurobi.
+The `models/` directory contains the MCBOMs formulation in four representations: AMPL, GAMS, the LP file format, and Microsoft Excel workbooks. These files are the formal model definitions; the Python implementation in `src/mcboms/` is a parallel access path that calls the same mathematics through Gurobi.
 
 Each format page below renders every file inline with a download button. The full source is visible without leaving the documentation site.
 
@@ -17,7 +17,7 @@ Files use a numeric prefix to indicate the tier of the instance:
 
 Files sharing a prefix belong to the same instance (for example, AMPL `02_harwood.mod` + `02_harwood_50m.dat` + `02_harwood_50m.run`).
 
-## Three formats, one mathematics
+## Four formats, one mathematics
 
 <div class="grid cards" markdown>
 
@@ -33,11 +33,15 @@ Files sharing a prefix belong to the same instance (for example, AMPL `02_harwoo
 
     Solver-native flat text. No symbolic expressions; the constraint matrix is fully expanded into numeric coefficients. Compatible with CPLEX, Gurobi, CBC, and any solver that reads the standard LP format.
 
+-   **[Excel Workbooks](excel/index.md)**
+
+    Self-contained `.xlsx` files solved using the Solver add-in built into Microsoft Excel. Each workbook includes the input data, the optimization model, and a setup panel that walks the reviewer through entering the Solver constraints. No Python installation, no commercial solver license required.
+
 </div>
 
 ## Validation
 
-The LP files have been solved with CBC; objective values agree numerically with the Python implementation and the AMPL and GAMS counterparts.
+The LP files have been solved with CBC; objective values agree numerically with the Python implementation, the AMPL and GAMS counterparts, and the Excel workbooks.
 
 | Instance | Optimal objective | Notes |
 |---|---|---|
