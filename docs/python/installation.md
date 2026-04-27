@@ -4,11 +4,12 @@ The framework can be installed locally on any machine with Python 3.11+, or exec
 
 ## Browser execution via Colab
 
-The two reference notebooks are linked below. Each is self-contained — the first cell pulls the framework from this repository, the remaining cells run a complete case.
+The three reference notebooks are linked below. Each is self-contained — the first cell pulls the framework from this repository, the remaining cells run a complete case.
 
 <div class="run-on-colab" markdown>
-[:simple-googlecolab: &nbsp; Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button }
-[:simple-googlecolab: &nbsp; Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button .colab-button }
+[:simple-googlecolab: &nbsp; Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button target="_blank" rel="noopener" }
+[:simple-googlecolab: &nbsp; Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button .colab-button target="_blank" rel="noopener" }
+[:simple-googlecolab: &nbsp; Optimizer capabilities](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/03_optimizer_capabilities.ipynb){ .md-button .colab-button target="_blank" rel="noopener" }
 </div>
 
 ## Install locally

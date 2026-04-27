@@ -4,14 +4,15 @@ The Python code is organized as a standard Python package under `src/mcboms/`. T
 
 ## Interactive examples
 
-Two notebooks accompany this codebase. Each is self-contained: it pulls the framework from this repository, runs an end-to-end case, and prints a result that can be checked against a published reference.
+Three notebooks accompany this codebase. Each is self-contained: it pulls the framework from this repository, runs an end-to-end case, and prints a result that can be checked against a reference value.
 
 <div class="run-on-colab" markdown>
-[:simple-googlecolab: &nbsp; Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button }
-[:simple-googlecolab: &nbsp; Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button .colab-button }
+[:simple-googlecolab: &nbsp; Worked example](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button target="_blank" rel="noopener" }
+[:simple-googlecolab: &nbsp; Harwood case study](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/02_harwood_50m.ipynb){ .md-button .colab-button target="_blank" rel="noopener" }
+[:simple-googlecolab: &nbsp; Optimizer capabilities](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/03_optimizer_capabilities.ipynb){ .md-button .colab-button target="_blank" rel="noopener" }
 </div>
 
-The first notebook derives the safety benefit for a single rural two-lane segment from KABCO crash counts and unit costs, then verifies that the optimizer reproduces the manual derivation. The second reproduces Harwood et al. (2003) at the $50M unconstrained budget and compares the result against the published Table 4 values.
+The first notebook derives the safety benefit for a single rural two-lane segment from KABCO crash counts and unit costs, then verifies that the optimizer reproduces the manual derivation. The second reproduces Harwood et al. (2003) at the $50M unconstrained budget and compares against published Table 4 values. The third is a synthetic 6-site network that exercises every optional constraint type — dependencies, conflicts, minimum BCR, facility-type sub-budgets, regional caps, and regional floors — to demonstrate the optimizer's full capability surface.
 
 ---
 
@@ -64,8 +65,7 @@ The constructor accepts the following optional constraints, each activated only 
 When optional kwargs are not provided, the corresponding constraints are inactive — the same class handles project-level-only and full network-level cases. The methodology PDF gives the formal mathematical statement of each constraint with its equation number.
 
 <div class="action-buttons" markdown>
-[:material-download: &nbsp; Download `optimizer.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/core/optimizer.py){ .md-button .file-button }
-[:simple-googlecolab: &nbsp; Open in Colab](https://colab.research.google.com/github/ttitamu/mcboms-optimization/blob/main/notebooks/01_worked_example.ipynb){ .md-button .colab-button }
+[:material-download: &nbsp; Download `optimizer.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/core/optimizer.py){ .md-button .file-button target="_blank" rel="noopener" }
 </div>
 
 ??? abstract "View source: optimizer.py"
@@ -75,7 +75,7 @@ When optional kwargs are not provided, the corresponding constraints are inactiv
 
 ### `alternatives.py` — alternative enumeration helpers
 
-[:material-download: Download `alternatives.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/core/alternatives.py){ .md-button .file-button }
+[:material-download: Download `alternatives.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/core/alternatives.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: alternatives.py"
     ```python
@@ -103,7 +103,7 @@ This package houses the three benefit-equation implementations.
 
 Computes the present-value safety benefit from per-severity inputs. Validated against the worked example to the cent.
 
-[:material-download: Download `safety.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/benefits/safety.py){ .md-button .file-button }
+[:material-download: Download `safety.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/benefits/safety.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: safety.py"
     ```python
@@ -114,7 +114,7 @@ Computes the present-value safety benefit from per-severity inputs. Validated ag
 
 Travel-time savings and vehicle-operating-cost reductions, summed across vehicle classes and converted to present value. USDOT BCA May 2025 default unit values for value of time, occupancy, and operating cost. Component functions for each term, an aggregator over vehicle classes, a convenience helper for the single-passenger-class case, and a DataFrame batch interface.
 
-[:material-download: Download `operations.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/benefits/operations.py){ .md-button .file-button }
+[:material-download: Download `operations.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/benefits/operations.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: operations.py"
     ```python
@@ -125,7 +125,7 @@ Travel-time savings and vehicle-operating-cost reductions, summed across vehicle
 
 Corridor Condition Measures across five categories: energy, emissions, accessibility, resilience, and pavement / asset condition. Per-category monetization functions and a top-level aggregator with explicit double-counting prevention against `operations.py` (the accessibility category overlaps with the operational benefit's mobility component). Default unit values from USDOT BCA May 2025, EPA Social Cost of Carbon, and FEMA Standard Economic Values v13.
 
-[:material-download: Download `ccm.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/benefits/ccm.py){ .md-button .file-button }
+[:material-download: Download `ccm.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/benefits/ccm.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: ccm.py"
     ```python
@@ -145,7 +145,7 @@ Input/output modules for reading data files and writing results.
 
 ### `readers.py` — generic CSV readers
 
-[:material-download: Download `readers.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/io/readers.py){ .md-button .file-button }
+[:material-download: Download `readers.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/io/readers.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: readers.py"
     ```python
@@ -154,7 +154,7 @@ Input/output modules for reading data files and writing results.
 
 ### `writers.py` — results output
 
-[:material-download: Download `writers.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/io/writers.py){ .md-button .file-button }
+[:material-download: Download `writers.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/io/writers.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: writers.py"
     ```python
@@ -165,7 +165,7 @@ Input/output modules for reading data files and writing results.
 
 Imports the parallel TTI BCA Excel workbook, reconstructs its per-segment safety benefit using `safety.py`, and converts the segment data to the optimizer's `SafetySegment` format. Used to reconcile the workbook's precomputed values against this codebase's implementation.
 
-[:material-download: Download `bca_workbook.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/io/bca_workbook.py){ .md-button .file-button }
+[:material-download: Download `bca_workbook.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/io/bca_workbook.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: bca_workbook.py"
     ```python
@@ -185,7 +185,7 @@ Imports the parallel TTI BCA Excel workbook, reconstructs its per-segment safety
 
 PWF computation, USDOT BCA May 2025 default unit costs (crash costs, value of time, vehicle operating cost). Every value is documented with its source in the file.
 
-[:material-download: Download `economics.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/utils/economics.py){ .md-button .file-button }
+[:material-download: Download `economics.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/utils/economics.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: economics.py"
     ```python
@@ -205,7 +205,7 @@ PWF computation, USDOT BCA May 2025 default unit costs (crash costs, value of ti
 
 Returns a DataFrame of 21 alternatives across 10 sites with all the published cost and benefit components.
 
-[:material-download: Download `harwood_alternatives.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/data/harwood_alternatives.py){ .md-button .file-button }
+[:material-download: Download `harwood_alternatives.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/src/mcboms/data/harwood_alternatives.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: harwood_alternatives.py"
     ```python
@@ -230,7 +230,7 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 
 ### `test_harwood_validation.py` — Harwood reproduction tests
 
-[:material-download: Download `test_harwood_validation.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_harwood_validation.py){ .md-button .file-button }
+[:material-download: Download `test_harwood_validation.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_harwood_validation.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: test_harwood_validation.py"
     ```python
@@ -239,7 +239,7 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 
 ### `test_safety.py` — safety module unit tests
 
-[:material-download: Download `test_safety.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_safety.py){ .md-button .file-button }
+[:material-download: Download `test_safety.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_safety.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: test_safety.py"
     ```python
@@ -248,7 +248,7 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 
 ### `test_operations.py` — operations module unit tests
 
-[:material-download: Download `test_operations.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_operations.py){ .md-button .file-button }
+[:material-download: Download `test_operations.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_operations.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: test_operations.py"
     ```python
@@ -257,7 +257,7 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 
 ### `test_ccm.py` — CCM module unit tests
 
-[:material-download: Download `test_ccm.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_ccm.py){ .md-button .file-button }
+[:material-download: Download `test_ccm.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_ccm.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: test_ccm.py"
     ```python
@@ -266,7 +266,7 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 
 ### `test_optimizer_constraints.py` — optional and network constraint tests
 
-[:material-download: Download `test_optimizer_constraints.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_optimizer_constraints.py){ .md-button .file-button }
+[:material-download: Download `test_optimizer_constraints.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/tests/test_optimizer_constraints.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: test_optimizer_constraints.py"
     ```python
@@ -281,7 +281,7 @@ Returns a DataFrame of 21 alternatives across 10 sites with all the published co
 
 Runs both Level 2a (rigorous $50M check) and Level 2b (documented $10M divergence). Prints a complete validation summary.
 
-[:material-download: Download `run_harwood_validation.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/run_harwood_validation.py){ .md-button .file-button }
+[:material-download: Download `run_harwood_validation.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/run_harwood_validation.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: run_harwood_validation.py"
     ```python
@@ -292,7 +292,7 @@ Runs both Level 2a (rigorous $50M check) and Level 2b (documented $10M divergenc
 
 Builds the alternative table from raw IHSDM CPM inputs, runs the optimizer at the unconstrained budget, prints the structural results.
 
-[:material-download: Download `banihashemi_intersections.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/examples/banihashemi_intersections.py){ .md-button .file-button }
+[:material-download: Download `banihashemi_intersections.py`](https://github.com/ttitamu/mcboms-optimization/raw/main/examples/banihashemi_intersections.py){ .md-button .file-button target="_blank" rel="noopener" }
 
 ??? abstract "View source: banihashemi_intersections.py"
     ```python
