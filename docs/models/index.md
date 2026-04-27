@@ -35,7 +35,7 @@ Files sharing a prefix belong to the same instance (for example, AMPL `02_harwoo
 
 -   **[Excel Workbooks](excel/index.md)**
 
-    Self-contained `.xlsx` files solved using the Solver add-in built into Microsoft Excel. Each workbook includes the input data, the optimization model, and a setup panel that walks the reviewer through entering the Solver constraints. No Python installation, no commercial solver license required.
+    Self-contained `.xlsx` files solved using Excel's built-in Solver add-in. Each workbook includes the input data, optimization model, and Solver setup on a single sheet.
 
 </div>
 

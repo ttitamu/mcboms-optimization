@@ -65,9 +65,9 @@ MCBOMs is mathematically a single optimization model. That single model is expre
 | **Formal mathematical specification** | [MCBOMs Methodology (PDF)](formulation/methodology.md) | Reading the math; auditing the formulation; citing in reports |
 | **Solver-language models** (AMPL, GAMS, LP) | [`models/`](models/index.md) | Running the validation in CPLEX, Gurobi, or any commercial MILP solver |
 | **Python implementation** | [`src/mcboms/`](python/index.md) | Programmatic use, custom data integration, building extensions |
-| **Excel workbooks** | [`models/excel/`](models/excel/index.md) | Reviewers and analysts who want to inspect and re-run the model in Excel without installing software |
+| **Excel workbooks** | [`models/excel/`](models/excel/index.md) | Inspection and review in Excel without external software |
 
-These four forms produce numerically identical results. A reviewer who works in classical optimization software does not need to install or run Python; a reviewer who prefers Excel does not need to install or run a commercial solver.
+These four forms produce numerically identical results. A reviewer can choose the form that matches their existing tooling.
 
 ---
 
