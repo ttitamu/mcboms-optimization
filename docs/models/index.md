@@ -70,15 +70,3 @@ Adding a new benefit category, constraint type, or validation case requires upda
 **LP** — LP files are generated from AMPL or Python rather than hand-edited. To add a new LP file, write the model in AMPL (or Python with PuLP) and export to LP format.
 
 **Excel** — workbooks are tied to specific validation cases. Adding a new workbook means creating a new validation case (data, expected answer, README, optimization sheet) rather than extending an existing one. Use `01_worked_example.xlsx` as a template for small instances or `02_harwood_50m.xlsx` for larger ones.
-
-## Extending
-
-Adding a new benefit category, constraint type, or validation case requires updates across the implementations. Start with the math (Methodology document), then propagate to each form:
-
-**AMPL** — edit `models/ampl/00_optimization.mod` for new constraints, or create a new `.mod` file for a new instance. Add the corresponding `.dat` and `.run` files.
-
-**GAMS** — mirror AMPL changes in `models/gams/00_optimization.gms` or in a new instance file. The two solver languages have parallel structure, so AMPL and GAMS edits are usually one-to-one.
-
-**LP** — LP files are generated from AMPL or Python rather than hand-edited. To add a new LP file, write the model in AMPL (or Python with PuLP) and export to LP format.
-
-**Excel** — workbooks are tied to specific validation cases. Adding a new workbook means creating a new validation case (data, expected answer, README, optimization sheet) rather than extending an existing one. Use `01_worked_example.xlsx` as a template for small instances or `02_harwood_50m.xlsx` for larger ones.
