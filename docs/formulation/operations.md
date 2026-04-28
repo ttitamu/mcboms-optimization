@@ -65,4 +65,4 @@ The Python module exposes the equation through several entry points:
 
 Default unit values follow USDOT BCA Guidance May 2025: VOT $21.10/person-hour (all purposes), occupancy 1.52 (passenger), VOC $0.56/vehicle-mile (light-duty).
 
-The AMPL and GAMS solver-language files declare the same equation in parametric form. The LP files have evaluated coefficients with the derivation in header comments.
+The AMPL and GAMS solver-language files declare the same equation in parametric form. The LP files have evaluated coefficients with the derivation in header comments. The Excel workbooks in `docs/models/excel/` solve the same model via Excel's Solver add-in.

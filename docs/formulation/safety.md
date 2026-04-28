@@ -96,6 +96,7 @@ This is the only validation instance where MCBOMs implements the safety benefit 
 - **AMPL** (full chain): `models/ampl/01_worked_example.mod` declares severity proportions, unit costs, CMF, and the full safety-benefit chain as parametric expressions
 - **GAMS** (full chain): `models/gams/01_worked_example.gms`
 - **LP**: `models/lp/01_worked_example.lp` carries the evaluated coefficient ($1,493,914 net at $1M budget) with header comments showing the derivation
+- **Excel**: `docs/models/excel/01_worked_example.xlsx` solves the same model via Excel's Solver add-in
 
 ## Tests
 

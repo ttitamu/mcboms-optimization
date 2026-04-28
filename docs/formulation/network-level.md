@@ -50,8 +50,8 @@ When facility-type and regional constraints are both active, they may interact r
 
 The network-level constraints are declared in the abstract optimization model file and activated by populating the corresponding sets in the data file:
 
-- AMPL: `models/ampl/00_optimization.mod` declares all 10 constraints
+- AMPL: `models/ampl/00_optimization.mod` declares the project-level and network-level constraints
 - GAMS: `models/gams/00_optimization.gms` mirrors the same structure
 - LP: not represented symbolically (LP is a flat numeric form)
 
-The current validation case studies (Harwood, Banihashemi worked example, Banihashemi intersection sub-problem) do not exercise these constraints. They are part of the formulation framework and will be tested when an agency provides a use case requiring them.
+The current validation case studies (the worked example, Harwood (2003), and the Banihashemi (2007) sub-problem) do not exercise these constraints. They are part of the formulation framework and will be tested when an agency provides a use case requiring them.

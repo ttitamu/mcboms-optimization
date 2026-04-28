@@ -34,7 +34,7 @@ The key equations are also rendered directly on this site:
 - [Operational Benefit](operations.md) — covers Section 2.4
 - [Corridor Condition Benefit](ccm.md) — covers Section 2.5
 
-For formal proofs, derivations, and the full validation discussion, refer to the PDF above.
+For the full mathematical exposition and validation discussion, refer to the PDF above.
 
 ## Citation
 

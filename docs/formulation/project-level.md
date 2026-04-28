@@ -104,7 +104,8 @@ This formulation is implemented in:
 
 - [AMPL](../models/ampl.md) — `models/ampl/00_optimization.mod`
 - [GAMS](../models/gams.md) — `models/gams/00_optimization.gms`
-- [LP](../models/lp.md) — `models/lp/00_optimization.lp` (with illustrative example since LP is numeric-only)
+- [LP](../models/lp.md) — `models/lp/00_optimization.lp`
+- [Excel](../models/excel/index.md) — Solver-based workbooks in `docs/models/excel/`
 - [Python](../python/architecture.md) — `src/mcboms/core/optimizer.py`
 
-All four produce identical numerical results.
+All five produce identical numerical results.

@@ -32,13 +32,13 @@ Where:
 
 ## Double-counting prevention
 
-The framework includes mathematical protocols to prevent double-counting between CCM categories and the safety/operations modules. For example, mobility energy productivity (MEP) embeds travel-time components that overlap with operational benefits. The combined formulation enforces:
+The framework includes a runtime check that guards against double-counting between CCM categories and the safety/operations modules. For example, mobility energy productivity (MEP) embeds travel-time components that overlap with operational benefits. The intent is that the operations and CCM-MEP benefit sets remain disjoint:
 
 $$
 B_{ij}^{\mathrm{operations}} \cap B_{ij}^{\mathrm{corridor, MEP}} = \emptyset
 $$
 
-This is documented in Section 2.5.4.
+The Python aggregator enforces this by raising an error when potential overlap is detected unless the user explicitly confirms they have handled it. This is documented in Section 2.5.4.
 
 ## Implementation
 
