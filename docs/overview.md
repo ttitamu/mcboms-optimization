@@ -22,6 +22,17 @@ MCBOMs builds directly on three established frameworks:
 
 Default unit costs and economic parameters come from **USDOT Benefit-Cost Analysis Guidance for Discretionary Grant Programs (May 2025)**.
 
+## Validation summary
+
+| Instance | Optimal objective | Status |
+|---|---|---|
+| Worked example | $1,493,914 | Matches Section 2.3.7 |
+| Harwood $50M | $6,159,512 | Matches Harwood Table 4 within $5 |
+| Harwood $10M | $4,931,520 | +5.5% above Harwood (no PNR; documented) |
+| Banihashemi sub-problem | $5,177,251 | Structural validation passes |
+
+Full details, including the explanation of the $10M divergence from Harwood's published value, are on the [Validation](validation/index.md) page.
+
 ## Repository structure
 
 | Folder | What it contains |
@@ -34,17 +45,6 @@ Default unit costs and economic parameters come from **USDOT Benefit-Cost Analys
 | `notebooks/` | Jupyter notebooks |
 
 The mathematical formulation is documented in detail in [MCBOMs Methodology](formulation/methodology.md).
-
-## Validation status
-
-The framework reproduces:
-
-- **Worked example** (Section 2.3.7): $1,493,914 net benefit at $1M budget — matches the manual arithmetic to within numerical precision
-- **Harwood (2003) at $50M**: $6,159,512 net benefit — matches Harwood Table 4 within $5 rounding, all 10 site selections match exactly
-- **Harwood (2003) at $10M**: $4,931,520 — 5.5% higher than Harwood's published $4,675,033 because the MCBOMs prototype does not implement the Penalty for Not Resurfacing (PNR) mechanism. Harwood does not publish per-site PNR values, and Banihashemi (2007) also omits PNR. Documented in Section 2.7.3.
-- **Banihashemi (2007) intersection sub-problem**: structural validation. Int 12:LTL identified as most cost-effective (B/C ≈ 11.5), signalization at Int 3 and Int 4 correctly rejected, rank ordering of LTL improvements consistent with Banihashemi Table 5.
-
-See [Scope of this prototype](reference/status.md) for the validated benchmarks and the framework features ready for agency-specific use cases.
 
 ## Institutional context
 
