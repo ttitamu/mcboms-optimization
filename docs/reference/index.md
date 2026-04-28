@@ -18,7 +18,11 @@
 
     Definitions of acronyms and domain terms (RRR, RSRAP, IHSDM, KABCO, PWF, AMF/CMF, etc.).
 
--   **[References](references.md)**
+-   **Methodology Notes**
+
+    Detailed methodology references for the validation case studies: [Harwood (2003)](harwood-methodology.md) and [Banihashemi (2007)](banihashemi-methodology.md).
+
+-   **[Bibliography](bibliography.md)**
 
     Full bibliography for the methodological foundation.
 
