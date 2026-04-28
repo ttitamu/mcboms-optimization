@@ -1,6 +1,12 @@
 # Multidisciplinary Cost-Benefit Optimization Models (MCBOMs)
 
-A mixed-integer linear programming framework for transportation infrastructure investment decisions, integrating safety, operations, and corridor condition measures into a single optimization model. Builds directly on Harwood, Rabbani, and Richard (2003) and Banihashemi (2007), parameterized with USDOT Benefit-Cost Analysis Guidance values. Developed at the Texas A&M Transportation Institute under FHWA Contract HRSO20240009PR. [Read the full overview →](overview.md)
+A mixed-integer linear programming framework for transportation infrastructure investment decisions. Integrates safety, operations, and corridor condition measures into a single optimization model.
+
+Builds directly on Harwood, Rabbani, and Richard (2003) and Banihashemi (2007), parameterized with USDOT Benefit-Cost Analysis Guidance values.
+
+Developed at the Texas A&M Transportation Institute under FHWA Contract HRSO20240009PR.
+
+[Read the full overview →](overview.md)
 
 ---
 
