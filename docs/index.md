@@ -20,7 +20,7 @@ A mixed-integer linear programming framework for transportation infrastructure i
 
     ---
 
-    The `models/` folder contains the MILP in three solver-language formats (AMPL, GAMS, LP) plus Microsoft Excel workbooks. Use AMPL/GAMS/LP directly in CPLEX, Gurobi, or any commercial MILP solver. Excel uses its built-in Solver add-in. No Python required.
+    AMPL, GAMS, and LP files for commercial MILP solvers, plus Microsoft Excel workbooks.
 
     [:octicons-arrow-right-24: View the models](models/index.md)
 
