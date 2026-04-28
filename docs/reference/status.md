@@ -6,7 +6,7 @@ The current prototype is implemented and validated for the rural two-lane highwa
 
 | Benchmark | What it validates | Result |
 |---|---|---|
-| Worked example | The full safety-benefit chain end-to-end on a single segment, from raw per-severity inputs through the optimization | Arithmetic matches the methodology document to within numerical precision in Python and in all three solver-language formats (AMPL, GAMS, LP) |
+| Worked example | The full safety-benefit chain end-to-end on a single segment, from raw per-severity inputs through the optimization | Arithmetic matches the methodology document to within numerical precision across the framework's implementations |
 | Harwood (2003) at $50M | The optimization layer reproduces a published case study at the unconstrained budget | All four rigorous metrics match Harwood Table 4 within rounding tolerance; all ten site selections match exactly |
 | Harwood (2003) at $10M | The optimization layer at a tight budget where alternative selection becomes binding | The MCBOMs solution has higher net benefit than the published Harwood result because the PNR deferral-cost mechanism is not part of the framework; the divergence is documented and explained |
 | Banihashemi (2007) intersection sub-problem | The IHSDM Crash Prediction Module path for intersections | Structural validation passes; rank ordering of left-turn-lane improvements is consistent with the published case |

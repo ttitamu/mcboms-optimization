@@ -88,7 +88,7 @@ $$
 B^{\mathrm{safety, PV}} = \$211{,}810 \cdot 10.594 = \$2{,}243{,}914
 $$
 
-This is the only validation instance where MCBOMs implements the safety benefit equation end-to-end from raw severity inputs. See [Worked Example validation](../validation/worked-example.md) for the full reproduction across all three solver formats.
+This is the only validation instance where MCBOMs implements the safety benefit equation end-to-end from raw severity inputs. See [Worked Example validation](../validation/worked-example.md) for the full reproduction across the framework's implementations.
 
 ## Implementations
 

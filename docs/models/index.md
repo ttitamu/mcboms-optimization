@@ -58,3 +58,27 @@ The four tiers reach different levels of parametric detail, reflecting what the 
 - **`01_worked_example`** is fully parametric. Annual crash count, severity distribution, CMF, unit costs, and discount parameters are declared as named inputs in the model file. The full safety-benefit chain is therefore visible directly from the model.
 - **`03_banihashemi_intersections`** is fully parametric for the IHSDM Crash Prediction Module. Per-intersection ADTs, skew angles, traffic control, left-turn-lane and intersection-sight-distance attributes, and delay times appear as inputs; the model computes expected annual crashes per the published prediction equation. AMF values follow the standard IHSDM and Vogt-Bared (1998) tables, since the Banihashemi paper does not publish per-alternative AMF values.
 - **`02_harwood_50m`** and **`02_harwood_10m`** use the per-site, per-alternative cost and benefit values published in Harwood (2003) Tables 2 and 3 directly. The original RSRAP tool computes PSB internally from per-severity AMFs, but only the aggregate values appear in the publication. The worked example tier provides a fully parametric demonstration of the safety chain that the Harwood instance does not require.
+
+## Extending
+
+Adding a new benefit category, constraint type, or validation case requires updates across the implementations. Start with the math (Methodology document), then propagate to each form:
+
+**AMPL** — edit `models/ampl/00_optimization.mod` for new constraints, or create a new `.mod` file for a new instance. Add the corresponding `.dat` and `.run` files.
+
+**GAMS** — mirror AMPL changes in `models/gams/00_optimization.gms` or in a new instance file. The two solver languages have parallel structure, so AMPL and GAMS edits are usually one-to-one.
+
+**LP** — LP files are generated from AMPL or Python rather than hand-edited. To add a new LP file, write the model in AMPL (or Python with PuLP) and export to LP format.
+
+**Excel** — workbooks are tied to specific validation cases. Adding a new workbook means creating a new validation case (data, expected answer, README, optimization sheet) rather than extending an existing one. Use `01_worked_example.xlsx` as a template for small instances or `02_harwood_50m.xlsx` for larger ones.
+
+## Extending
+
+Adding a new benefit category, constraint type, or validation case requires updates across the implementations. Start with the math (Methodology document), then propagate to each form:
+
+**AMPL** — edit `models/ampl/00_optimization.mod` for new constraints, or create a new `.mod` file for a new instance. Add the corresponding `.dat` and `.run` files.
+
+**GAMS** — mirror AMPL changes in `models/gams/00_optimization.gms` or in a new instance file. The two solver languages have parallel structure, so AMPL and GAMS edits are usually one-to-one.
+
+**LP** — LP files are generated from AMPL or Python rather than hand-edited. To add a new LP file, write the model in AMPL (or Python with PuLP) and export to LP format.
+
+**Excel** — workbooks are tied to specific validation cases. Adding a new workbook means creating a new validation case (data, expected answer, README, optimization sheet) rather than extending an existing one. Use `01_worked_example.xlsx` as a template for small instances or `02_harwood_50m.xlsx` for larger ones.

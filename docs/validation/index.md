@@ -1,6 +1,6 @@
 # Validation
 
-The MCBOMs framework is validated against three benchmarks. Each is reproducible from the repository — by running the AMPL/GAMS/LP files in `models/` or by running the Python scripts.
+The MCBOMs framework is validated against three benchmarks. Each is reproducible from the repository: run the AMPL/GAMS/LP files in `models/`, run the Python scripts, or open the Excel workbooks in `models/excel/`.
 
 <div class="grid cards" markdown>
 
