@@ -1,18 +1,14 @@
 # Mathematical Formulation
 
-The MCBOMs framework is a Mixed-Integer Linear Programming formulation that integrates safety, operational, and corridor condition benefits within a single optimization problem. The contribution is not the use of MILP itself — that has been standard in transportation investment literature since RSRAP (Harwood et al., 2003) — but in the explicit segment-level structure of project alternatives, the unified treatment of multiple benefit categories, and the use of preprocessing-based alternative enumeration to keep the problem solver-agnostic and globally optimal.
+The MCBOMs framework is a Mixed-Integer Linear Programming formulation that integrates safety, operational, and corridor condition benefits within a single optimization problem. The formulation builds on Harwood, Rabbani, and Richard (2003) and Banihashemi (2007), with three structural elements that the rest of this section documents.
 
-Three structural elements distinguish this formulation:
+**Segment-level alternative composition.** A project alternative is a composition of segment-specific treatments rather than a single uniform treatment applied to a whole site. Different homogeneous segments within the same project may receive different treatments under the same alternative. This is essential for the rural two-lane prototype, where treatments and crash propensities vary along a project's length.
 
-**Segment-level alternative composition.** A project alternative is not a single uniform treatment applied to a whole site. It is a composition of segment-specific treatments, where different homogeneous segments within the same project may receive different treatments under the same alternative. This generalization is essential for the rural two-lane prototype, where treatments and crash propensities vary along a project's length.
+**Multi-category benefit aggregation.** The total benefit is the sum of safety, operational, and corridor condition components, each computed from documented formulas with USDOT-recommended unit values. The framework's modular structure addresses double-counting between the operational and corridor condition modules, a real concern when energy productivity and travel time savings overlap.
 
-**Multi-category benefit aggregation.** The total benefit is the sum of safety, operational, and corridor condition components, each computed from raw inputs through documented formulas with USDOT-recommended unit values. The framework's modular structure prevents double-counting between the operational and corridor condition modules — a real concern when energy productivity and travel time savings overlap.
+**Preprocessing-based alternative enumeration.** Following Harwood (2003), MCBOMs enumerates feasible alternatives during preprocessing and presents each one as a single binary decision variable to the solver, rather than embedding combinatorial logic inside the optimization. This keeps the MILP linear and structurally simple while preserving the full combinatorial space of segment-level treatment choices.
 
-**Preprocessing-based alternative enumeration.** Rather than embedding combinatorial logic inside the optimization (which complicates the constraints and risks slow solver behavior on large problems), MCBOMs enumerates feasible alternatives during preprocessing and presents each one as a single binary decision variable to the solver. This keeps the MILP linear and structurally simple while preserving the full combinatorial space of segment-level treatment choices.
-
-## How this section is organized
-
-The pages below document the formulation in detail. Pages are intended to be read in order:
+## Section pages
 
 <div class="grid cards" markdown>
 
@@ -34,14 +30,14 @@ The pages below document the formulation in detail. Pages are intended to be rea
 
 -   **[Corridor Condition Benefit](ccm.md)**
 
-    Energy, emissions, accessibility, resilience, and pavement improvements. Per-category monetization with explicit double-counting prevention against the operational benefit.
+    Energy, emissions, accessibility, resilience, and pavement improvements. Per-category monetization with double-counting protocols against the operational benefit.
 
 -   **[MCBOMs Methodology (PDF)](methodology.md)**
 
-    The complete formulation in a single standalone document. Includes proofs, full validation discussion, and bibliography.
+    The complete formulation in a single standalone document, with full validation discussion.
 
 </div>
 
 ## Cross-referencing the methodology PDF
 
-Each equation in the methodology PDF carries a numeric label (e.g., the safety benefit equation appears as Eq 2.18). The same equations are rendered with the same labels on the formulation pages of this site, and on the AMPL, GAMS, and LP files in `models/`. This consistency lets readers move between the formal document, the rendered web pages, and the solver-readable code without losing track of which equation is which.
+The methodology PDF is the formal specification, with numbered equations and full validation discussion. The pages on this site present the same formulation in browser-readable form for reference.
