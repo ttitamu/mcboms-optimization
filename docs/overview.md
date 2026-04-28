@@ -46,6 +46,6 @@ The framework reproduces:
 
 See [Scope of this prototype](reference/status.md) for the validated benchmarks and the framework features ready for agency-specific use cases.
 
-## Who maintains this
+## Institutional context
 
-Texas A&M Transportation Institute, College Station, TX. For questions about MCBOMs methodology or implementation, contact TTI directly. For bugs or feature requests, [open a GitHub issue](https://github.com/ttitamu/mcboms-optimization/issues).
+Texas A&M Transportation Institute, College Station, TX. Developed under FHWA Contract HRSO20240009PR.
