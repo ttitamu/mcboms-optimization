@@ -18,7 +18,7 @@ External links open in a new tab.
 
 ## Safety performance methodology
 
-6. Vogt, A., & Bared, J. (1998). [*Accident Models for Two-Lane Rural Roads: Segments and Intersections*](https://highways.dot.gov/sites/fhwa.dot.gov/files/FHWA-RD-98-133.pdf){target="_blank" rel="noopener"}. FHWA-RD-98-133.
+6. Vogt, A., & Bared, J. (1998). [Accident models for two-lane rural segments and intersections](https://doi.org/10.3141/1635-03){target="_blank" rel="noopener"}. *Transportation Research Record*, 1635(1), 18–29. Long-form companion report: [*Accident Models for Two-Lane Rural Roads: Segments and Intersections*](https://highways.dot.gov/sites/fhwa.dot.gov/files/FHWA-RD-98-133.pdf){target="_blank" rel="noopener"}, FHWA-RD-98-133.
 
 7. Federal Highway Administration. (1999). [*Interactive Highway Safety Design Model: Crash Prediction Module*](https://www.fhwa.dot.gov/publications/research/safety/99207/index.cfm){target="_blank" rel="noopener"}, FHWA-RD-99-207.
 
