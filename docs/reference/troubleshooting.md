@@ -16,7 +16,7 @@ The optimization model includes optional and network-level constraints that are 
 
 ### Solver reports "infeasible" for an intersection sub-problem
 
-The default budget is $12M (effectively unconstrained for the intersection sub-problem). If you tightened the budget, check that it is positive and large enough to accommodate at least one improvement.
+The Banihashemi intersection notebook uses a budget of $1.3M, which is enough to accommodate the published improvements. If you tightened the budget below this and the solver reports infeasibility, increase the budget to at least the cost of the cheapest selectable alternative.
 
 ## Python-side issues
 
@@ -43,3 +43,21 @@ The Level 2a check failed. Run `pytest tests/test_harwood_validation.py -v` to s
 ### "Python was not found" or "command not found: python"
 
 Windows ships with a Microsoft Store stub at the `python` path that is not real Python. Install actual Python from [python.org](https://www.python.org/downloads/) and check the "Add Python to PATH" box during installation. Open a new terminal after installation.
+
+## Excel workbook issues
+
+### Solver does not appear on the Data tab
+
+Enable the Solver add-in: File → Options → Add-ins → Manage Excel Add-ins → Go, then check Solver Add-in. The same path works on Excel for Windows. On Excel for Mac, the menu is Tools → Excel Add-ins.
+
+### Excel for the web or Excel for Mac does not have Solver
+
+Solver is a desktop-only feature on Windows and Mac. The web and mobile versions of Excel do not include it. Open the workbook in desktop Excel to run the optimization.
+
+### Solver reports "Solver could not find a feasible solution"
+
+The constraints are inconsistent with the inputs. The most common cause is that the budget cell was changed below the cost of any selectable combination. Reset the budget to the value documented on the Optimization sheet's setup panel.
+
+### Solver runs but the Results sheet shows FAIL
+
+The match indicator on the Results sheet compares the Solver output against the published optimal value. If it shows FAIL, the Solver may have used the GRG Nonlinear or Evolutionary engines instead of Simplex LP. In the Solver dialog, check that "Solving Method" is set to "Simplex LP" before clicking Solve.
