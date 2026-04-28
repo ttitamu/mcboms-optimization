@@ -2,7 +2,7 @@
 
 The benchmark Harwood (2003) validation case. Ten sites, mix of rural and urban undivided/divided 2- and 4-lane nonfreeway facilities. Two budget levels: $50M and $10M.
 
-**Reference**: Harwood, D. W., Rabbani, E. R. K., & Richard, K. R. (2003). Systemwide optimization of safety improvements for resurfacing, restoration, or rehabilitation projects. *Transportation Research Record*, 1840(1), 148–157.
+**Reference**: Harwood, D. W., Rabbani, E. R. K., & Richard, K. R. (2003). [Systemwide optimization of safety improvements for resurfacing, restoration, or rehabilitation projects](https://doi.org/10.3141/1840-17){target="_blank" rel="noopener"}. *Transportation Research Record*, 1840(1), 148–157.
 
 ## Expected results at $50M
 

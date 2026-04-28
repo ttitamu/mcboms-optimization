@@ -1,6 +1,6 @@
 # Default Parameters
 
-The framework ships with USDOT Benefit-Cost Analysis Guidance for Discretionary Grant Programs (May 2025) default values. All values are in 2023 dollars unless noted otherwise.
+The framework ships with [USDOT Benefit-Cost Analysis Guidance for Discretionary Grant Programs (May 2025)](https://www.transportation.gov/sites/dot.gov/files/2024-11/Benefit%20Cost%20Analysis%20Guidance%202025%20Update%20%28Final%29.pdf){target="_blank" rel="noopener"} default values. All values are in 2023 dollars unless noted otherwise.
 
 ## Discounting
 
@@ -45,4 +45,4 @@ State agencies may override these with state-specific values.
 
 **In the Excel workbooks** — edit the parameter cells directly on the input sheet of each workbook in `docs/models/excel/`. The Solver setup will pick up the new values on the next run.
 
-For HSIP-context applications, FHWA-SA-25-021 (October 2025) documents a per-capita-income procedure for adjusting national crash costs to state-specific values.
+For HSIP-context applications, [FHWA-SA-25-021 (October 2025)](https://highways.dot.gov/sites/fhwa.dot.gov/files/2025-10/CrashCostFactSheet_508_OCT2025.pdf){target="_blank" rel="noopener"} documents a per-capita-income procedure for adjusting national crash costs to state-specific values.

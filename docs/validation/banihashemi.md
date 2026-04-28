@@ -2,7 +2,7 @@
 
 A 13-intersection sub-problem from Banihashemi's TRR 2019 paper. Each intersection has 2-5 alternatives covering left-turn-lane addition, traffic control changes, sight distance correction, and skew angle adjustment.
 
-**Reference**: Banihashemi, M. (2007). Optimization of highway safety and operation by using crash prediction models with accident modification factors. *Transportation Research Record*, 2019(1), 111–117.
+**Reference**: Banihashemi, M. (2007). [Optimization of highway safety and operation by using crash prediction models with accident modification factors](https://doi.org/10.3141/2019-14){target="_blank" rel="noopener"}. *Transportation Research Record*, 2019(1), 111–117.
 
 ## What's parametric
 

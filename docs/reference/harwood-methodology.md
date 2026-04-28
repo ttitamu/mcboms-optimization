@@ -4,7 +4,7 @@ This page documents the methodology of Harwood, Rabbani, and Richard (2003) in d
 
 ## Citation
 
-Harwood, D.W., Rabbani, E.R.K., and Richard, K.R. (2003). "Systemwide optimization of safety improvements for resurfacing, restoration, or rehabilitation projects." *Transportation Research Record* 1840, pp. 148–157.
+Harwood, D.W., Rabbani, E.R.K., and Richard, K.R. (2003). "[Systemwide optimization of safety improvements for resurfacing, restoration, or rehabilitation projects](https://doi.org/10.3141/1840-17){target="_blank" rel="noopener"}." *Transportation Research Record* 1840, pp. 148–157.
 
 ## Optimization formulation
 

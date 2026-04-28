@@ -4,7 +4,7 @@ This page documents the methodology of Banihashemi (2007) in detail, as a refere
 
 ## Citation
 
-Banihashemi, M. (2007). "Optimization of highway safety and operation by using crash prediction models with accident modification factors." *Transportation Research Record* 2019, pp. 108–118. DOI: 10.3141/2019-14.
+Banihashemi, M. (2007). "[Optimization of highway safety and operation by using crash prediction models with accident modification factors](https://doi.org/10.3141/2019-14){target="_blank" rel="noopener"}." *Transportation Research Record* 2019, pp. 108–118. DOI: [10.3141/2019-14](https://doi.org/10.3141/2019-14){target="_blank" rel="noopener"}.
 
 ## Optimization formulation
 
