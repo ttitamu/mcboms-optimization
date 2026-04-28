@@ -8,7 +8,7 @@ Harwood, D.W., Rabbani, E.R.K., and Richard, K.R. (2003). "Systemwide optimizati
 
 ## Optimization formulation
 
-### Objective function (Equation 4)
+#### Objective function (Equation 4)
 
 $$
 \max \quad TB = \sum_j \sum_k NB_{jk} \cdot X_{jk}
@@ -21,7 +21,7 @@ Where:
 - $k$ — alternative index at site $j$ ($0$ to $z$ alternatives)
 - $X_{jk}$ — binary decision variable ($1$ if selected, $0$ otherwise)
 
-### Net benefit equation (Equation 3)
+#### Net benefit equation (Equation 3)
 
 $$
 NB_{jk} = PSB_{jk} + PTOB_{jk} + PNR_{jk} - PRP_{jk} - CC_{jk}
@@ -35,7 +35,7 @@ Where:
 - $PRP_{jk}$ — penalty for resurfacing without safety improvements
 - $CC_{jk}$ — construction cost for alternative $k$ at site $j$
 
-### Constraints
+#### Constraints
 
 Mutual exclusivity (Equations 5–7) — exactly one alternative per site:
 
@@ -67,7 +67,7 @@ Where:
 - $AC_s$ — cost savings per accident reduced for severity level $s$
 - $(P/A, i, n)$ — uniform-series present worth factor, with $i = 4\%$ (AASHTO 1977 recommendation) and $n =$ service life (typically 20 years)
 
-### AMF interpretation
+#### AMF interpretation
 
 - $AMF = 1.0$ — base condition (no change)
 - $AMF < 1.0$ — safety improvement (crashes reduced)
@@ -89,7 +89,7 @@ Resurfacing cost enters the budget constraint but not the objective. From the pa
 
 This is the discretionary-versus-committed cost decomposition that MCBOMs follows.
 
-### Verification from Table 4 ($50M budget)
+#### Verification from Table 4 ($50M budget)
 
 | Component | Value |
 |---|---|
@@ -116,7 +116,7 @@ This is the discretionary-versus-committed cost decomposition that MCBOMs follow
 
 ## Published results (Table 4)
 
-### $50M budget (unconstrained)
+#### $50M budget (unconstrained)
 
 | Component | Value |
 |---|---|
@@ -130,7 +130,7 @@ This is the discretionary-versus-committed cost decomposition that MCBOMs follow
 | Penalty for not resurfacing (PNR) | $0 |
 | **Net benefit** | **$6,159,517** |
 
-### $10M budget (constrained)
+#### $10M budget (constrained)
 
 | Component | Value |
 |---|---|
@@ -160,14 +160,14 @@ The paper considers eight improvement types:
 
 ## Penalty terms (PNR and PRP)
 
-### Penalty for not resurfacing (PNR)
+#### Penalty for not resurfacing (PNR)
 
 - Applied only to the do-nothing alternative ($k = 0$)
 - Based on a percentage of pavement replacement cost
 - Increases as pavement gets closer to failure
 - Reflects avoided future reconstruction costs
 
-### Penalty for resurfacing without safety improvements (PRP)
+#### Penalty for resurfacing without safety improvements (PRP)
 
 - Applied when resurfacing without geometric improvements
 - Based on findings that resurfacing may increase speeds and short-term crashes
@@ -192,7 +192,7 @@ The paper only shows the **selected** alternatives in Tables 2 and 3. It does no
 - The specific AMFs used for each improvement type
 - The unit construction costs used
 
-To fully reproduce Harwood from raw inputs, an analyst would need to: implement RSRAP's cost calculation methodology, implement the AMF-based benefit calculation, calculate costs and benefits for all possible alternatives at each site, and then run the optimization. The MCBOMs validation uses Harwood's published per-site cost and benefit values for the selected alternatives directly, which is sufficient to verify that the MCBOMs optimizer reproduces the published selections at $50M.
+The MCBOMs validation uses Harwood's published per-site values for the selected alternatives directly. This verifies that the optimizer reproduces Harwood's site selections at $50M, but it does not test the cost-and-benefit calculation chain (RSRAP cost methodology, AMF-based benefit calculation) against Harwood's published totals. That chain is exercised separately in the worked example validation.
 
 ## MCBOMs validation against this case study
 
