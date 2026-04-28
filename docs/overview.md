@@ -27,7 +27,7 @@ Default unit costs and economic parameters come from **USDOT Benefit-Cost Analys
 | Folder | What it contains |
 |---|---|
 | `docs/` | This documentation site, plus the MCBOMs Methodology PDF specification |
-| `models/` | Solver-language mathematical models (AMPL, GAMS, LP) and Excel workbooks |
+| `models/` | Solver-language models (AMPL, GAMS, LP) and Excel workbooks |
 | `src/mcboms/` | Python implementation |
 | `tests/` | Test suite (32 tests) |
 | `examples/` | Reproducible Python examples |

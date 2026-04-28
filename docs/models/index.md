@@ -1,4 +1,4 @@
-# Mathematical Models
+# Solver Models
 
 The `models/` directory contains the MCBOMs formulation in four representations: AMPL, GAMS, the LP file format, and Microsoft Excel workbooks. These files are the formal model definitions; the Python implementation in `src/mcboms/` is a parallel access path that calls the same mathematics through Gurobi.
 

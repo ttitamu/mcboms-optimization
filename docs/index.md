@@ -16,7 +16,15 @@ A mixed-integer linear programming framework for transportation infrastructure i
 
     [:octicons-arrow-right-24: Read the formulation](formulation/index.md)
 
--   :material-format-list-bulleted-square:{ .lg .middle } **Solver-Language Models**
+-   :material-check-decagram:{ .lg .middle } **Validation**
+
+    ---
+
+    Three benchmarks: a worked example, Harwood (2003), and Banihashemi (2007). All three are reproducible from the repository.
+
+    [:octicons-arrow-right-24: See validation results](validation/index.md)
+
+-   :material-format-list-bulleted-square:{ .lg .middle } **Solver Models**
 
     ---
 
@@ -31,14 +39,6 @@ A mixed-integer linear programming framework for transportation infrastructure i
     Install the package, run the validation, integrate into a Python pipeline, or extend the framework with new benefit categories.
 
     [:octicons-arrow-right-24: Get started in Python](python/index.md)
-
--   :material-check-decagram:{ .lg .middle } **Validation**
-
-    ---
-
-    Three benchmarks: a worked example, Harwood (2003), and Banihashemi (2007). All three are reproducible from the repository.
-
-    [:octicons-arrow-right-24: See validation results](validation/index.md)
 
 </div>
 
